@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'chatv1.ui'
+# Form implementation generated from reading ui file './gui/VChat.ui'
 #
 # Created by: PyQt5 UI code generator 5.15.2
 #
@@ -47,15 +47,20 @@ class Ui_Form(object):
         self.label_friends.setGeometry(QtCore.QRect(600, 280, 72, 15))
         self.label_friends.setAlignment(QtCore.Qt.AlignCenter)
         self.label_friends.setObjectName("label_friends")
+        self.pushButton_2 = QtWidgets.QPushButton(Form)
+        self.pushButton_2.setGeometry(QtCore.QRect(450, 10, 93, 28))
+        self.pushButton_2.setObjectName("pushButton_2")
 
         self.retranslateUi(Form)
         self.pushButton.clicked.connect(Form.send_message)
+        self.pushButton_2.clicked.connect(Form.user_setting)
         QtCore.QMetaObject.connectSlotsByName(Form)
 
     def retranslateUi(self, Form):
         _translate = QtCore.QCoreApplication.translate
-        Form.setWindowTitle(_translate("Form", "沙口聊天室"))
+        Form.setWindowTitle(_translate("Form", "ShacoRoom"))
         self.pushButton.setText(_translate("Form", "发送"))
         self.label_username.setText(_translate("Form", "TextLabel"))
         self.label_friends.setText(_translate("Form", "好友列表"))
+        self.pushButton_2.setText(_translate("Form", "设置"))
 import resources_rc

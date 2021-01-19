@@ -11,10 +11,10 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>沙口聊天室</string>
+   <string>ShacoRoom</string>
   </property>
   <property name="windowIcon">
-   <iconset resource="resources.qrc">
+   <iconset>
     <normaloff>:/images/Shaco_Logo.jpg</normaloff>:/images/Shaco_Logo.jpg</iconset>
   </property>
   <widget class="QTextEdit" name="textEdit">
@@ -112,6 +112,19 @@
     <set>Qt::AlignCenter</set>
    </property>
   </widget>
+  <widget class="QPushButton" name="pushButton_2">
+   <property name="geometry">
+    <rect>
+     <x>450</x>
+     <y>10</y>
+     <width>93</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>设置</string>
+   </property>
+  </widget>
  </widget>
  <resources>
   <include location="resources.qrc"/>
@@ -133,8 +146,25 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>pushButton_2</sender>
+   <signal>clicked()</signal>
+   <receiver>Form</receiver>
+   <slot>user_setting()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>462</x>
+     <y>25</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>116</x>
+     <y>27</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>send_message()</slot>
+  <slot>user_setting()</slot>
  </slots>
 </ui>

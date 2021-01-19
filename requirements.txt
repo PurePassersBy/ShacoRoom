@@ -1,0 +1,4 @@
+PyQt5==5.15.2
+pyqt5-tools==5.15.2.3.0.1
+opencv-python==4.4.0.46
+PyAudio==0.2.11

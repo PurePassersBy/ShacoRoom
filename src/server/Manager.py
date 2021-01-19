@@ -17,7 +17,7 @@ class Command():
         return self._id
 
 
-class Server(threading.Thread):
+class Manager(threading.Thread):
     def __init__(self, address=('0.0.0.0',3976), max_connections = 20):
         super().__init__()
         self._addr = address
