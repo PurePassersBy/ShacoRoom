@@ -1,7 +1,8 @@
 import sys
+import shutil
 
 from PyQt5 import QtCore
-from PyQt5.QtWidgets import QWidget, QApplication
+from PyQt5.QtWidgets import QWidget, QApplication, QFileDialog
 
 from VSettings import Ui_Dialog
 
@@ -21,6 +22,14 @@ class SettingsGui(QWidget, Ui_Dialog):
         self.lineEdit_fav_comic.setText(self.favComic)
         if self.isKnow:
             self.checkBox_yes.setCheckState(QtCore.Qt.Checked)
+
+    def load_file(self):
+        file_name, file_type = QFileDialog.getOpenFileName(self, "选取文件", './',
+                                                           "图片文件 (*.jpg);;图片文件 (*.png)")
+        file_type = file_type[-4:-1]
+        #shutil.copyfile(file_name, './resource/xxx.'+file_type) # 唯一标识符命名存储头像
+        print(file_name)
+        print(file_type)
 
     def flush(self):
         self.graphicsView.setStyleSheet(f"border-image: url({self.portrait});")
