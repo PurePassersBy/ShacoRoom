@@ -7,6 +7,7 @@ from VSettings import Ui_Dialog
 
 
 class SettingsGui(QWidget, Ui_Dialog):
+    _signal = QtCore.pyqtSignal(dict)
     def __init__(self, user_name, portrait, fav_comic, is_know):
         super(SettingsGui, self).__init__()
         self.setupUi(self)
@@ -20,14 +21,23 @@ class SettingsGui(QWidget, Ui_Dialog):
         self.lineEdit_fav_comic.setText(self.favComic)
         if self.isKnow:
             self.checkBox_yes.setCheckState(QtCore.Qt.Checked)
-        else:
-            self.checkBox_no.setCheckState(QtCore.Qt.Checked)
+
+    def flush(self):
+        self.graphicsView.setStyleSheet(f"border-image: url({self.portrait});")
+        self.lineEdit_username.setText(self.userName)
+        self.lineEdit_fav_comic.setText(self.favComic)
+        if self.isKnow:
+            self.checkBox_yes.setCheckState(QtCore.Qt.Checked)
 
     def accept(self):
-        pass
+        dic = dict()
+        dic['user_name'] = self.lineEdit_username.text()
+        dic['fac_comic'] = self.lineEdit_fav_comic.text()
+        dic['is_know'] = bool(self.checkBox_yes.checkState())
+        self._signal.emit(dic)
 
     def reject(self):
-        pass
+        self.close()
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)

@@ -23,13 +23,20 @@ class ChatGUI(QWidget,Ui_Form):
         self.portrait = portrait
         self.favComic = fav_comic
         self.isKnow = is_know
-        self.userSettings = SettingsGui(self.userName, self.portrait, self.favComic, self.isKnow)
-
-        self.label_username.setText(self.userName)
-        self.graphicsView.setStyleSheet(f"border-image: url({self.portrait});")
+        self._flush()
 
         self.textEdit_msg_box.setReadOnly(True)
         self.textEdit.installEventFilter(self)
+
+    def _flush(self):
+        """
+        刷新用户信息
+        每次设置成功后调用
+        :return:
+        """
+        self.userSettings = SettingsGui(self.userName, self.portrait, self.favComic, self.isKnow)
+        self.label_username.setText(self.userName)
+        self.graphicsView.setStyleSheet(f"border-image: url({self.portrait});")
 
     def send_message(self):
         """
@@ -59,11 +66,33 @@ class ChatGUI(QWidget,Ui_Form):
         threading.Thread(target=self._close_label, args=(empty_info,)).start()
 
     def _close_label(self, label):
+        """
+        多线程提示（等待一秒）
+        :param label:
+        :return:
+        """
         sleep(1)
         label.close()
 
     def user_setting(self):
+        """
+        打开设置界面
+        :return:
+        """
+        self.userSettings.flush()
         self.userSettings.show()
+        self.userSettings._signal.connect(self._update)
+
+    def _update(self, params):
+        """
+        更新用户信息
+        :param params:
+        :return:
+        """
+        self.userName = params['user_name']
+        self.favComic = params['fac_comic']
+        self.isKnow = params['is_know']
+        self._flush()
 
     def eventFilter(self, obj, event):
         """
@@ -79,12 +108,6 @@ class ChatGUI(QWidget,Ui_Form):
                 return True  # 表示过滤此事件
 
         return False
-
-
-class Child(QWidget):
-    def __init__(self):
-        super().__init__()
-        self.setWindowTitle("我是子窗口啊")
 
 if __name__ == '__main__':
     app = QtWidgets.QApplication(sys.argv)
