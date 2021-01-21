@@ -24,6 +24,10 @@ class SettingsGui(QWidget, Ui_Dialog):
             self.checkBox_yes.setCheckState(QtCore.Qt.Checked)
 
     def load_file(self):
+        """
+        加载头像图片
+        :return:
+        """
         file_name, file_type = QFileDialog.getOpenFileName(self, "选取文件", './',
                                                            "图片文件 (*.jpg);;图片文件 (*.png)")
         file_type = file_type[-4:-1]
@@ -32,6 +36,10 @@ class SettingsGui(QWidget, Ui_Dialog):
         print(file_type)
 
     def flush(self):
+        """
+        刷新个人信息
+        :return:
+        """
         self.graphicsView.setStyleSheet(f"border-image: url({self.portrait});")
         self.lineEdit_username.setText(self.userName)
         self.lineEdit_fav_comic.setText(self.favComic)
@@ -39,6 +47,10 @@ class SettingsGui(QWidget, Ui_Dialog):
             self.checkBox_yes.setCheckState(QtCore.Qt.Checked)
 
     def accept(self):
+        """
+        成功修改个人设置
+        :return:
+        """
         dic = dict()
         dic['user_name'] = self.lineEdit_username.text()
         dic['fac_comic'] = self.lineEdit_fav_comic.text()
