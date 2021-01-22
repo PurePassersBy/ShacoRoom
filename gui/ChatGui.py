@@ -7,15 +7,12 @@ from PyQt5.QtGui import QPixmap, QIcon, QTextCursor
 from PyQt5 import QtWidgets, QtCore
 from PyQt5.QtWidgets import QLabel, QMessageBox, QWidget
 
-from gui.VChat import Ui_Form
-from gui.SettingsGui import SettingsGui
+from VChat import Ui_Form
+from SettingsGui import SettingsGui
 
 SERVER_ADDRESS = ('39.106.169.58', 3976)
 VIDEO_SERVER_ADDRESS = ('39.106.169.58', 3977)
 AUDIO_SERVER_ADDRESS = ('39.106.169.58', 3978)
-
-def get_localtime():
-    return strftime("%Y-%m-%d %H:%M:%S", localtime())
 
 
 class ChatGUI(QWidget,Ui_Form):
@@ -63,11 +60,11 @@ class ChatGUI(QWidget,Ui_Form):
                 msg = self.chatter.recv(1024).decode()
                 msg_ls = msg.split(' ')
                 ltime = ' '.join(msg_ls[:2])
-                username = msg_ls[3]
+                user_name = msg_ls[2]
                 msg = ' '.join(msg_ls[3:])
                 self.textEdit_msg_box.append(ltime)
                 self.textEdit_msg_box.append(
-                    f'<img src="{self.portrait}" id="portrait" width="50"/>{user_name}: ' + msg)
+                    f'<img src="{self.portrait}" id="portrait" width="50" height="50"/>{user_name}: ' + msg)
                 self.textEdit_msg_box.append('')
                 self.textEdit_msg_box.moveCursor(self.textEdit_msg_box.textCursor().End)
             except Exception as e:
@@ -127,6 +124,9 @@ class ChatGUI(QWidget,Ui_Form):
         self.isKnow = params['is_know']
         self._flush()
 
+        # TODO: 在服务端同步更新
+        # TODO: 头像的更新
+
     def eventFilter(self, obj, event):
         """
         事件过滤器
@@ -144,7 +144,7 @@ class ChatGUI(QWidget,Ui_Form):
 
 if __name__ == '__main__':
     app = QtWidgets.QApplication(sys.argv)
-    user_name = 's6第一个王者'
+    user_name = '牛蛙丶丶'
     portrait = './resource/Saten_Ruiko.jpg'
     fav_comic = 'Attack on Titan'
     is_know = True
