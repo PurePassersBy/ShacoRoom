@@ -49,8 +49,8 @@ class Dispatcher(threading.Thread):
 
     def _broadcast(self, msg, sender=None):
         if sender != None:
-            msg = f'{sender} : {msg}'
-        msg = f'{get_localtime()}  {msg}'
+            msg = f'{sender} {msg}'
+        msg = f'{get_localtime()} {msg}'
         for conn in self._user2conn.values():
             conn.send(msg.encode('utf-8'))
 
