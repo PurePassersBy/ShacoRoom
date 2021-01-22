@@ -7,9 +7,8 @@ from PyQt5.QtGui import QPixmap, QIcon, QTextCursor
 from PyQt5 import QtWidgets, QtCore
 from PyQt5.QtWidgets import QLabel, QMessageBox, QWidget
 
-from VChat import Ui_Form
-from SettingsGui import SettingsGui
-from ..src.client.Chatter import Chatter
+from gui.VChat import Ui_Form
+from gui.SettingsGui import SettingsGui
 
 SERVER_ADDRESS = ('39.106.169.58', 3976)
 VIDEO_SERVER_ADDRESS = ('39.106.169.58', 3977)
@@ -31,13 +30,18 @@ class ChatGUI(QWidget,Ui_Form):
         self.isKnow = is_know
         self._flush()
 
-        self.chatter = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.chatter.connect(SERVER_ADDRESS)
-        self.chatter.send(self.userName.encode())
-        threading.Thread(target=self.recv_message).start()
+        self.init_chatter()
 
         self.textEdit_msg_box.setReadOnly(True)
         self.textEdit.installEventFilter(self)
+
+    def init_chatter(self):
+        self.chatter = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.chatter.connect(SERVER_ADDRESS)
+        self.chatter.send(self.userName.encode())
+        receiver = threading.Thread(target=self.recv_message)
+        receiver.setDaemon(True)
+        receiver.start()
 
     def _flush(self):
         """
@@ -56,7 +60,16 @@ class ChatGUI(QWidget,Ui_Form):
         """
         while True:
             try:
-                self.chatter.recv(1024)
+                msg = self.chatter.recv(1024).decode()
+                msg_ls = msg.split(' ')
+                ltime = ' '.join(msg_ls[:2])
+                username = msg_ls[3]
+                msg = ' '.join(msg_ls[3:])
+                self.textEdit_msg_box.append(ltime)
+                self.textEdit_msg_box.append(
+                    f'<img src="{self.portrait}" id="portrait" width="50"/>{user_name}: ' + msg)
+                self.textEdit_msg_box.append('')
+                self.textEdit_msg_box.moveCursor(self.textEdit_msg_box.textCursor().End)
             except Exception as e:
                 print(e)
                 break
@@ -71,11 +84,7 @@ class ChatGUI(QWidget,Ui_Form):
             self.message_empty_info()
             return
         self.textEdit.clear()
-        self.chatter.send(msg)
-        self.textEdit_msg_box.append(get_localtime())
-        self.textEdit_msg_box.append(f'<img src="{self.portrait}" id="portrait" width="50"/>{self.userName}: ' + msg)
-        self.textEdit_msg_box.append('')
-        self.textEdit_msg_box.moveCursor(self.textEdit_msg_box.textCursor().End)
+        self.chatter.send(msg.encode())
 
     def message_empty_info(self):
         """
