@@ -1,6 +1,7 @@
 import sys
 from time import sleep, strftime, localtime
 import threading
+import socket
 
 from PyQt5.QtGui import QPixmap, QIcon, QTextCursor
 from PyQt5 import QtWidgets, QtCore
@@ -9,8 +10,9 @@ from PyQt5.QtWidgets import QLabel, QMessageBox, QWidget
 from VChat import Ui_Form
 from SettingsGui import SettingsGui
 
-def get_localtime():
-    return strftime("%Y-%m-%d %H:%M:%S", localtime())
+SERVER_ADDRESS = ('39.106.169.58', 3976)
+VIDEO_SERVER_ADDRESS = ('39.106.169.58', 3977)
+AUDIO_SERVER_ADDRESS = ('39.106.169.58', 3978)
 
 
 class ChatGUI(QWidget,Ui_Form):
@@ -25,8 +27,18 @@ class ChatGUI(QWidget,Ui_Form):
         self.isKnow = is_know
         self._flush()
 
+        self.init_chatter()
+
         self.textEdit_msg_box.setReadOnly(True)
         self.textEdit.installEventFilter(self)
+
+    def init_chatter(self):
+        self.chatter = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.chatter.connect(SERVER_ADDRESS)
+        self.chatter.send(self.userName.encode())
+        receiver = threading.Thread(target=self.recv_message)
+        receiver.setDaemon(True)
+        receiver.start()
 
     def _flush(self):
         """
@@ -38,6 +50,27 @@ class ChatGUI(QWidget,Ui_Form):
         self.label_username.setText(self.userName)
         self.graphicsView.setStyleSheet(f"border-image: url({self.portrait});")
 
+    def recv_message(self):
+        """
+        接收消息
+        :return:
+        """
+        while True:
+            try:
+                msg = self.chatter.recv(1024).decode()
+                msg_ls = msg.split(' ')
+                ltime = ' '.join(msg_ls[:2])
+                user_name = msg_ls[2]
+                msg = ' '.join(msg_ls[3:])
+                self.textEdit_msg_box.append(ltime)
+                self.textEdit_msg_box.append(
+                    f'<img src="{self.portrait}" id="portrait" width="50" height="50"/>{user_name}: ' + msg)
+                self.textEdit_msg_box.append('')
+                self.textEdit_msg_box.moveCursor(self.textEdit_msg_box.textCursor().End)
+            except Exception as e:
+                print(e)
+                break
+
     def send_message(self):
         """
         发送消息
@@ -48,10 +81,7 @@ class ChatGUI(QWidget,Ui_Form):
             self.message_empty_info()
             return
         self.textEdit.clear()
-        self.textEdit_msg_box.append(get_localtime())
-        self.textEdit_msg_box.append(f'<img src="{self.portrait}" id="portrait" width="50"/>{self.userName}: ' + msg)
-        self.textEdit_msg_box.append('')
-        self.textEdit_msg_box.moveCursor(self.textEdit_msg_box.textCursor().End)
+        self.chatter.send(msg.encode())
 
     def message_empty_info(self):
         """
@@ -94,6 +124,9 @@ class ChatGUI(QWidget,Ui_Form):
         self.isKnow = params['is_know']
         self._flush()
 
+        # TODO: 在服务端同步更新
+        # TODO: 头像的更新
+
     def eventFilter(self, obj, event):
         """
         事件过滤器
@@ -111,7 +144,7 @@ class ChatGUI(QWidget,Ui_Form):
 
 if __name__ == '__main__':
     app = QtWidgets.QApplication(sys.argv)
-    user_name = 's6第一个王者'
+    user_name = '牛蛙丶丶'
     portrait = './resource/Saten_Ruiko.jpg'
     fav_comic = 'Attack on Titan'
     is_know = True
