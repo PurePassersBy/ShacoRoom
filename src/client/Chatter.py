@@ -2,8 +2,8 @@ import socket
 import threading
 from time import sleep
 
-from VideoChatter import VideoChatter
-from AudioChatter import AudioChatter
+from .VideoChatter import VideoChatter
+from .AudioChatter import AudioChatter
 
 SERVER_ADDRESS = ('39.106.169.58', 3976)
 VIDEO_SERVER_ADDRESS = ('39.106.169.58', 3977)
