@@ -1,6 +1,7 @@
 import sys
 from time import sleep, strftime, localtime
 import threading
+import socket
 
 from PyQt5.QtGui import QPixmap, QIcon, QTextCursor
 from PyQt5 import QtWidgets, QtCore
@@ -8,6 +9,11 @@ from PyQt5.QtWidgets import QLabel, QMessageBox, QWidget
 
 from VChat import Ui_Form
 from SettingsGui import SettingsGui
+from ..src.client.Chatter import Chatter
+
+SERVER_ADDRESS = ('39.106.169.58', 3976)
+VIDEO_SERVER_ADDRESS = ('39.106.169.58', 3977)
+AUDIO_SERVER_ADDRESS = ('39.106.169.58', 3978)
 
 def get_localtime():
     return strftime("%Y-%m-%d %H:%M:%S", localtime())
@@ -25,6 +31,11 @@ class ChatGUI(QWidget,Ui_Form):
         self.isKnow = is_know
         self._flush()
 
+        self.chatter = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.chatter.connect(SERVER_ADDRESS)
+        self.chatter.send(self.userName.encode())
+        threading.Thread(target=self.recv_message).start()
+
         self.textEdit_msg_box.setReadOnly(True)
         self.textEdit.installEventFilter(self)
 
@@ -38,6 +49,18 @@ class ChatGUI(QWidget,Ui_Form):
         self.label_username.setText(self.userName)
         self.graphicsView.setStyleSheet(f"border-image: url({self.portrait});")
 
+    def recv_message(self):
+        """
+        接收消息
+        :return:
+        """
+        while True:
+            try:
+                self.chatter.recv(1024)
+            except Exception as e:
+                print(e)
+                break
+
     def send_message(self):
         """
         发送消息
@@ -48,6 +71,7 @@ class ChatGUI(QWidget,Ui_Form):
             self.message_empty_info()
             return
         self.textEdit.clear()
+        self.chatter.send(msg)
         self.textEdit_msg_box.append(get_localtime())
         self.textEdit_msg_box.append(f'<img src="{self.portrait}" id="portrait" width="50"/>{self.userName}: ' + msg)
         self.textEdit_msg_box.append('')
