@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file './gui/VChat.ui'
+# Form implementation generated from reading ui file 'gui/VChat.ui'
 #
 # Created by: PyQt5 UI code generator 5.15.2
 #
@@ -18,6 +18,7 @@ class Ui_Form(object):
         icon = QtGui.QIcon()
         icon.addPixmap(QtGui.QPixmap(":/images/Shaco_Logo.jpg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         Form.setWindowIcon(icon)
+        Form.setStyleSheet("")
         self.textEdit = QtWidgets.QTextEdit(Form)
         self.textEdit.setGeometry(QtCore.QRect(40, 80, 481, 111))
         self.textEdit.setObjectName("textEdit")
@@ -26,6 +27,9 @@ class Ui_Form(object):
         self.pushButton.setObjectName("pushButton")
         self.textEdit_msg_box = QtWidgets.QTextEdit(Form)
         self.textEdit_msg_box.setGeometry(QtCore.QRect(40, 230, 481, 511))
+        self.textEdit_msg_box.setStyleSheet("QTextEdit .class{\n"
+"    align:right\n"
+"}")
         self.textEdit_msg_box.setObjectName("textEdit_msg_box")
         self.graphicsView = QtWidgets.QGraphicsView(Form)
         self.graphicsView.setGeometry(QtCore.QRect(550, 10, 171, 192))

@@ -62,11 +62,14 @@ class ChatGUI(QWidget,Ui_Form):
                 ltime = ' '.join(msg_ls[:2])
                 user_name = msg_ls[2]
                 msg = ' '.join(msg_ls[3:])
+                msg = '<div id="self">' + msg + '</div>'
                 self.textEdit_msg_box.append(ltime)
                 self.textEdit_msg_box.append(
-                    f'<img src="{self.portrait}" id="portrait" width="50" height="50"/>{user_name}: ' + msg)
+                    f'<img src="{self.portrait}" id="portrait" width=50 height=50/>{user_name}: ' + msg)
                 self.textEdit_msg_box.append('')
                 self.textEdit_msg_box.moveCursor(self.textEdit_msg_box.textCursor().End)
+
+                print(self.textEdit_msg_box.toHtml())
             except Exception as e:
                 print(e)
                 break
@@ -76,7 +79,8 @@ class ChatGUI(QWidget,Ui_Form):
         发送消息
         :return:
         """
-        msg = self.textEdit.toPlainText()
+        msg = self.textEdit.toHtml()
+        # print(msg)
         if msg == '':
             self.message_empty_info()
             return
