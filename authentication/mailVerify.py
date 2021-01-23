@@ -13,12 +13,12 @@ class Mail():
         self.mailSender = sender
         self.mailPassword = password
         self.mailReceiver = receiver
-        self.verifCode
+        self.verifyCode
     def send(self):
         self.verifyCode = self.generateCode()
         flag = True
         try:
-            msg = MIMEText('欢迎注册ShacoRoom 您的验证码为：' + str(verifyCode) + '\n请在十五分钟内完成验证', 'plain', 'utf-8')      #邮件内容
+            msg = MIMEText('欢迎注册ShacoRoom 您的验证码为：' + str(self.verifyCode) + '\n请在十五分钟内完成验证', 'plain', 'utf-8')      #邮件内容
             msg['From'] = formataddr(["ShacoRoom", self.mailSender])            # 括号里的对应发件人邮箱昵称、发件人邮箱账号
             msg['To'] = formataddr(["Dear ShacoRoom User", self.mailReceiver])  # 括号里的对应收件人邮箱昵称、收件人邮箱账号
             msg['Subject'] = "ShacoRoom注册验证码"                               # 邮件的主题，也可以说是标题
@@ -34,14 +34,3 @@ class Mail():
         code = random.randint(100000, 999999)                                   #生成六位随机数
         return code
 
-    def check(self):
-        pass
-
-
-
-if __name__ == '__main__':
-    test = Mail('614446871@qq.com', 'rduygnlorlpgbeec', '614446871@qq.com')
-    if test.send():
-        print("Test success")
-    else:
-        print("Something Wrong")

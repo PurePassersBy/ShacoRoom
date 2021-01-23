@@ -1,39 +1,59 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'connect_me.ui'
-#
-# Created by: PyQt5 UI code generator 5.11.3
-#
-# WARNING! All changes made in this file will be lost!
-#导入程序运行必须模块
 import sys
+import pymysql
 # 从mail模块中获得系统生成的验证码
-import mailVerify
-#PyQt5中使用的基本控件都在PyQt5.QtWidgets模块中
+from authentication.verifyGUI import Ui_Verify
+from authentication.mailVerify import Mail
 from PyQt5.QtWidgets import QApplication, QMainWindow
 #导入designer工具生成的模块
-from verifyGUI import Ui_Verify
 
 class MyMainForm(QMainWindow, Ui_Verify):
-    def __init__(self, parent=None):
-        super(MyMainForm, self).__init__(parent)
+    def __init__(self, senderMail):
+        super(MyMainForm, self).__init__()
         self.setupUi(self)
-        self.sendButton.clicked.connect(self.display)           # 添加登录按钮信号和槽。注意display函数不加小括号()
-        self.confirmButton.clicked.connect(self.close)          # 添加退出按钮信号和槽。调用close函数
+        self.retranslateUi(self)
+        self.senderMail=senderMail
+        self.verifyCode=None
+        # 添加检测验证码文本变化信号和槽
+        self.sendButton.clicked.connect(self.send)
+        self.codeEdit.textChanged['QString'].connect(self.statusBrowser.display)
+        self.confirmButton.clicked.connect(self.update)          # 添加退出按钮信号和槽。调用close函数
+
+    def send(self):
+        mailAddress = self.mailEdit.text()
+        sendMail = Mail(self.senderMail,"rduygnlorlpgbeec",mailAddress)
+        if sendMail.send():
+            print("Send successfullly!")
+            #储存系统生成的验证码 用于检验
+            self.verifyCode=sendMail.verifyCode
+        else:
+            print("Send failed")
+            self.failDisplay()
+
+
     def display(self):
         # 利用line Edit控件对象text()函数获取界面输入
-        mailAddress = self.mailEdit.text()
+
         verifyCodeUser = self.codeEdit.text()
         # 利用text Browser控件对象setText()函数设置界面显示
-        if verifyCodeUser==mailVerify.varifyCode:
-            self.user_textBrowser.setText("登录成功!\n" + "用户名是: "+ username+ ",密码是： "+ password)
+        if verifyCodeUser==self.varifyCode:
+            self.user_textBrowser.setText("验证成功")
+        else:
+            self.user_texBrowser.setText("验证码错误")
+    def failDisplay(self):
+        self.user_textBrowser.setText("邮件发送失败，请联系管理员")
+
+    def update(self):
+
 
 if __name__ == "__main__":
     #固定的，PyQt5程序都需要QApplication对象。sys.argv是命令行参数列表，确保程序可以双击运行
     app = QApplication(sys.argv)
     #初始化
-    myWin = MyMainForm()
+    myWin = MyMainForm("614446871@qq.com")
     #将窗口控件显示在屏幕上
     myWin.show()
+
     #程序运行，sys.exit方法确保程序完整退出。
     sys.exit(app.exec_())
