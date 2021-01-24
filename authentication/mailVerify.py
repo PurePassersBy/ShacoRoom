@@ -13,7 +13,7 @@ class Mail():
         self.mailSender = sender
         self.mailPassword = password
         self.mailReceiver = receiver
-        self.verifyCode
+        self.verifyCode = None
     def send(self):
         self.verifyCode = self.generateCode()
         flag = True
@@ -25,8 +25,10 @@ class Mail():
             server = smtplib.SMTP_SSL("smtp.qq.com", 465)                       # 发件人邮箱中的SMTP服务器，qqmail端口是465
             server.login(self.mailSender, self.mailPassword)                    # 括号中对应的是发件人邮箱账号、邮箱密码
             server.sendmail(self.mailSender, [self.mailReceiver,], msg.as_string())
+            print("Send successfully")
             server.quit()                                                       # 关闭连接
         except Exception:
+            print("Send failed")
             flag = False
         return flag
 
