@@ -37,7 +37,7 @@ class ChatGUI(QWidget,Ui_Form):
     def init_chatter(self):
         self.chatter = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.chatter.connect(SERVER_ADDRESS)
-        self.chatter.send((self.userName+" "+self.id).encode())
+        self.chatter.send((self.userName).encode())
         receiver = threading.Thread(target=self.recv_message)
         receiver.setDaemon(True)
         receiver.start()
