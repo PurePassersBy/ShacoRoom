@@ -17,12 +17,13 @@ AUDIO_SERVER_ADDRESS = ('39.106.169.58', 3978)
 
 class ChatGUI(QWidget,Ui_Form):
 
-    def __init__(self, user_name, portrait, fav_comic, is_know):
+    def __init__(self, id, user_name, fav_comic, is_know):
         super(ChatGUI, self).__init__()
         self.setupUi(self)
 
+        self.id = id
         self.userName = user_name
-        self.portrait = portrait
+        self.portrait = f'./resource/portrait/{id}.jpg'
         self.favComic = fav_comic
         self.isKnow = is_know
         self._flush()
@@ -62,7 +63,6 @@ class ChatGUI(QWidget,Ui_Form):
                 ltime = ' '.join(msg_ls[:2])
                 user_name = msg_ls[2]
                 msg = ' '.join(msg_ls[3:])
-                msg = '<div id="self">' + msg + '</div>'
                 self.textEdit_msg_box.append(ltime)
                 self.textEdit_msg_box.append(
                     f'<img src="{self.portrait}" id="portrait" width=50 height=50/>{user_name}: ' + msg)
@@ -80,7 +80,7 @@ class ChatGUI(QWidget,Ui_Form):
         :return:
         """
         msg = self.textEdit.toHtml()
-        # print(msg)
+        #msg = self.textEdit.toPlainText()
         if msg == '':
             self.message_empty_info()
             return
@@ -148,10 +148,11 @@ class ChatGUI(QWidget,Ui_Form):
 
 if __name__ == '__main__':
     app = QtWidgets.QApplication(sys.argv)
+    id = 0
     user_name = '牛蛙丶丶'
     portrait = './resource/Saten_Ruiko.jpg'
     fav_comic = 'Attack on Titan'
     is_know = True
-    gui = ChatGUI(user_name, portrait, fav_comic, is_know)
+    gui = ChatGUI(id, user_name, fav_comic, is_know)
     gui.show()
     sys.exit(app.exec_())

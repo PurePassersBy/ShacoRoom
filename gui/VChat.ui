@@ -53,9 +53,7 @@
     </rect>
    </property>
    <property name="styleSheet">
-    <string notr="true">QTextEdit .class{
-	align:right
-}</string>
+    <string notr="true">QTextEdit p{font-size=10px;}</string>
    </property>
   </widget>
   <widget class="QGraphicsView" name="graphicsView">

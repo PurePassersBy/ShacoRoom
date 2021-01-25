@@ -27,9 +27,7 @@ class Ui_Form(object):
         self.pushButton.setObjectName("pushButton")
         self.textEdit_msg_box = QtWidgets.QTextEdit(Form)
         self.textEdit_msg_box.setGeometry(QtCore.QRect(40, 230, 481, 511))
-        self.textEdit_msg_box.setStyleSheet("QTextEdit .class{\n"
-"    align:right\n"
-"}")
+        self.textEdit_msg_box.setStyleSheet("QTextEdit p{font-size=10px;}")
         self.textEdit_msg_box.setObjectName("textEdit_msg_box")
         self.graphicsView = QtWidgets.QGraphicsView(Form)
         self.graphicsView.setGeometry(QtCore.QRect(550, 10, 171, 192))
