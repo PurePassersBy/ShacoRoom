@@ -10,18 +10,6 @@ from PyQt5.QtWidgets import QApplication, QMainWindow
 from PyQt5.QtCore import QThread ,  pyqtSignal,  QDateTime , QObject
 #导入designer工具生成的模块
 
-class BackendThread(QObject):
-    # 通过类成员对象定义信号
-    update_date = pyqtSignal(str)
-
-    # 处理业务逻辑
-    def run(self):
-        while True:
-            data = QDateTime.currentDateTime()
-            currTime = data.toString("yyyy-MM-dd hh:mm:ss")
-            self.update_date.emit(str(currTime))
-            time.sleep(1)
-
 class MyMainForm(QMainWindow, Ui_Verify):
     def __init__(self, senderMail,passwordMail):
         super(MyMainForm, self).__init__()
@@ -39,7 +27,9 @@ class MyMainForm(QMainWindow, Ui_Verify):
 
         # 添加检测验证码文本变化信号和槽 name password主要检测长度
         self.nameEdit.textChanged['QString'].connect(self.nameCheck)
+        self.nameEdit.setToolTip('长度不超过8')
         self.passwordEdit.textChanged['QString'].connect(self.passwordCheck)
+        self.passwordEdit.setToolTip('长度不超过12')
         # 检测验证码是否正确
         self.codeEdit.textChanged['QString'].connect(self.codeCheck)
         #点击发送验证邮件按钮 调用send函数
@@ -47,9 +37,10 @@ class MyMainForm(QMainWindow, Ui_Verify):
         self.confirmButton.clicked.connect(self.update)
 
 
+
     def nameCheck(self):
         name = self.nameEdit.text()
-        if len(name)>=9:
+        if len(name)>8:
             print("Too long")
             self.nameStatus.setText("Too long")
         else:
@@ -57,7 +48,7 @@ class MyMainForm(QMainWindow, Ui_Verify):
             self.nameStatus.setText("Ok")
     def passwordCheck(self):
         password = self.passwordEdit.text()
-        if len(password )>=12:
+        if len(password )>12:
             print("Too long")
             self.passwordStatus.setText("Too long")
         else:
@@ -65,10 +56,12 @@ class MyMainForm(QMainWindow, Ui_Verify):
             self.passwordStatus.setText("Ok")
 
     def codeCheck(self):
-        code= self.codeEdit.text()
-        if code !=self.verifyCode:
+        code = int(self.codeEdit.text())
+        if code != self.verifyCode:
             print("Wrong verify code!")
-            self.codeStatus.setText("Wrong verify code!")
+            self.codeStatus.setText("Wrong")
+            # 确认用户邮箱
+            self.flag=True
         else:
             print("Right！")
             self.codeStatus.setText("Ok")
@@ -76,36 +69,40 @@ class MyMainForm(QMainWindow, Ui_Verify):
     def send(self):
         #获取用户输入的邮箱地址
         mailAddress = str(self.mailEdit.text())
-        print("test1")
-        print(self.senderMail+"   "+self.passwordMail)
-        sendMail = Mail(self.senderMail, self.passwordMail, mailAddress)
-        print("test2")
-        if sendMail.send():
-            print("Send successfullly!")
-            #储存系统生成的验证码 用于检验
-            self.verifyCode=sendMail.verifyCode
+        #检测用户邮箱是否注册
+        connect = conn()
+        if connect.mailRepeat(mailAddress):
+        #邮箱重复
+            self.mailStatus.setText("该邮箱已被注册！")
+            return False
         else:
-            print("Send failed")
-            self.failDisplay()
+        #邮箱合法
+            print(self.senderMail + "   " + self.passwordMail)
+            sendMail = Mail(self.senderMail, self.passwordMail, mailAddress)
+            if sendMail.send():
+                print("Send successfullly!")
+                # 储存系统生成的验证码 用于检验
+                self.verifyCode = sendMail.verifyCode
+                self.mailStatus.setText("发送成功")
+            else:
+                print("Send failed")
+                self.mailStatus.setText("发送失败，请联系管理员")
 
+            return True
+        #关闭与mysql的连接
+        connect.close()
 
-    def display(self):
-        # 利用line Edit控件对象text()函数获取界面输入
-
-        verifyCodeUser = self.codeEdit.text()
-        # 利用text Browser控件对象setText()函数设置界面显示
-        if verifyCodeUser==self.varifyCode:
-            self.user_textBrowser.setText("验证成功")
-        else:
-            self.user_texBrowser.setText("验证码错误")
-    def failDisplay(self):
-        self.user_textBrowser.setText("邮件发送失败，请联系管理员")
 
     def update(self):
         #初始化封装在dataBase的连接
-        connect=conn()
-        connect.insert(self.name, self.mail, self.password)
-        connect.close()
+        if self.flag:
+            connect = conn()
+            #将用户信息添加到数据库
+            connect.insert(self.name, self.mail, self.password)
+            connect.close()
+        else:
+            self.codeStatus.setText("未收到邮件？请检查邮箱是否输入错误")
+            pass
 
 
 
