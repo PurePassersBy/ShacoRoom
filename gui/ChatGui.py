@@ -9,6 +9,7 @@ from PyQt5.QtWidgets import QLabel, QMessageBox, QWidget
 
 from VChat import Ui_Form
 from SettingsGui import SettingsGui
+#from authentication.dataBase import
 
 SERVER_ADDRESS = ('39.106.169.58', 3976)
 VIDEO_SERVER_ADDRESS = ('39.106.169.58', 3977)
@@ -36,7 +37,7 @@ class ChatGUI(QWidget,Ui_Form):
     def init_chatter(self):
         self.chatter = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.chatter.connect(SERVER_ADDRESS)
-        self.chatter.send(self.userName.encode())
+        self.chatter.send((self.userName+" "+self.id).encode())
         receiver = threading.Thread(target=self.recv_message)
         receiver.setDaemon(True)
         receiver.start()
@@ -62,10 +63,11 @@ class ChatGUI(QWidget,Ui_Form):
                 msg_ls = msg.split(' ')
                 ltime = ' '.join(msg_ls[:2])
                 user_name = msg_ls[2]
+                user_id = msg_ls[3]
                 msg = ' '.join(msg_ls[3:])
                 self.textEdit_msg_box.append(ltime)
                 self.textEdit_msg_box.append(
-                    f'<img src="{self.portrait}" id="portrait" width=50 height=50/>{user_name}: ' + msg)
+                    f'<img src="./resource/portrait/{user_id}.jpg" id="portrait" width=50 height=50/>{user_name}: ' + msg)
                 self.textEdit_msg_box.append('')
                 self.textEdit_msg_box.moveCursor(self.textEdit_msg_box.textCursor().End)
             except Exception as e:
