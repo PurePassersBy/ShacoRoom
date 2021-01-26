@@ -1,13 +1,14 @@
 # -*- coding: utf-8 -*-
-
 import sys
-import time
-from dataBase import conn
-# 从mail模块中获得系统生成的验证码
-from verifyGUI import Ui_Verify
-from mailVerify import Mail
+
 from PyQt5.QtWidgets import QApplication, QMainWindow
 from PyQt5.QtCore import QThread, pyqtSignal, QDateTime, QObject
+from threading import Thread
+
+from dataBase import conn
+from verifyGUI import Ui_Verify
+from mailVerify import Mail
+
 
 
 # 导入designer工具生成的模块
@@ -58,9 +59,10 @@ class MyMainForm(QMainWindow, Ui_Verify):
         if code != self.verifyCode:
             print("Wrong verify code!")
             self.codeStatus.setText("Wrong")
+
+        else:
             # 确认用户邮箱
             self.flag = True
-        else:
             print("Right！")
             self.codeStatus.setText("Ok")
 
@@ -76,22 +78,30 @@ class MyMainForm(QMainWindow, Ui_Verify):
             # 邮箱合法
             print(self.senderMail + "   " + self.passwordMail)
             sendMail = Mail(self.senderMail, self.passwordMail, mailAddress)
-            if sendMail.send():
-                print("Send successfullly!")
-                # 储存系统生成的验证码 用于检验
-                self.verifyCode = sendMail.verifyCode
-                self.mailStatus.setText("发送成功")
-            else:
-                print("Send failed")
-                self.mailStatus.setText("发送失败，请联系管理员")
+            # 用线程发送邮件 避免用户等待
+            sendMail.start()
+            thread_check = threading.Thread(target=self._mail_check,
+                             args=(sendMail.sendResult, sendMail.verifyCode,))
+            thread_check.start()
+            sendMail.join()
+            thread_check.join()
         # 关闭与mysql的连接
         connect.close()
 
+    def _mail_check(self, send_result, verify_code):
+        if send_result:
+            print("Send successfullly!")
+            # 储存系统生成的验证码 用于检验
+            self.verifyCode = verify_code
+            self.mailStatus.setText("发送成功")
+        else:
+            print("Send failed")
+            self.mailStatus.setText("发送失败，请联系管理员")
     def updateUserinfo(self):
         # 初始化封装在dataBase的连接
         mailEnter = str(self.mailEdit.text())
         nameEnter = str(self.nameEdit.text())
-        passwordEnter=str(self.passwordEdit.text())
+        passwordEnter = str(self.passwordEdit.text())
         print(mailEnter)
         if self.flag:
             connect = conn()
