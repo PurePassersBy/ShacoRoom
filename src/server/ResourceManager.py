@@ -1,7 +1,7 @@
 import socket
 import threading
 import struct
-import pickle
+import json
 
 CHUNK = 1024
 PAYLOAD_SIZE = struct.calcsize("L")
@@ -20,7 +20,7 @@ class ResourceManager(threading.Thread):
         print('fetch file...')
         header_size = struct.unpack('i', self.server.recv(4))[0]
         header_str = self.server.recv(header_size)
-        header = pickle.loads(header_str.decode())
+        header = json.loads(header_str.decode())
         user_id = header['user_id']
         file_size = header['file_size']
         with open(f'./resource/portrait/{user_id}.jpg', 'wb') as f:

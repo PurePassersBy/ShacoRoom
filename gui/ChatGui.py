@@ -1,6 +1,6 @@
 import sys
 import os
-import pickle
+import json
 import struct
 from time import sleep
 import threading
@@ -130,7 +130,7 @@ class ChatGUI(QWidget,Ui_Form):
             'user_id': self.id,
             'file_size': os.path.getsize(self.portrait)
         }
-        header_str = pickle.dumps(header).encode()
+        header_str = json.dumps(header).encode()
         client.send(struct.pack('i', len(header_str)))
         client.send(header_str)
         with open(self.portrait, 'rb') as f:
