@@ -21,7 +21,7 @@ class ResourceManager(threading.Thread):
 
     def fetch_and_store(self, conn):
         print('fetch file...')
-        picked_header = self.server.recv(CHUNK)
+        picked_header = self.server.recv(CHUNK + 4)
         header_str = header_struct.unpack(picked_header)
         header = pickle.loads(header_str)
         user_id = header['user_id']

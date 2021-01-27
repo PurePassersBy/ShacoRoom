@@ -134,7 +134,7 @@ class ChatGUI(QWidget,Ui_Form):
             'file_size': os.path.getsize(self.portrait)
         }
         header_str = pickle.dumps(header)
-        client.send(header_struct.pack(header_str))
+        client.send(header_struct.pack(*(len(header_str), header_str)))
         with open(self.portrait, 'rb') as f:
             for line in f:
                 client.send(line)
