@@ -1,6 +1,5 @@
 import sys
 import os
-import pickle
 import struct
 from time import sleep
 import threading
