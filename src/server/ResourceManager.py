@@ -7,9 +7,6 @@ CHUNK = 1024
 PAYLOAD_SIZE = struct.calcsize("L")
 RESOURCE_SERVER_ADDRESS = ('0.0.0.0', 3979)
 
-header_struct = struct.Struct('i1024s')
-data_struct = struct.Struct('1024s')
-
 
 class ResourceManager(threading.Thread):
     def __init__(self, addr):
@@ -21,9 +18,9 @@ class ResourceManager(threading.Thread):
 
     def fetch_and_store(self, conn):
         print('fetch file...')
-        picked_header = self.server.recv(CHUNK + 4)
-        header_size, header_str = header_struct.unpack(picked_header)
-        header = pickle.loads(header_str)
+        header_size = struct.unpack('i', self.server.recv(4))[0]
+        header_str = self.server.recv(header_size)
+        header = pickle.loads(header_str.decode())
         user_id = header['user_id']
         file_size = header['file_size']
         with open(f'./resource/portrait/{user_id}.jpg', 'wb') as f:

@@ -19,9 +19,6 @@ VIDEO_SERVER_ADDRESS = ('39.106.169.58', 3977)
 AUDIO_SERVER_ADDRESS = ('39.106.169.58', 3978)
 RESOURCE_SERVER_ADDRESS = ('39.106.169.58', 3979)
 
-header_struct = struct.Struct('i1024s')
-data_struct = struct.Struct('1024s')
-
 
 class ChatGUI(QWidget,Ui_Form):
 
@@ -133,8 +130,9 @@ class ChatGUI(QWidget,Ui_Form):
             'user_id': self.id,
             'file_size': os.path.getsize(self.portrait)
         }
-        header_str = pickle.dumps(header)
-        client.send(header_struct.pack(*(len(header_str), header_str)))
+        header_str = pickle.dumps(header).encode()
+        client.send(struct.pack('i', len(header_str)))
+        client.send(header_str)
         with open(self.portrait, 'rb') as f:
             for line in f:
                 client.send(line)
