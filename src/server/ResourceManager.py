@@ -9,6 +9,7 @@ RESOURCE_SERVER_ADDRESS = ('0.0.0.0', 3979)
 
 class ResourceManager(threading.Thread):
     def __init__(self, addr):
+        super().__init__()
         self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.server.bind(addr)
