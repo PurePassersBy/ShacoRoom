@@ -9,11 +9,12 @@ from VSettings import Ui_Dialog
 
 class SettingsGui(QWidget, Ui_Dialog):
     _signal = QtCore.pyqtSignal(dict)
-    def __init__(self, user_name, portrait, fav_comic, is_know):
+    def __init__(self, user_id, user_name, fav_comic, is_know):
         super(SettingsGui, self).__init__()
         self.setupUi(self)
+        self.id = user_id
         self.userName = user_name
-        self.portrait = portrait
+        self.portrait = f'./resource/portrait/{self.id}.jpg'
         self.favComic = fav_comic
         self.isKnow = is_know
 
@@ -31,9 +32,7 @@ class SettingsGui(QWidget, Ui_Dialog):
         file_name, file_type = QFileDialog.getOpenFileName(self, "选取文件", './',
                                                            "图片文件 (*.jpg);;图片文件 (*.png)")
         file_type = file_type[-4:-1]
-        #shutil.copyfile(file_name, './resource/xxx.'+file_type) # 唯一标识符命名存储头像
-        print(file_name)
-        print(file_type)
+        shutil.copyfile(file_name, f'./resource/portrait/{self.id}.{file_type}') # 唯一标识符命名存储头像
 
     def flush(self):
         """
@@ -62,10 +61,10 @@ class SettingsGui(QWidget, Ui_Dialog):
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
+    user_id = 0
     user_name = 's6第一个王者'
-    portrait = './resource/Saten_Ruiko.jpg'
     fav_comic = 'Attack on Titan'
     is_know = True
-    setting = SettingsGui(user_name, portrait, fav_comic, is_know)
+    setting = SettingsGui(user_id, user_name, fav_comic, is_know)
     setting.show()
     sys.exit(app.exec_())
