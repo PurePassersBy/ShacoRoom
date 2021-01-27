@@ -1,5 +1,8 @@
 import sys
-from time import sleep, strftime, localtime
+import os
+import pickle
+import struct
+from time import sleep
 import threading
 import socket
 
@@ -14,7 +17,7 @@ from SettingsGui import SettingsGui
 SERVER_ADDRESS = ('39.106.169.58', 3976)
 VIDEO_SERVER_ADDRESS = ('39.106.169.58', 3977)
 AUDIO_SERVER_ADDRESS = ('39.106.169.58', 3978)
-
+RESOURCE_SERVER_ADDRESS = ('39.106.169.58', 3979)
 
 class ChatGUI(QWidget,Ui_Form):
 
@@ -128,6 +131,16 @@ class ChatGUI(QWidget,Ui_Form):
         self.favComic = params['fac_comic']
         self.isKnow = params['is_know']
         self._flush()
+
+        client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        client.connect(RESOURCE_SERVER_ADDRESS)
+        client.send(str(self.id).encode())
+        file_size = os.path.getsize(self.portrait)
+        client.send(struct.pack("L", file_size))
+        with open(self.portrait, 'rb') as f:
+            for line in f:
+                client.send(line)
+        client.close()
 
         # TODO: 在服务端同步更新
 
