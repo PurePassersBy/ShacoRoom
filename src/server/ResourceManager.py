@@ -16,7 +16,9 @@ class ResourceManager(threading.Thread):
         self.server.listen(50)
 
     def fetch_and_store(self, conn):
+        print('fetch file...')
         user_id = conn.recv(CHUNK).decode()
+        print('user_id :', user_id)
         data = ''.encode()
         while len(data) < PAYLOAD_SIZE:
             data += conn.recv(CHUNK)
@@ -27,6 +29,7 @@ class ResourceManager(threading.Thread):
         with open(f'./resource/portrait/{user_id}.jpg', 'wb') as f:
             f.write(data)
         conn.close()
+        print('fetch done')
 
         def run(self):
             while True:

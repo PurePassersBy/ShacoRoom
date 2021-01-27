@@ -120,6 +120,19 @@ class ChatGUI(QWidget,Ui_Form):
         self.userSettings.show()
         self.userSettings._signal.connect(self._update)
 
+    def _send_portrait(self):
+        print('send portrait...')
+        client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        client.connect(RESOURCE_SERVER_ADDRESS)
+        client.send(str(self.id).encode())
+        file_size = os.path.getsize(self.portrait)
+        client.send(struct.pack("L", file_size))
+        with open(self.portrait, 'rb') as f:
+            for line in f:
+                client.send(line)
+        client.close()
+        print('send done')
+
     def _update(self, params):
         """
         更新用户信息
@@ -130,16 +143,8 @@ class ChatGUI(QWidget,Ui_Form):
         self.favComic = params['fac_comic']
         self.isKnow = params['is_know']
         self._flush()
+        threading.Thread(target=self._send_portrait).start()
 
-        client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        client.connect(RESOURCE_SERVER_ADDRESS)
-        client.send(str(self.id).encode())
-        file_size = os.path.getsize(self.portrait)
-        client.send(struct.pack("L", file_size))
-        with open(self.portrait, 'rb') as f:
-            for line in f:
-                client.send(line)
-        client.close()
 
         # TODO: 在服务端同步更新
 
