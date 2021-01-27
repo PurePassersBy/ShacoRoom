@@ -14,7 +14,7 @@ class Connect:
         self.count = self.cur.execute('SELECT * from userinfo')
         # 解决中文编码问题
         self.cur.execute("ALTER TABLE userinfo CONVERT TO CHARACTER SET utf8;")
-        #防止直接用str代替sql表属性名出现错误
+        # 防止直接用str代替sql表属性名出现错误
         self.search_property = {'id': 'select * from userinfo where id = %s;',
                                 'name': 'select * from userinfo where name = %s;',
                                 'mail': 'select * from userinfo where mail = %s;',
