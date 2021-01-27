@@ -32,9 +32,11 @@ class ResourceManager(threading.Thread):
         print('fetch done')
 
         def run(self):
+            print('ResourceManager starts...')
             while True:
                 try:
                     conn, addr = self.server.accept()
+                    print('ResourceManager accept one...')
                     threading.Thread(target=self.fetch_and_store, args=(conn,)).start()
                 except:
                     print('Resource Error')
