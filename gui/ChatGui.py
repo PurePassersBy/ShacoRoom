@@ -130,7 +130,6 @@ class ChatGUI(QWidget,Ui_Form):
         self._flush()
 
         # TODO: 在服务端同步更新
-        # TODO: 头像的更新
 
     def eventFilter(self, obj, event):
         """
