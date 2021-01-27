@@ -31,16 +31,16 @@ class ResourceManager(threading.Thread):
         conn.close()
         print('fetch done')
 
-        def run(self):
-            print('ResourceManager starts...')
-            while True:
-                try:
-                    conn, addr = self.server.accept()
-                    print('ResourceManager accept one...')
-                    threading.Thread(target=self.fetch_and_store, args=(conn,)).start()
-                except:
-                    print('Resource Error')
-                    break
+    def run(self):
+        print('ResourceManager starts...')
+        while True:
+            try:
+                conn, addr = self.server.accept()
+                print('ResourceManager accept one...')
+                threading.Thread(target=self.fetch_and_store, args=(conn,)).start()
+            except:
+                print('Resource Error')
+                break
 
 if __name__ == '__main__':
     resourceManager = ResourceManager(RESOURCE_SERVER_ADDRESS)
