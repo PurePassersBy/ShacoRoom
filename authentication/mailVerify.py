@@ -1,5 +1,4 @@
 # -*- coding: UTF-8 -*-
-import random
 import threading
 
 import smtplib
@@ -9,7 +8,7 @@ from email.utils import formataddr
 
 class Mail(threading.Thread):
     # 继承线程，完成邮件发送
-    def __init__(self, sender, password, receiver):
+    def __init__(self, sender, password, receiver, verify_code):
         """
         发送邮件
         :param sender:   发送邮箱
@@ -18,14 +17,15 @@ class Mail(threading.Thread):
         :return:Void:
         """
         # 第三方SMTP服务
+        super(Mail, self).__init__()
         self.mailSender = sender
         self.mailPassword = password
         self.mailReceiver = receiver
-        self.verifyCode = None
-        self.sendResult = False
         # 生成6位随机验证码
-        self.verifyCode = self.generateCode()
-        threading.Thread.__init__(self)
+        self.verifyCode = verify_code
+        # sendResult初始状态，线程结束后更新状态为True 或者False
+        self.sendResult = None
+
 
     def run(self):
         try:
@@ -41,9 +41,11 @@ class Mail(threading.Thread):
             server.quit()  # 关闭连接
         except Exception:
             print("Send failed")
+            self.sendResult = False #邮件发送失败
 
-    def generateCode(self):
-        code = random.randint(100000, 999999)  # 生成六位随机数
-        return code
+    def get_result(self):
+        return self.sendResult
+
+
 
 

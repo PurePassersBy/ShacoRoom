@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
 import sys
+import random
 
 from PyQt5.QtWidgets import QApplication, QMainWindow
 from PyQt5.QtCore import QThread, pyqtSignal, QDateTime, QObject
-from threading import Thread
+import threading
 
-from dataBase import conn
+from dataBase import Connect
 from verifyGUI import Ui_Verify
 from mailVerify import Mail
 
@@ -42,7 +43,6 @@ class MyMainForm(QMainWindow, Ui_Verify):
             print("Too long")
             self.nameStatus.setText("Too long")
         else:
-            print("Right！")
             self.nameStatus.setText("Ok")
 
     def passwordCheck(self):
@@ -51,52 +51,47 @@ class MyMainForm(QMainWindow, Ui_Verify):
             print("Too long")
             self.passwordStatus.setText("Too long")
         else:
-            print("Right！")
             self.passwordStatus.setText("Ok")
 
     def codeCheck(self):
         code = int(self.codeEdit.text())
         if code != self.verifyCode:
-            print("Wrong verify code!")
             self.codeStatus.setText("Wrong")
 
         else:
             # 确认用户邮箱
             self.flag = True
-            print("Right！")
+            print("Right verify code!")
             self.codeStatus.setText("Ok")
 
     def send(self):
         # 获取用户输入的邮箱地址
         mailAddress = str(self.mailEdit.text())
         # 检测用户邮箱是否注册
-        connect = conn()
-        if connect.mailRepeat(mailAddress):
-            # 邮箱重复
-            self.mailStatus.setText("该邮箱已被注册！")
-        else:
-            # 邮箱合法
-            print(self.senderMail + "   " + self.passwordMail)
-            sendMail = Mail(self.senderMail, self.passwordMail, mailAddress)
-            # 用线程发送邮件 避免用户等待
-            sendMail.start()
-            thread_check = threading.Thread(target=self._mail_check,
-                             args=(sendMail.sendResult, sendMail.verifyCode,))
-            thread_check.start()
-            sendMail.join()
-            thread_check.join()
+        connect = Connect()
+        mail_repeat = connect.search('mail', mailAddress)
         # 关闭与mysql的连接
         connect.close()
 
-    def _mail_check(self, send_result, verify_code):
-        if send_result:
-            print("Send successfullly!")
-            # 储存系统生成的验证码 用于检验
-            self.verifyCode = verify_code
-            self.mailStatus.setText("发送成功")
+        if mail_repeat == None:
+            # 邮箱合法
+            print("邮箱合法")
+            self.verifyCode = self.generateCode()
+            print(self.senderMail + "   " + self.passwordMail + "verify code:" + str(self.verifyCode))
+            sendMail = Mail(self.senderMail, self.passwordMail, mailAddress, self.verifyCode)
+            # 用线程发送邮件 避免用户等待
+            sendMail.start()
         else:
-            print("Send failed")
-            self.mailStatus.setText("发送失败，请联系管理员")
+            # 邮箱重复
+            print("邮箱重复")
+            self.mailStatus.setText("该邮箱已被注册！")
+
+
+    def generateCode(self):
+        code = random.randint(100000, 999999)  # 生成六位随机数
+        return code
+
+
     def updateUserinfo(self):
         # 初始化封装在dataBase的连接
         mailEnter = str(self.mailEdit.text())
@@ -104,7 +99,7 @@ class MyMainForm(QMainWindow, Ui_Verify):
         passwordEnter = str(self.passwordEdit.text())
         print(mailEnter)
         if self.flag:
-            connect = conn()
+            connect = Connect()
             # 将用户信息添加到数据库
 
             connect.insert(nameEnter, mailEnter, passwordEnter)
