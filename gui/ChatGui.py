@@ -1,5 +1,8 @@
 import sys
-from time import sleep, strftime, localtime
+import os
+import json
+import struct
+from time import sleep
 import threading
 import socket
 
@@ -14,17 +17,18 @@ from SettingsGui import SettingsGui
 SERVER_ADDRESS = ('39.106.169.58', 3976)
 VIDEO_SERVER_ADDRESS = ('39.106.169.58', 3977)
 AUDIO_SERVER_ADDRESS = ('39.106.169.58', 3978)
+RESOURCE_SERVER_ADDRESS = ('39.106.169.58', 3979)
 
 
 class ChatGUI(QWidget,Ui_Form):
 
-    def __init__(self, id, user_name, fav_comic, is_know):
+    def __init__(self, user_id, user_name, fav_comic, is_know):
         super(ChatGUI, self).__init__()
         self.setupUi(self)
 
-        self.id = id
+        self.id = user_id
         self.userName = user_name
-        self.portrait = f'./resource/portrait/{id}.jpg'
+        self.portrait = f'./resource/portrait/{self.id}.jpg'
         self.favComic = fav_comic
         self.isKnow = is_know
         self._flush()
@@ -48,7 +52,7 @@ class ChatGUI(QWidget,Ui_Form):
         每次设置成功后调用
         :return:
         """
-        self.userSettings = SettingsGui(self.userName, self.portrait, self.favComic, self.isKnow)
+        self.userSettings = SettingsGui(self.id,self.userName, self.favComic, self.isKnow)
         self.label_username.setText(self.userName)
         self.graphicsView.setStyleSheet(f"border-image: url({self.portrait});")
 
@@ -63,11 +67,12 @@ class ChatGUI(QWidget,Ui_Form):
                 msg_ls = msg.split(' ')
                 ltime = ' '.join(msg_ls[:2])
                 user_name = msg_ls[2]
-                user_id = msg_ls[3]
+                # user_id = msg_ls[3]
+                user_id = self.id
                 msg = ' '.join(msg_ls[3:])
                 self.textEdit_msg_box.append(ltime)
                 self.textEdit_msg_box.append(
-                    f'<img src="./resource/portrait/{user_id}.jpg" id="portrait" width=50 height=50/>{user_name}: ' + msg)
+                    f'<img src="./resource/portrait/{self.id}.jpg" id="portrait" width=50 height=50/>{user_name}: ' + msg)
                 self.textEdit_msg_box.append('')
                 self.textEdit_msg_box.moveCursor(self.textEdit_msg_box.textCursor().End)
             except Exception as e:
@@ -117,6 +122,23 @@ class ChatGUI(QWidget,Ui_Form):
         self.userSettings.show()
         self.userSettings._signal.connect(self._update)
 
+    def _send_portrait(self):
+        print('send portrait...')
+        client = socket.socket()
+        client.connect(RESOURCE_SERVER_ADDRESS)
+        header = {
+            'user_id': self.id,
+            'file_size': os.path.getsize(self.portrait)
+        }
+        header_str = json.dumps(header).encode()
+        client.send(struct.pack('i', len(header_str)))
+        client.send(header_str)
+        with open(self.portrait, 'rb') as f:
+            for line in f:
+                client.send(line)
+        client.close()
+        print('send done')
+
     def _update(self, params):
         """
         更新用户信息
@@ -127,9 +149,10 @@ class ChatGUI(QWidget,Ui_Form):
         self.favComic = params['fac_comic']
         self.isKnow = params['is_know']
         self._flush()
+        threading.Thread(target=self._send_portrait).start()
+
 
         # TODO: 在服务端同步更新
-        # TODO: 头像的更新
 
     def eventFilter(self, obj, event):
         """
