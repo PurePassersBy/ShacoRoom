@@ -1,10 +1,14 @@
 import socket
 import threading
 import struct
+import pickle
 
 CHUNK = 1024
 PAYLOAD_SIZE = struct.calcsize("L")
 RESOURCE_SERVER_ADDRESS = ('0.0.0.0', 3979)
+
+header_struct = struct.Struct('i1024s')
+data_struct = struct.Struct('1024s')
 
 
 class ResourceManager(threading.Thread):
@@ -17,17 +21,18 @@ class ResourceManager(threading.Thread):
 
     def fetch_and_store(self, conn):
         print('fetch file...')
-        user_id = conn.recv(CHUNK).decode()
-        print('user_id :', user_id)
-        data = ''.encode()
-        while len(data) < PAYLOAD_SIZE:
-            data += conn.recv(CHUNK)
-        file_size = struct.unpack("L", data[:PAYLOAD_SIZE])[0]
-        data = data[PAYLOAD_SIZE:]
-        while len(data) < file_size:
-            data += conn.recv(CHUNK)
+        picked_header = self.server.recv(CHUNK)
+        header_str = header_struct.unpack(picked_header)
+        header = pickle.loads(header_str)
+        user_id = header['user_id']
+        file_size = header['file_size']
         with open(f'./resource/portrait/{user_id}.jpg', 'wb') as f:
-            f.write(data)
+            recv_size = 0
+            while recv_size < file_size:
+                data = self.server.recv(CHUNK)
+                f.write(data)
+                recv_size += len(data)
+                print('recv_pre: ',recv_size/file_size)
         conn.close()
         print('fetch done')
 
