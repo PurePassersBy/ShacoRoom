@@ -29,7 +29,6 @@ class ResourceManager(threading.Thread):
                 data = conn.recv(CHUNK)
                 f.write(data)
                 recv_size += len(data)
-                print('recv_pre: ',recv_size/file_size)
         conn.close()
         print('fetch done')
 
