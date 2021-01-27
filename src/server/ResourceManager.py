@@ -2,10 +2,6 @@ import socket
 import threading
 import struct
 
-import numpy as np
-import cv2
-import pymysql
-
 CHUNK = 1024
 PAYLOAD_SIZE = struct.calcsize("L")
 RESOURCE_SERVER_ADDRESS = ('0.0.0.0', 3979)
