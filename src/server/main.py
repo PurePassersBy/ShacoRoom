@@ -16,3 +16,4 @@ if __name__ == '__main__':
     manager.start()
     videoManager.start()
     audioManager.start()
+    resourceManager.start()
