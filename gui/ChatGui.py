@@ -127,7 +127,7 @@ class ChatGUI(QWidget,Ui_Form):
 
     def _send_portrait(self):
         print('send portrait...')
-        client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        client = socket.socket()
         client.connect(RESOURCE_SERVER_ADDRESS)
         header = {
             'user_id': self.id,
