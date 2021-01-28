@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
 import sys
 import random
+import time
 
+import threading
 from PyQt5.QtWidgets import QApplication, QMainWindow
 from PyQt5.QtGui import QPixmap, QIcon, QTextCursor
 from PyQt5 import QtWidgets, QtCore
-
 
 from mailVerify import Mail
 from DAO.dataBase import Connect
@@ -41,7 +42,7 @@ class MyMainForm(QMainWindow, Ui_Verify):
         # 检测验证码是否正确
         self.codeEdit.textChanged['QString'].connect(self._code_check)
         # 点击发送验证邮件按钮 调用send函数
-        self.sendButton.clicked.connect(self.send)
+        self.sendButton.clicked.connect(self._send)
         self.confirmButton.clicked.connect(self._update_userinfo)
 
     def _mail_check(self):
@@ -76,7 +77,7 @@ class MyMainForm(QMainWindow, Ui_Verify):
             print("Right verify code!")
             self.codeStatus.setText("Ok")
 
-    def send(self):
+    def _send(self):
         # 获取用户输入的邮箱地址
         mailAddress = str(self.mailEdit.text())
         # 检测用户邮箱是否注册
@@ -93,10 +94,26 @@ class MyMainForm(QMainWindow, Ui_Verify):
             send_thread = Mail(self.senderMail, self.passwordMail, mailAddress, self.verifyCode)
             # 用线程发送邮件 避免用户等待
             send_thread.start()
+            # 用线程计时可重新发送邮件的等待时间 避免堵塞
+            threading.Thread(target=self._count_down, args=()).start()
         else:
             # 邮箱重复
             print("邮箱重复")
             self.mailStatus.setText("该邮箱已被注册！")
+
+    def _count_down(self):
+        # 按下按钮后过60s后才可以再次发送验证邮件
+        current_time = 0
+        # 禁用发送按钮
+        self.sendButton.setEnabled(False)
+        while current_time < 60:
+            self.sendButton.setText(str(60-current_time)+'s后可再发送')
+            # 每过一秒更新一次时间
+            time.sleep(1)
+            current_time += 1
+        # 60s后恢复发送按钮
+        self.sendButton.setEnabled(True)
+        self.sendButton.setText('发送验证邮件')
 
     def _generate_code(self):
         code = random.randint(100000, 999999)  # 生成六位随机数

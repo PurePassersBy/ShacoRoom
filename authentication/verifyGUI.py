@@ -18,7 +18,7 @@ class Ui_Verify(object):
         Verify.setMinimumSize(QtCore.QSize(600, 300))
         Verify.setMaximumSize(QtCore.QSize(600, 300))
         self.sendButton = QtWidgets.QPushButton(Verify)
-        self.sendButton.setGeometry(QtCore.QRect(440, 120, 100, 30))
+        self.sendButton.setGeometry(QtCore.QRect(440, 120, 111, 30))
         self.sendButton.setObjectName("sendButton")
         self.mailLabel = QtWidgets.QLabel(Verify)
         self.mailLabel.setGeometry(QtCore.QRect(50, 130, 72, 15))
