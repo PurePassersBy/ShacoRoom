@@ -47,7 +47,7 @@ class ChatGUI(QWidget,Ui_Form):
     def init_chatter(self):
         self.chatter = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.chatter.connect(SERVER_ADDRESS)
-        self.chatter.send((self.userName).encode())
+        self.chatter.send(str(self.id).encode())
         receiver = threading.Thread(target=self.recv_message)
         receiver.setDaemon(True)
         receiver.start()
@@ -72,9 +72,8 @@ class ChatGUI(QWidget,Ui_Form):
                 msg = self.chatter.recv(1024).decode()
                 msg_ls = msg.split(' ')
                 ltime = ' '.join(msg_ls[:2])
-                user_name = msg_ls[2]
-                # user_id = msg_ls[3]
-                user_id = self.cur.execute('select id from userinfo where name = %s',[user_name])
+                user_id = msg_ls[2]
+                user_name = self.cur.execute('select name from userinfo where id = %s;',[user_id])
                 print(user_id)
                 msg = ' '.join(msg_ls[3:])
                 self.textEdit_msg_box.append(ltime)
@@ -178,7 +177,7 @@ class ChatGUI(QWidget,Ui_Form):
 
 if __name__ == '__main__':
     app = QtWidgets.QApplication(sys.argv)
-    id = 0
+    id = 4
     user_name = '牛蛙丶丶'
     portrait = './resource/Saten_Ruiko.jpg'
     fav_comic = 'Attack on Titan'
