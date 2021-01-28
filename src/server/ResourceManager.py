@@ -2,6 +2,7 @@ import socket
 import threading
 import struct
 import json
+import os
 
 CHUNK = 1024
 PAYLOAD_SIZE = struct.calcsize("L")
@@ -23,7 +24,8 @@ class ResourceManager(threading.Thread):
         header = json.loads(header_str.decode())
         user_id = header['user_id']
         file_size = header['file_size']
-        with open(f'./resource/portrait/{user_id}.jpg', 'wb') as f:
+        file_path = f'./resource/portrait/{user_id}.jpg'
+        with open(file_path, 'wb') as f:
             recv_size = 0
             while recv_size < file_size:
                 data = conn.recv(CHUNK)

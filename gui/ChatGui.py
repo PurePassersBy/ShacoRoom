@@ -9,11 +9,13 @@ import socket
 from PyQt5.QtGui import QPixmap, QIcon, QTextCursor
 from PyQt5 import QtWidgets, QtCore
 from PyQt5.QtWidgets import QLabel, QMessageBox, QWidget
+import pymysql
 
 from VChat import Ui_Form
 from SettingsGui import SettingsGui
 #from authentication.dataBase import
 
+SERVER_IP = '39.106.169.58'
 SERVER_ADDRESS = ('39.106.169.58', 3976)
 VIDEO_SERVER_ADDRESS = ('39.106.169.58', 3977)
 AUDIO_SERVER_ADDRESS = ('39.106.169.58', 3978)
@@ -33,6 +35,10 @@ class ChatGUI(QWidget,Ui_Form):
         self.isKnow = is_know
         self._flush()
 
+        self.db_conn = pymysql.connect(host=SERVER_IP, port=3306, user='Shaco', password='Badwoman',
+                                       db='ShacoRoomDB') # 连接很慢
+        self.cur = self.db_conn.cursor()
+
         self.init_chatter()
 
         self.textEdit_msg_box.setReadOnly(True)
@@ -41,7 +47,7 @@ class ChatGUI(QWidget,Ui_Form):
     def init_chatter(self):
         self.chatter = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.chatter.connect(SERVER_ADDRESS)
-        self.chatter.send((self.userName).encode())
+        self.chatter.send(str(self.id).encode())
         receiver = threading.Thread(target=self.recv_message)
         receiver.setDaemon(True)
         receiver.start()
@@ -66,13 +72,14 @@ class ChatGUI(QWidget,Ui_Form):
                 msg = self.chatter.recv(1024).decode()
                 msg_ls = msg.split(' ')
                 ltime = ' '.join(msg_ls[:2])
-                user_name = msg_ls[2]
-                # user_id = msg_ls[3]
-                user_id = self.id
+                user_id = msg_ls[2]
+                self.cur.execute('select name from userinfo where id = %s;',user_id)
+                user_name = self.cur.fetchone()[0]
                 msg = ' '.join(msg_ls[3:])
+                print(ltime)
                 self.textEdit_msg_box.append(ltime)
                 self.textEdit_msg_box.append(
-                    f'<img src="./resource/portrait/{self.id}.jpg" id="portrait" width=50 height=50/>{user_name}: ' + msg)
+                    f'<img src="./resource/portrait/{user_id}.jpg" id="portrait" width=50 height=50/>{user_name}: ' + msg)
                 self.textEdit_msg_box.append('')
                 self.textEdit_msg_box.moveCursor(self.textEdit_msg_box.textCursor().End)
             except Exception as e:
@@ -171,9 +178,8 @@ class ChatGUI(QWidget,Ui_Form):
 
 if __name__ == '__main__':
     app = QtWidgets.QApplication(sys.argv)
-    id = 0
+    id = 4
     user_name = '牛蛙丶丶'
-    portrait = './resource/Saten_Ruiko.jpg'
     fav_comic = 'Attack on Titan'
     is_know = True
     gui = ChatGUI(id, user_name, fav_comic, is_know)
