@@ -11,9 +11,10 @@ class Mail(threading.Thread):
     def __init__(self, sender, password, receiver, verify_code):
         """
         发送邮件
-        :param sender:   发送邮箱
-        :param password: stmp授权码
-        :param receiver: 接收邮箱
+        :param sender:      发送邮箱
+        :param password:    stmp授权码
+        :param receiver:    接收邮箱
+        :param verify_code: 验证码
         :return:Void:
         """
         # 第三方SMTP服务
@@ -28,6 +29,11 @@ class Mail(threading.Thread):
 
 
     def run(self):
+        """
+        发送邮件
+        :param：
+        :return:
+        """
         try:
             msg = MIMEText('欢迎注册ShacoRoom 您的验证码为：' + str(self.verifyCode) + '\n请在十五分钟内完成验证', 'plain', 'utf-8')  # 邮件内容
             msg['From'] = formataddr(["ShacoRoom", self.mailSender])  # 括号里的对应发件人邮箱昵称、发件人邮箱账号
@@ -42,9 +48,6 @@ class Mail(threading.Thread):
         except Exception:
             print("Send failed")
             self.sendResult = False #邮件发送失败
-
-    def get_result(self):
-        return self.sendResult
 
 
 
