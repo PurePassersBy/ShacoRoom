@@ -28,31 +28,44 @@ class MyMainForm(QMainWindow, Ui_Verify):
         self.verifyCode = None
 
         # 添加检测验证码文本变化信号和槽 name password主要检测长度
-        self.nameEdit.textChanged['QString'].connect(self.nameCheck)
+        self.nameEdit.textChanged['QString'].connect(self._name_check)
         self.nameEdit.setToolTip('长度不超过8')
-        self.passwordEdit.textChanged['QString'].connect(self.passwordCheck)
+        self.nameEdit.setMaxLength(9)
+        self.passwordEdit.textChanged['QString'].connect(self._password_check)
         self.passwordEdit.setToolTip('长度不超过12')
+        self.passwordEdit.setMaxLength(13)
+
+        self.mailEdit.textChanged['QString'].connect(self._mail_check)
+        self.nameEdit.setToolTip('输入您的邮箱')
+        self.mailEdit.setMaxLength(21)
         # 检测验证码是否正确
-        self.codeEdit.textChanged['QString'].connect(self.codeCheck)
+        self.codeEdit.textChanged['QString'].connect(self._code_check)
         # 点击发送验证邮件按钮 调用send函数
         self.sendButton.clicked.connect(self.send)
-        self.confirmButton.clicked.connect(self.updateUserinfo)
+        self.confirmButton.clicked.connect(self._update_userinfo)
 
-    def nameCheck(self):
+    def _mail_check(self):
+        mail = self.mailEdit.text()
+        if len(mail) > 20:
+            self.mailStatus.setText("Too long")
+        else:
+            self.mailStatus.setText("Ok")
+
+    def _name_check(self):
         name = self.nameEdit.text()
         if len(name) > 8:
             self.nameStatus.setText("Too long")
         else:
             self.nameStatus.setText("Ok")
 
-    def passwordCheck(self):
+    def _password_check(self):
         password = self.passwordEdit.text()
         if len(password) > 12:
             self.passwordStatus.setText("Too long")
         else:
             self.passwordStatus.setText("Ok")
 
-    def codeCheck(self):
+    def _code_check(self):
         code = int(self.codeEdit.text())
         if code != self.verifyCode:
             self.codeStatus.setText("Wrong")
@@ -75,31 +88,30 @@ class MyMainForm(QMainWindow, Ui_Verify):
         if mail_repeat is None:
             # 邮箱合法
             print("邮箱合法")
-            self.verifyCode = self.generateCode()
+            self.verifyCode = self._generate_code()
             print(self.senderMail + "   " + self.passwordMail + "verify code:" + str(self.verifyCode))
-            sendMail = Mail(self.senderMail, self.passwordMail, mailAddress, self.verifyCode)
+            send_thread = Mail(self.senderMail, self.passwordMail, mailAddress, self.verifyCode)
             # 用线程发送邮件 避免用户等待
-            sendMail.start()
+            send_thread.start()
         else:
             # 邮箱重复
             print("邮箱重复")
             self.mailStatus.setText("该邮箱已被注册！")
 
-    def generateCode(self):
+    def _generate_code(self):
         code = random.randint(100000, 999999)  # 生成六位随机数
         return code
 
-    def updateUserinfo(self):
+    def _update_userinfo(self):
         # 初始化封装在dataBase的连接
-        mailEnter = str(self.mailEdit.text())
-        nameEnter = str(self.nameEdit.text())
-        passwordEnter = str(self.passwordEdit.text())
-        print(mailEnter)
+        mail_enter = str(self.mailEdit.text())
+        name_enter = str(self.nameEdit.text())
+        password_enter = str(self.passwordEdit.text())
+
         if self.flag:
             connect = Connect()
             # 将用户信息添加到数据库
-
-            connect.insert(nameEnter, mailEnter, passwordEnter)
+            connect.insert(name_enter, mail_enter, password_enter)
             connect.close()
         else:
             self.codeStatus.setText("未收到邮件？请检查邮箱是否输入错误")
@@ -116,9 +128,11 @@ class LoginForm(QMainWindow, Ui_login):
         # 添加检测验证码文本变化信号和槽 mil password主要检测长度
         self.mailEdit.textChanged['QString'].connect(self._mail_check)
         self.mailEdit.setToolTip('没有邮箱？请先注册')
+        self.mailEdit.setMaxLength(21)
 
         self.passwordEdit.textChanged['QString'].connect(self._password_check)
         self.passwordEdit.setToolTip('长度不超过12')
+        self.passwordEdit.setMaxLength(13)
         # 点击发送验证邮件按钮 调用send函数
         self.loginButton.clicked.connect(self._login)
         self.registerButton.clicked.connect(self._register)
@@ -126,7 +140,8 @@ class LoginForm(QMainWindow, Ui_login):
 
     def _mail_check(self):
         mail = str(self.mailEdit.text())
-        if len(mail) > 20:
+        length = len(mail)
+        if length > 20:
             self.mailStatus.setText('Too long')
         else:
             self.mailStatus.setText('Oook')
