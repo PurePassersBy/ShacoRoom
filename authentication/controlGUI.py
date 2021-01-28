@@ -3,13 +3,14 @@ import sys
 import random
 
 from PyQt5.QtWidgets import QApplication, QMainWindow
-from PyQt5.QtCore import QThread, pyqtSignal, QDateTime, QObject
-import threading
+from PyQt5.QtGui import QPixmap, QIcon, QTextCursor
+from PyQt5 import QtWidgets, QtCore
 
-from dataBase import Connect
-from verifyGUI import Ui_Verify
+
 from mailVerify import Mail
-
+from DAO.dataBase import Connect
+from verifyGUI import Ui_Verify
+from loginGUI import Ui_login
 
 
 # 导入designer工具生成的模块
@@ -40,7 +41,6 @@ class MyMainForm(QMainWindow, Ui_Verify):
     def nameCheck(self):
         name = self.nameEdit.text()
         if len(name) > 8:
-            print("Too long")
             self.nameStatus.setText("Too long")
         else:
             self.nameStatus.setText("Ok")
@@ -48,7 +48,6 @@ class MyMainForm(QMainWindow, Ui_Verify):
     def passwordCheck(self):
         password = self.passwordEdit.text()
         if len(password) > 12:
-            print("Too long")
             self.passwordStatus.setText("Too long")
         else:
             self.passwordStatus.setText("Ok")
@@ -73,7 +72,7 @@ class MyMainForm(QMainWindow, Ui_Verify):
         # 关闭与mysql的连接
         connect.close()
 
-        if mail_repeat == None:
+        if mail_repeat is None:
             # 邮箱合法
             print("邮箱合法")
             self.verifyCode = self.generateCode()
@@ -86,11 +85,9 @@ class MyMainForm(QMainWindow, Ui_Verify):
             print("邮箱重复")
             self.mailStatus.setText("该邮箱已被注册！")
 
-
     def generateCode(self):
         code = random.randint(100000, 999999)  # 生成六位随机数
         return code
-
 
     def updateUserinfo(self):
         # 初始化封装在dataBase的连接
@@ -109,11 +106,67 @@ class MyMainForm(QMainWindow, Ui_Verify):
             pass
 
 
+class LoginForm(QMainWindow, Ui_login):
+    def __init__(self):
+        super(LoginForm, self).__init__()
+        self.setupUi(self)
+        self.retranslateUi(self)
+        self.mail = None
+        self.password = None
+        # 添加检测验证码文本变化信号和槽 mil password主要检测长度
+        self.mailEdit.textChanged['QString'].connect(self._mail_check)
+        self.mailEdit.setToolTip('没有邮箱？请先注册')
+
+        self.passwordEdit.textChanged['QString'].connect(self._password_check)
+        self.passwordEdit.setToolTip('长度不超过12')
+        # 点击发送验证邮件按钮 调用send函数
+        self.loginButton.clicked.connect(self._login)
+        self.registerButton.clicked.connect(self._register)
+        self.qt_register = MyMainForm("614446871@qq.com", "rduygnlorlpgbeec")
+
+    def _mail_check(self):
+        mail = str(self.mailEdit.text())
+        if len(mail) > 20:
+            self.mailStatus.setText('Too long')
+        else:
+            self.mailStatus.setText('Oook')
+
+    def _password_check(self):
+        password = str(self.passwordEdit.text())
+        if len(password) > 12:
+            self.passwordStatus.setText('Too long')
+        else:
+            self.passwordStatus.setText('Oook')
+
+    def _login(self):
+        self.mail = str(self.mailEdit.text())
+        self.password = str(self.passwordEdit.text())
+        # 连接数据库
+        conn = Connect()
+        result = conn.search('mail', self.mail)
+        if result is None:
+            self.mailStatus.setText('该邮箱未注册，请先注册')
+        else:
+            # result 返回的是一个二维tuple
+            if result[0][3] == self.password:
+                self.passwordStatus.setText('密码正确')
+                # 接入聊天室
+                pass
+            else:
+                self.passwordStatus.setText('密码错误')
+        # 关闭数据库连接
+        conn.close()
+
+    def _register(self):
+        # 跳转到注册界面
+        self.qt_register.show()
+
+
 if __name__ == "__main__":
     # 固定的，PyQt5程序都需要QApplication对象。sys.argv是命令行参数列表，确保程序可以双击运行
     app = QApplication(sys.argv)
     # 初始化用于发送验证邮件的邮箱 以及STMP服务授权码
-    myWin = MyMainForm("614446871@qq.com", "rduygnlorlpgbeec")
+    myWin = LoginForm()
     # 将窗口控件显示在屏幕上
     myWin.show()
 

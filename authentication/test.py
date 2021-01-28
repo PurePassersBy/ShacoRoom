@@ -1,4 +1,4 @@
-from authentication.dataBase import Connect
+from authentication.DAO.dataBase import Connect
 
 # 运行主窗口
 if __name__ == "__main__":
