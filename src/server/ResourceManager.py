@@ -25,9 +25,6 @@ class ResourceManager(threading.Thread):
         user_id = header['user_id']
         file_size = header['file_size']
         file_path = f'./resource/portrait/{user_id}.jpg'
-        if not os.path.exists(file_path):
-            f = open(file_path, 'w')
-            f.close()
         with open(file_path, 'wb') as f:
             recv_size = 0
             while recv_size < file_size:

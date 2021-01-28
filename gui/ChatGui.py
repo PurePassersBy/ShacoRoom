@@ -73,9 +73,10 @@ class ChatGUI(QWidget,Ui_Form):
                 msg_ls = msg.split(' ')
                 ltime = ' '.join(msg_ls[:2])
                 user_id = msg_ls[2]
-                user_name = self.cur.execute('select name from userinfo where id = %s;',[user_id])
-                print(user_id)
+                self.cur.execute('select name from userinfo where id = %s;',user_id)
+                user_name = self.cur.fetchone()[0]
                 msg = ' '.join(msg_ls[3:])
+                print(ltime)
                 self.textEdit_msg_box.append(ltime)
                 self.textEdit_msg_box.append(
                     f'<img src="./resource/portrait/{user_id}.jpg" id="portrait" width=50 height=50/>{user_name}: ' + msg)
@@ -179,7 +180,6 @@ if __name__ == '__main__':
     app = QtWidgets.QApplication(sys.argv)
     id = 4
     user_name = '牛蛙丶丶'
-    portrait = './resource/Saten_Ruiko.jpg'
     fav_comic = 'Attack on Titan'
     is_know = True
     gui = ChatGUI(id, user_name, fav_comic, is_know)
