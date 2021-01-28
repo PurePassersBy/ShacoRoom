@@ -9,11 +9,13 @@ import socket
 from PyQt5.QtGui import QPixmap, QIcon, QTextCursor
 from PyQt5 import QtWidgets, QtCore
 from PyQt5.QtWidgets import QLabel, QMessageBox, QWidget
+import pymysql
 
 from VChat import Ui_Form
 from SettingsGui import SettingsGui
 #from authentication.dataBase import
 
+SERVER_IP = '39.106.169.58'
 SERVER_ADDRESS = ('39.106.169.58', 3976)
 VIDEO_SERVER_ADDRESS = ('39.106.169.58', 3977)
 AUDIO_SERVER_ADDRESS = ('39.106.169.58', 3978)
@@ -32,6 +34,10 @@ class ChatGUI(QWidget,Ui_Form):
         self.favComic = fav_comic
         self.isKnow = is_know
         self._flush()
+
+        self.db_conn = pymysql.connect(host=SERVER_IP, port=3306, user='Shaco', password='Badwoman',
+                                       db='ShacoRoomDB') # 连接很慢
+        self.cur = self.db_conn.cursor()
 
         self.init_chatter()
 
@@ -68,11 +74,12 @@ class ChatGUI(QWidget,Ui_Form):
                 ltime = ' '.join(msg_ls[:2])
                 user_name = msg_ls[2]
                 # user_id = msg_ls[3]
-                user_id = self.id
+                user_id = self.cur.execute('select id from userinfo where name = %s',[user_name])
+                print(user_id)
                 msg = ' '.join(msg_ls[3:])
                 self.textEdit_msg_box.append(ltime)
                 self.textEdit_msg_box.append(
-                    f'<img src="./resource/portrait/{self.id}.jpg" id="portrait" width=50 height=50/>{user_name}: ' + msg)
+                    f'<img src="./resource/portrait/{user_id}.jpg" id="portrait" width=50 height=50/>{user_name}: ' + msg)
                 self.textEdit_msg_box.append('')
                 self.textEdit_msg_box.moveCursor(self.textEdit_msg_box.textCursor().End)
             except Exception as e:
