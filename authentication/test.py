@@ -17,5 +17,5 @@ if __name__ == "__main__":
     test.delete()
     # 查找mail 中 是614446871@qq.com 的用户,被删除
     test.search('mail', '614446871@qq.com')
-
+    # 使用完Connect 记得关闭
     test.close()
