@@ -5,20 +5,23 @@ import time
 
 import threading
 from PyQt5.QtWidgets import QApplication, QMainWindow
-from PyQt5.QtGui import QPixmap, QIcon, QTextCursor
-from PyQt5 import QtWidgets, QtCore
+from PyQt5 import QtCore
+
 
 from mailVerify import Mail
 from DAO.dataBase import Connect
 from verifyGUI import Ui_Verify
 from loginGUI import Ui_login
+from dialogGUI import Ui_Dialog
 
 
 # 导入designer工具生成的模块
 
-class MyMainForm(QMainWindow, Ui_Verify):
+class RegisterForm(QMainWindow, Ui_Verify):
     def __init__(self, senderMail, passwordMail):
-        super(MyMainForm, self).__init__()
+        super(RegisterForm, self).__init__()
+        # 实例化子类dialog,这一步一定要在self.initUi前面,不然initUi中不能调用没有实例化的close_signal这个槽信
+        self.success_dialog = CloseDialog()
         self.setupUi(self)
         self.retranslateUi(self)
         self.senderMail = senderMail
@@ -44,6 +47,8 @@ class MyMainForm(QMainWindow, Ui_Verify):
         # 点击发送验证邮件按钮 调用send函数
         self.sendButton.clicked.connect(self._send)
         self.confirmButton.clicked.connect(self._update_userinfo)
+        # 调用CloseDialog类中的close_signal 槽信号并绑定信号到self.close 既关闭RegisterForm这个类的方法
+        self.success_dialog.close_signal.connect(self.close)
 
     def _mail_check(self):
         mail = self.mailEdit.text()
@@ -130,9 +135,30 @@ class MyMainForm(QMainWindow, Ui_Verify):
             # 将用户信息添加到数据库
             connect.insert(name_enter, mail_enter, password_enter)
             connect.close()
+            self.success_dialog.show()
+
         else:
             self.codeStatus.setText("未收到邮件？请检查邮箱是否输入错误")
             pass
+
+
+class CloseDialog(QMainWindow, Ui_Dialog):
+    # pyqtSignal 要定义为一个类而不是属性，不能放到__init__里
+    close_signal = QtCore.pyqtSignal()
+
+    def __init__(self):
+        super(CloseDialog, self).__init__()
+        self.setupUi(self)
+        self.retranslateUi(self)
+
+        self.buttonBox.accepted.connect(self._close)
+        self.buttonBox.rejected.connect(self._close)
+
+    def _close(self):
+        self.close_signal.emit()
+        self.close()
+
+
 
 
 class LoginForm(QMainWindow, Ui_login):
@@ -153,7 +179,7 @@ class LoginForm(QMainWindow, Ui_login):
         # 点击发送验证邮件按钮 调用send函数
         self.loginButton.clicked.connect(self._login)
         self.registerButton.clicked.connect(self._register)
-        self.qt_register = MyMainForm("614446871@qq.com", "rduygnlorlpgbeec")
+        self.qt_register = RegisterForm("614446871@qq.com", "rduygnlorlpgbeec")
 
     def _mail_check(self):
         mail = str(self.mailEdit.text())
