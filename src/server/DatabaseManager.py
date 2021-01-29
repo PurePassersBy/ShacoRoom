@@ -2,10 +2,16 @@ import socket
 import threading
 import struct
 import json
+from time import strftime, localtime
 
 import pymysql
 
 cur_lock = threading.Lock()
+
+
+def get_localtime():
+    return strftime("%Y-%m-%d %H:%M:%S", localtime())
+
 
 class DatabaseManager(threading.Thread):
     def __init__(self, addr):
@@ -20,6 +26,7 @@ class DatabaseManager(threading.Thread):
         self.cur = self.db_conn.cursor()
 
     def do_sql(self, conn):
+        print(f"{get_localtime()}  DatabaseManager starts...")
         while True:
             try:
                 pack_size = struct.unpack("i", conn.recv(4))[0]

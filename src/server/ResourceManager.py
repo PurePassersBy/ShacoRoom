@@ -2,11 +2,14 @@ import socket
 import threading
 import struct
 import json
-import os
+from time import strftime, localtime
 
 CHUNK = 1024
 PAYLOAD_SIZE = struct.calcsize("L")
 RESOURCE_SERVER_ADDRESS = ('0.0.0.0', 3979)
+
+def get_localtime():
+    return strftime("%Y-%m-%d %H:%M:%S", localtime())
 
 
 class ResourceManager(threading.Thread):
@@ -35,7 +38,7 @@ class ResourceManager(threading.Thread):
         print('fetch done')
 
     def run(self):
-        print('ResourceManager starts...')
+        print(f"{get_localtime()}  ResourceManager starts...")
         while True:
             try:
                 conn, addr = self.server.accept()
