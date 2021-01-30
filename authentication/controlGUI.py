@@ -13,6 +13,7 @@ from verifyGUI import Ui_Verify
 from loginGUI import Ui_login
 from dialogGUI import Ui_Dialog
 from DAO.dataBase import ConnectSQL
+from gui.ChatGui import ChatGUI
 
 SERVER_ADDRESS = ('39.106.169.58', 3980)
 TABLE_NAME = 'userinfo'
@@ -249,8 +250,10 @@ class LoginForm(QMainWindow, Ui_login):
         # 点击发送验证邮件按钮 调用send函数
         self.loginButton.clicked.connect(self._login)
         self.registerButton.clicked.connect(self._register)
+        # 初始化注册界面
         self.qt_register = RegisterForm("614446871@qq.com", "rduygnlorlpgbeec", self.conn)
-
+        # 初始化聊天室界面
+        self.qt_chat = None
     def _mail_check(self):
         """
         检测邮箱输入长度，太长则改变文本提示用户
@@ -297,6 +300,8 @@ class LoginForm(QMainWindow, Ui_login):
             if result[0][3] == self.password:
                 self.passwordStatus.setText('密码正确')
                 # 接入聊天室
+                self.qt_chat = ChatGUI(
+                    result[0][0], result[0][1], 'Stein Gates', 'True', self.conn)
                 pass
             else:
                 self.passwordStatus.setText('密码错误')
