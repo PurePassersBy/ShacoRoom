@@ -1,181 +1,175 @@
-import pymysql
+import socket
+import threading
+import struct
+import json
+from time import strftime, localtime
 
 
-class Connect:
-    def __init__(self):
-        # self.conn = pymysql.connect(host='192.168.1.105', port=3306, user='root', password='123456', db='shacousers',
-        #                            charset='utf8', )
-        self.conn = pymysql.connect(host='39.106.169.58', port=3306, user='Shaco', password='Badwoman',
-                                    db='ShacoRoomDB',
-                                    charset='utf8', )
-        self.cur = self.conn.cursor()
-        # 获取数据库中的用户数量count
-        # 新用户注册其id为count+1
-        self.count = self.cur.execute('SELECT * from userinfo')
-        # 解决中文编码问题
-        self.cur.execute("ALTER TABLE userinfo CONVERT TO CHARACTER SET utf8;")
-        # 防止直接用str代替sql表属性名出现错误
-        self.search_property = {'id': 'select * from userinfo where id = %s;',
-                                'name': 'select * from userinfo where name = %s;',
-                                'mail': 'select * from userinfo where mail = %s;',
-                                'password': 'select * from userinfo where password = %s;'}
+def get_localtime():
+    return strftime("%Y-%m-%d %H:%M:%S", localtime())
 
-        self.edit_property = {'name':'update userinfo set name = %s WHERE id = %s;',
-                              'mail':'update userinfo set mail = %s WHERE id = %s;',
-                              'password':'update userinfo set password = %s WHERE id = %s;',}
 
-    def test(self):
+# data base serve ('39.106.169.58', 3980)
+
+class ServerConnect(threading.Thread):
+    def __init__(self, address):
+        super().__init__()
+        self._server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self._server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        self._server.connect(address)
+        # data为需要sql执行的语句
+        self._notion_success = {
+            'search': '符合查找条件的数据为：',
+            'insert': '插入成功，插入的数据为：',
+            'edit': '修改成功，修改后的数据为：',
+            'delete': '删除成功，删除后的数据为：'
+        }
+        self._notion_fail = {
+            'search': '未查找到符合条件的数据',
+            'insert': '插入失败',
+            'edit': '修改失败',
+            'delete': '删除失败'
+        }
+        self.result = None
+        self.count = 0
+
+    def send_sql(self, sql_type, data):
         """
-        检测数据库是否连接成功，打印数据库版本号
-        :param
-        :return
+        向服务器发送sql请求，
+        :param :
+        :return:返回查询结果，查询失败则返回None
         """
-        self.cur.execute("SELECT VERSION()")
-        data = self.cur.fetchone()
-        print("Database version:%s" % data)
+        print(f"{get_localtime()}  SQL Request sending  starts...")
+        try:
+            data_json = json.dumps(data)  # 把字典序列化
+            data_str = data_json.encode()  # 转换成二进制比特流
+            self._server.send(struct.pack('i', len(data_str)))  # 发送数据包大小
+            self._server.send(data_str)
+            print('Waiting for response from server...')
+            # 等待服务端响应
+            pack_size = struct.unpack("i", self._server.recv(4))[0]
+            pack_str = self._server.recv(pack_size)
+            print(f'Received pack from server')
+            pack = json.loads(pack_str.decode())
+            self.count = pack['count']
+            self.result = pack['result']
+            if self.count:
+                print(f'{self._notion_success[sql_type]}{self.result}')
+                return self.get_result()
+            else:
+                print(f'{self._notion_fail[sql_type]}')
+                return None
 
-    def close(self):
-        """
-        关闭cur与connect
-        :param
-        :return
-        """
-        self.cur.close()
-        self.conn.close()
+        except Exception as e:
+            print('sql error', e)
 
-    def insert(self, nameInsert, mailInsert, passwordInsert):
+    def get_result(self):
+        return self.result
+
+    def get_count(self):
+        return self.count
+
+
+class ConnectSQL():
+    def __init__(self, server_address):
+        self.cur = ServerConnect(server_address)
+        self.property_name = ['id', 'name', 'mail', 'password']
+
+    def insert(self, table_name, user_data):
         """
         向数据库插入数据，不允许留空
-        :param nameInsert:用户名
-        :param mailInsert:邮箱
-        :param passwordInsert:密码
-        :return bool:查询结果
+        :param : table_name '需要操作的表名'
+        :param : user_data['name','mail','password']
+        :return:
         """
         try:
-            sql = 'insert into userinfo(id,name,mail,password) values(%s,%s,%s,%s);'
             # 将用户提交的昵称、邮箱地址、密码提交,用户的ID为当前表行数+1
-            self.count += 1
-            self.cur.execute(sql, [self.count, str(nameInsert), str(mailInsert), str(passwordInsert)])
-            print("提交新用户数据成功,当前数据库储存用户数：" + str(self.count))
-            print("提交的内容:" + "id:" + str(self.count) + "  name:" + nameInsert + "  mail:"
-                  + mailInsert + "  password:" + passwordInsert)
-            self.conn.commit()
+            sql = f'insert into {table_name}(name, mail, password) values(%s, %s, %s);'
+            data = {'sql': sql, 'args': user_data}
+            self.cur.send_sql('insert', data)
+            print(f'提交成功，更新{self.cur.get_count()}条数据')
         except Exception:
-            # 发生错误，回滚
+            # 发生错误
             print("提交新用户数据发生错误")
-            self.conn.rollback()
 
-    def search(self, prop, content):
+    def search(self, table_name, data):
         """
-        在数据库查询数据，输入要查询的属性，以及对应内容，返回该用户的所有数据
-        :param prop:在数据库中的名称：id、name、mail、password
-        :param content:具体内容
-        :return results:一个n维数组[n][id, name, mail, password]
+        在数据库查询数据，输入表名以及一个数组包含 查询的属性 对应内容，返回该用户的所有数据
+        :param table_name '需要操作的表名'
+        :param data['属性名', '该属性需查找的内容']
+        :return results:一个n维数组[n][id, name, mail, password] 未查到则返回 None
         """
-        # 将输入转化成str
-
-        prop = str(prop)
-        content = str(content)
-        for i in self.search_property.keys():
-            if str(i) == prop:
+        for i in self.property_name:
+            if i == data[0]:
                 try:
-                    sql = str(self.search_property[prop])
-                    rows = self.cur.execute(sql, [content])
-                    results = self.cur.fetchall()
-                    if rows:
-                        print('共查询到符合条件的 ' + str(rows) + '条')
-                        print(results)
-                        return results
+                    sql = f'select * from {table_name} where {data[0]} = %s;'
+                    send_data = {'sql': sql, 'args': data[1]}
+                    self.cur.send_sql('search', send_data)
+                    if self.cur.get_count():
+                        result = self.cur.get_result()
+                        print(f'查找成功,共查找到{self.cur.get_count()}条数据')
+                        return result
                     else:
-                        print('没有查询到符合条件的数据')
+                        print(f'没有查找到{data[0]}为{data[1]}的用户')
                         return None
                 except Exception:
-                    # 发生错误，回滚
+                    # 发生错误
                     print('查询发生错误')
-                    self.conn.rollback()
                     return None
         # 如果表中没有相应property 则说明用户使用函数错误
-        print('使用search函数错误，search(property, content)property应为数据表中的属性')
+        print('使用search函数错误，search(table_name, data)data[0]应为数据表中的属性')
         return None
 
-    def delete(self, id_delete):
+    def delete(self, table_name, data):
         """
-        删除数据库的最后一条
-        :param id_delete:代删除的id
-        :return
-        """
-        try:
-            sql = "delete from userinfo where id = %s;"
-            rows = self.cur.execute(sql, [id_delete])
-            if rows:
-                self.count -= 1
-                print('删除成功，数据库共有' + str(self.count) + '条数据')
-                self.conn.commit()
-            else:
-                print('未查到此ID，删除失败')
-        except Exception:
-            # 发生错误，回滚
-            print('删除发生错误')
-            self.conn.rollback()
-
-    def delete(self):
-        """
-        无输入参数时，删除数据库的最后一条
-        :param
-        :return
+        删除数据库中的指定数据,data数据留空则删除最后一条
+        :param table_name '需要操作的表名'
+        :param data['属性名', '该属性需删除的内容']
+        :return results:删除的数量  发生错误则返回None
         """
         try:
-            sql = "delete from userinfo where id = %s;"
-            rows = self.cur.execute(sql, [self.count])
-            if rows:
-                self.count -= 1
-                print('删除成功，数据库共有' + str(self.count) + '条数据')
-                self.conn.commit()
-            else:
-                print('未查到此ID，删除失败')
-        except Exception:
-            # 发生错误，回滚
-            print('删除发生错误')
-            self.conn.rollback()
+            # if data:
+            #     # 无参时，删除数据库中的最后一条
+            #     sql = f'delete from {table_name} where id like (select top 1 id from {table_name} order by id desc)'
+            #     send_data = {'sql': sql, 'args': None}
+            #     self.cur.send_sql('delete', send_data)
+            #     return self.cur.get_count()
 
-    def edit(self, id_edit, prop, content):
+            # 删除数据库中指定内容
+            sql = f'delete from {table_name} where {data[0]} = %s;'
+            send_data = {'sql': sql, 'args': data[1]}
+            self.cur.send_sql('delete', send_data)
+            return self.cur.get_count()
+        except Exception:
+            # 发生错误
+            print('删除发生错误')
+            return None
+
+    def edit(self, table_name, data):
         """
-        在数据库更改数据，输入要更改的属性，以及修改后的对应内容，返回该用户的所有数据
-        :param prop: 在数据库中的名称：id、name、mail、password
-        :param id_edit: 要修改的用户id
-        :param content:具体内容
-        :return results:一个n维数组[n][id, name, mail, password]
+        在数据库更改数据，输入要更改的表名，以及需要进行修改操作的用户id，需要修改的属性及内容
+        :param table_name '需要操作的表名'
+        :param data['待修改用户id'， '属性名'， '该属性修改后的内容']
+        :return 修改后该用户的数据  出错则返回None
         """
-        id_edit = int(id_edit)
-        prop = str(prop)
-        content = str(content)
-        for i in self.search_property.keys():
-            if str(i) == prop:
+        for i in self.property_name:
+            if i == data[1]:
                 try:
-                    # 储存修改前的数据
-                    search_sql = 'select * from userinfo where id = %s;'
-                    rows = self.cur.execute(search_sql, [id_edit])
-                    results_pre = self.cur.fetchall()
-                    if rows:
-                        # 对目标数据进行修改
-                        sql = self.edit_property[prop]
-                        self.cur.execute(sql, [content, id_edit])
-                        # 获得修改后的数据
-                        self.cur.execute(search_sql, [id_edit])
-                        results = self.cur.fetchall()
-                        print('共查询到符合条件的待修改数据 ' + str(rows) + '条')
-                        print('修改前：' + str(results_pre))
-                        print('修改后' + str(results))
-                        self.conn.commit()
-                        return results
-                    else:
-                        print('没有查询到符合条件的待修改数据的ID')
+                    if self.search(table_name, ['id', data[0]]) is None:
+                        print(f'未查找到到id为{data[0]}的用户')
                         return None
+                    else:
+                        sql = f'update {table_name} set {data[1]} = {data[2]} where id = %s;'
+                        send_data = {'sql': sql, 'args': data[0]}
+                        self.cur.send_sql('edit', send_data)
+
+                        print(f'修改{self.cur.get_count()}条数据')
+                        return self.cur.get_result()
+
                 except Exception:
-                    # 发生错误，回滚
-                    print('更改发生错误')
-                    self.conn.rollback()
+                    # 发生错误
+                    print('修改发生错误')
                     return None
         # 如果表中没有相应property 则说明用户使用函数错误
-        print('使用edit函数错误，edit(property, content)property应为数据表中的属性')
+        print('使用edit函数错误，edit(table_name, data)中 data[1]应为数据表中的属性')
         return None
