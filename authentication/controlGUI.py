@@ -9,16 +9,16 @@ from PyQt5 import QtCore
 
 
 from mailThread import Mail
-from DAO.dataBase import Connect
 from verifyGUI import Ui_Verify
 from loginGUI import Ui_login
 from dialogGUI import Ui_Dialog
+from DAO.dataBase import ConnectSQL
 
-
-# 导入designer工具生成的模块
+SERVER_ADDRESS = ('39.106.169.58', 3980)
+TABLE_NAME = 'userinfo'
 
 class RegisterForm(QMainWindow, Ui_Verify):
-    def __init__(self, senderMail, passwordMail):
+    def __init__(self, senderMail, passwordMail, conn):
         """
         初始化RegisterForm类，设置不同按钮连接的槽与信号函数，实例化注册完成通知类CloseDialog()以便完成信号槽连接
         :param senderMail:   发送邮箱
@@ -30,6 +30,8 @@ class RegisterForm(QMainWindow, Ui_Verify):
         self.success_dialog = CloseDialog()
         self.setupUi(self)
         self.retranslateUi(self)
+        # 接收来自登陆界面的DAO connect
+        self.conn = conn
         # 储存发送邮箱以及邮箱stmp授权码
         self.senderMail = senderMail
         self.passwordMail = passwordMail
@@ -119,10 +121,8 @@ class RegisterForm(QMainWindow, Ui_Verify):
         # 获取用户输入的邮箱地址
         mailAddress = str(self.mailEdit.text())
         # 检测用户邮箱是否注册
-        connect = Connect()
-        mail_repeat = connect.search('mail', mailAddress)
-        # 关闭与mysql的连接
-        connect.close()
+        data_send = ['mail', mailAddress]
+        mail_repeat = self.conn.search(TABLE_NAME, data_send)
 
         if mail_repeat is None:
             # 邮箱合法
@@ -181,10 +181,10 @@ class RegisterForm(QMainWindow, Ui_Verify):
         password_enter = str(self.passwordEdit.text())
 
         if self.flag:
-            connect = Connect()
+
             # 将用户信息添加到数据库
-            connect.insert(name_enter, mail_enter, password_enter)
-            connect.close()
+            data_send = [name_enter, mail_enter, password_enter]
+            self.conn.insert(TABLE_NAME, data_send)
             self.success_dialog.show()
 
         else:
@@ -236,6 +236,8 @@ class LoginForm(QMainWindow, Ui_login):
         self.retranslateUi(self)
         self.mail = None
         self.password = None
+        # 初始化操作数据库的Connect
+        self.conn = ConnectSQL(SERVER_ADDRESS)
         # 添加检测验证码文本变化信号和槽 mil password主要检测长度
         self.mailEdit.textChanged['QString'].connect(self._mail_check)
         self.mailEdit.setToolTip('没有邮箱？请先注册')
@@ -247,7 +249,7 @@ class LoginForm(QMainWindow, Ui_login):
         # 点击发送验证邮件按钮 调用send函数
         self.loginButton.clicked.connect(self._login)
         self.registerButton.clicked.connect(self._register)
-        self.qt_register = RegisterForm("614446871@qq.com", "rduygnlorlpgbeec")
+        self.qt_register = RegisterForm("614446871@qq.com", "rduygnlorlpgbeec", self.conn)
 
     def _mail_check(self):
         """
@@ -285,9 +287,9 @@ class LoginForm(QMainWindow, Ui_login):
         """
         self.mail = str(self.mailEdit.text())
         self.password = str(self.passwordEdit.text())
-        # 连接数据库
-        conn = Connect()
-        result = conn.search('mail', self.mail)
+        # 向服务器发送sql查询请求
+        send_data = ['mail', self.mail]
+        result = self.conn.search(TABLE_NAME, send_data)
         if result is None:
             self.mailStatus.setText('该邮箱未注册，请先注册')
         else:
@@ -298,8 +300,7 @@ class LoginForm(QMainWindow, Ui_login):
                 pass
             else:
                 self.passwordStatus.setText('密码错误')
-        # 关闭数据库连接
-        conn.close()
+
 
     def _register(self):
         """
