@@ -69,7 +69,7 @@ class ChatGUI(QWidget,Ui_Form):
                 msg_ls = msg.split(' ')
                 ltime = ' '.join(msg_ls[:2])
                 user_id = msg_ls[2]
-                user_name = self.db_conn.search('userinfo', ['id', user_id])
+                user_name = self.db_conn.search('userinfo', ['id', user_id])[0][1]
                 msg = ' '.join(msg_ls[3:])
                 print(ltime)
                 self.textEdit_msg_box.append(ltime)
