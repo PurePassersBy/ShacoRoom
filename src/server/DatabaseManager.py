@@ -31,7 +31,7 @@ class DatabaseManager(threading.Thread):
             try:
                 pack_size = struct.unpack("i", conn.recv(4))[0]
                 pack_str = conn.recv(pack_size)
-                pack = json.loads(pack_str.decoe())
+                pack = json.loads(pack_str.decode())
                 sql = pack['sql']
                 args = pack['args']
                 print(pack)
