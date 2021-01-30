@@ -4,7 +4,7 @@ import shutil
 from PyQt5 import QtCore
 from PyQt5.QtWidgets import QWidget, QApplication, QFileDialog
 
-from VSettings import Ui_Dialog
+from gui.VSettings import Ui_Dialog
 
 
 class SettingsGui(QWidget, Ui_Dialog):

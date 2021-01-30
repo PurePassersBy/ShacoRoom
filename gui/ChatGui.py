@@ -10,8 +10,8 @@ from PyQt5.QtGui import QPixmap, QIcon, QTextCursor
 from PyQt5 import QtWidgets, QtCore
 from PyQt5.QtWidgets import QLabel, QMessageBox, QWidget
 
-from VChat import Ui_Form
-from SettingsGui import SettingsGui
+from gui.VChat import Ui_Form
+from gui.SettingsGui import SettingsGui
 
 SERVER_IP = '39.106.169.58'
 SERVER_ADDRESS = ('39.106.169.58', 3976)
