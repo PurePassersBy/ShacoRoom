@@ -83,8 +83,13 @@ class ConnectSQL():
         :return:
         """
         try:
+            sql = f'select * from {table_name};'
+            send_data = {'sql': sql, 'args': None}
+            self.cur.send_sql('search', send_data)
+            current_id = str(self.cur.get_count()+1)
+            print(current_id)
             # 将用户提交的昵称、邮箱地址、密码提交,用户的ID为当前表行数+1
-            sql = f'insert into {table_name}(name, mail, password) values(%s, %s, %s);'
+            sql = f'insert into {table_name}(id,name, mail, password) values({current_id}, %s, %s, %s);'
             data = {'sql': sql, 'args': user_data}
             self.cur.send_sql('insert', data)
             print(f'提交成功，更新{self.cur.get_count()}条数据')
@@ -159,8 +164,9 @@ class ConnectSQL():
                         print(f'未查找到到id为{data[0]}的用户')
                         return None
                     else:
-                        sql = f'update {table_name} set {data[1]} = {data[2]} where id = %s;'
-                        send_data = {'sql': sql, 'args': data[0]}
+                        sql = f'update {table_name} set {data[1]} = %s where id = %s;'
+                        send_data = {'sql': sql, 'args': [data[2], data[0]]}
+                        print('?')
                         self.cur.send_sql('edit', send_data)
 
                         print(f'修改{self.cur.get_count()}条数据')
