@@ -9,11 +9,9 @@ import socket
 from PyQt5.QtGui import QPixmap, QIcon, QTextCursor
 from PyQt5 import QtWidgets, QtCore
 from PyQt5.QtWidgets import QLabel, QMessageBox, QWidget
-import pymysql
 
 from VChat import Ui_Form
 from SettingsGui import SettingsGui
-#from authentication.dataBase import
 
 SERVER_IP = '39.106.169.58'
 SERVER_ADDRESS = ('39.106.169.58', 3976)
@@ -24,7 +22,7 @@ RESOURCE_SERVER_ADDRESS = ('39.106.169.58', 3979)
 
 class ChatGUI(QWidget,Ui_Form):
 
-    def __init__(self, user_id, user_name, fav_comic, is_know):
+    def __init__(self, user_id, user_name, fav_comic, is_know, db_conn):
         super(ChatGUI, self).__init__()
         self.setupUi(self)
 
@@ -35,9 +33,7 @@ class ChatGUI(QWidget,Ui_Form):
         self.isKnow = is_know
         self._flush()
 
-        self.db_conn = pymysql.connect(host=SERVER_IP, port=3306, user='Shaco', password='Badwoman',
-                                       db='ShacoRoomDB') # 连接很慢
-        self.cur = self.db_conn.cursor()
+        self.db_conn = db_conn
 
         self.init_chatter()
 
@@ -73,8 +69,7 @@ class ChatGUI(QWidget,Ui_Form):
                 msg_ls = msg.split(' ')
                 ltime = ' '.join(msg_ls[:2])
                 user_id = msg_ls[2]
-                self.cur.execute('select name from userinfo where id = %s;',user_id)
-                user_name = self.cur.fetchone()[0]
+                user_name = self.db_conn.search('userinfo', ['id', user_id])
                 msg = ' '.join(msg_ls[3:])
                 print(ltime)
                 self.textEdit_msg_box.append(ltime)
