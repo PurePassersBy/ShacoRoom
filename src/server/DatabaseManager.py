@@ -26,14 +26,15 @@ class DatabaseManager(threading.Thread):
         self.cur = self.db_conn.cursor()
 
     def do_sql(self, conn):
-        print(f"{get_localtime()}  DatabaseManager starts...")
+        print(f'{get_localtime()}: 一个新的连接')
         while True:
             try:
                 pack_size = struct.unpack("i", conn.recv(4))[0]
                 pack_str = conn.recv(pack_size)
-                pack = json.loads(pack_str.decoe())
+                pack = json.loads(pack_str.decode())
                 sql = pack['sql']
                 args = pack['args']
+                print(pack)
                 with cur_lock:
                     cnt = self.cur.execute(sql, args)
                     res = self.cur.fetchall()
@@ -50,6 +51,7 @@ class DatabaseManager(threading.Thread):
                 break
 
     def run(self):
+        print(f"{get_localtime()}  DatabaseManager starts...")
         while True:
             conn, addr = self._server.accept()
             threading.Thread(target=self.do_sql, args=(conn,)).start()
