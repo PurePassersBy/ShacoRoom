@@ -1,0 +1,5 @@
+<RCC>
+  <qresource prefix="login_images">
+    <file>resources/pic/shaco.jpg</file>
+  </qresource>
+</RCC>

@@ -9,7 +9,7 @@
 
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-
+import authentication.resources_rc
 
 class Ui_login(object):
     def setupUi(self, login):
@@ -69,7 +69,7 @@ class Ui_login(object):
         self.label = QtWidgets.QLabel(login)
         self.label.setGeometry(QtCore.QRect(430, 20, 331, 251))
         self.label.setText("")
-        self.label.setPixmap(QtGui.QPixmap("resources/pic/shaco.jpg"))
+        self.label.setPixmap(QtGui.QPixmap(":/login_images/resources/pic/shaco.jpg"))
         self.label.setScaledContents(True)
         self.label.setObjectName("label")
         self.mailLabel.raise_()
