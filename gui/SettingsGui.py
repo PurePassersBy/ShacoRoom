@@ -14,7 +14,7 @@ class SettingsGui(QWidget, Ui_Dialog):
         self.setupUi(self)
         self.id = user_id
         self.userName = user_name
-        self.portrait = f'./resource/portrait/{self.id}.jpg'
+        self.portrait = f'../gui/resource/portrait/{self.id}.jpg'
         self.favComic = fav_comic
         self.isKnow = is_know
 
@@ -32,7 +32,7 @@ class SettingsGui(QWidget, Ui_Dialog):
         file_name, file_type = QFileDialog.getOpenFileName(self, "选取文件", './',
                                                            "图片文件 (*.jpg);;图片文件 (*.png)")
         file_type = file_type[-4:-1]
-        shutil.copyfile(file_name, f'./resource/portrait/{self.id}.{file_type}') # 唯一标识符命名存储头像
+        shutil.copyfile(file_name, f'../gui/resource/portrait/{self.id}.{file_type}') # 唯一标识符命名存储头像
 
     def flush(self):
         """

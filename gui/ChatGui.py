@@ -28,7 +28,7 @@ class ChatGUI(QWidget,Ui_Form):
 
         self.id = user_id
         self.userName = user_name
-        self.portrait = f'./resource/portrait/{self.id}.jpg'
+        self.portrait = f'../gui/resource/portrait/{self.id}.jpg'
         self.favComic = fav_comic
         self.isKnow = is_know
         self._flush()
@@ -74,7 +74,7 @@ class ChatGUI(QWidget,Ui_Form):
                 print(ltime)
                 self.textEdit_msg_box.append(ltime)
                 self.textEdit_msg_box.append(
-                    f'<img src="./resource/portrait/{user_id}.jpg" id="portrait" width=50 height=50/>{user_name}: ' + msg)
+                    f'<img src="../gui/resource/portrait/{user_id}.jpg" id="portrait" width=50 height=50/>{user_name}: ' + msg)
                 self.textEdit_msg_box.append('')
                 self.textEdit_msg_box.moveCursor(self.textEdit_msg_box.textCursor().End)
             except Exception as e:
