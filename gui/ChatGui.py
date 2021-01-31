@@ -18,7 +18,7 @@ SERVER_ADDRESS = ('39.106.169.58', 3976)
 VIDEO_SERVER_ADDRESS = ('39.106.169.58', 3977)
 AUDIO_SERVER_ADDRESS = ('39.106.169.58', 3978)
 RESOURCE_SERVER_ADDRESS = ('39.106.169.58', 3979)
-
+TABLE_NAME = 'userinfo'
 
 class ChatGUI(QWidget,Ui_Form):
 
@@ -54,7 +54,7 @@ class ChatGUI(QWidget,Ui_Form):
         每次设置成功后调用
         :return:
         """
-        self.userSettings = SettingsGui(self.id,self.userName, self.favComic, self.isKnow)
+        self.userSettings = SettingsGui(self.id, self.userName, self.favComic, self.isKnow)
         self.label_username.setText(self.userName)
         self.graphicsView.setStyleSheet(f"border-image: url({self.portrait});")
 
@@ -150,9 +150,9 @@ class ChatGUI(QWidget,Ui_Form):
         self.userName = params['user_name']
         self.favComic = params['fac_comic']
         self.isKnow = params['is_know']
+        self.db_conn.edit(TABLE_NAME, [self.id, 'name', self.userName])
         self._flush()
         threading.Thread(target=self._send_portrait).start()
-
 
         # TODO: 在服务端同步更新
 
