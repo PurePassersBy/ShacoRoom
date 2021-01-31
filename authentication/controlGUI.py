@@ -306,6 +306,7 @@ class LoginForm(QMainWindow, Ui_login):
                 self.qt_chat = ChatGUI(
                     result[0][0], result[0][1], 'Stein Gates', True, self.conn)
                 self.qt_chat.show()
+                self.close()
             else:
                 self.passwordStatus.setText('密码错误')
 
