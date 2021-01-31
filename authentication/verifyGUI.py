@@ -15,6 +15,10 @@ class Ui_Verify(object):
     def setupUi(self, Verify):
         Verify.setObjectName("Verify")
         Verify.resize(600, 300)
+        icon = QtGui.QIcon()
+        icon.addPixmap(QtGui.QPixmap(":/images/Shaco_Logo.jpg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        Verify.setWindowIcon(icon)
+        Verify.setStyleSheet("")
         Verify.setMinimumSize(QtCore.QSize(600, 300))
         Verify.setMaximumSize(QtCore.QSize(600, 300))
         self.sendButton = QtWidgets.QPushButton(Verify)
@@ -69,7 +73,7 @@ class Ui_Verify(object):
 
     def retranslateUi(self, Verify):
         _translate = QtCore.QCoreApplication.translate
-        Verify.setWindowTitle(_translate("Verify", "Form"))
+        Verify.setWindowTitle(_translate("Verify", "注册ShacoRoom"))
         self.sendButton.setText(_translate("Verify", "发送验证邮件"))
         self.mailLabel.setText(_translate("Verify", "邮箱地址"))
         self.codeLabel.setText(_translate("Verify", "验证码"))

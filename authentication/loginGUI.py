@@ -15,6 +15,10 @@ class Ui_login(object):
     def setupUi(self, login):
         login.setObjectName("login")
         login.resize(800, 500)
+        icon = QtGui.QIcon()
+        icon.addPixmap(QtGui.QPixmap(":/images/Shaco_Logo.jpg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        login.setWindowIcon(icon)
+        login.setStyleSheet("")
         login.setMinimumSize(QtCore.QSize(800, 500))
         login.setMaximumSize(QtCore.QSize(900, 500))
         self.loginButton = QtWidgets.QPushButton(login)
@@ -84,7 +88,7 @@ class Ui_login(object):
 
     def retranslateUi(self, login):
         _translate = QtCore.QCoreApplication.translate
-        login.setWindowTitle(_translate("login", "Form"))
+        login.setWindowTitle(_translate("login", "ShacoRoom v1.0.0"))
         self.loginButton.setText(_translate("login", "登录"))
         self.registerButton.setText(_translate("login", "注册"))
         self.titleLabel.setText(_translate("login", "ShacoRoom"))
