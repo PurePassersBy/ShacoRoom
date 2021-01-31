@@ -7,6 +7,7 @@ import threading
 from PyQt5.QtWidgets import QApplication, QMainWindow
 from PyQt5 import QtCore
 
+sys.path.append('..')
 
 from mailThread import Mail
 from verifyGUI import Ui_Verify
@@ -14,6 +15,8 @@ from loginGUI import Ui_login
 from dialogGUI import Ui_Dialog
 from DAO.dataBase import ConnectSQL
 from gui.ChatGui import ChatGUI
+
+
 
 SERVER_ADDRESS = ('39.106.169.58', 3980)
 TABLE_NAME = 'userinfo'
@@ -301,8 +304,8 @@ class LoginForm(QMainWindow, Ui_login):
                 self.passwordStatus.setText('密码正确')
                 # 接入聊天室
                 self.qt_chat = ChatGUI(
-                    result[0][0], result[0][1], 'Stein Gates', 'True', self.conn)
-                pass
+                    result[0][0], result[0][1], 'Stein Gates', True, self.conn)
+                self.qt_chat.show()
             else:
                 self.passwordStatus.setText('密码错误')
 
