@@ -35,22 +35,47 @@ class ChatGUI(QWidget,Ui_Form):
 
         self.db_conn = db_conn
 
-        self.init_chatter()
-        self.get_others_portrait()
+        self.init_client_socket()
+        self.get_others_info()
 
         self.textEdit_msg_box.setReadOnly(True)
         self.textEdit.installEventFilter(self)
 
-    def get_others_portrait(self):
-        pass
+    def _get_others_portrait(self):
+        while True:
+            try:
+                header_size = struct.unpack('i', self.portrait_client.recv(4))[0]
+                header_str = self.portrait_client.recv(header_size)
+                header = json.loads(header_str.decode())
+                user_id = header['user_id']
+                file_size = header['file_size']
+                file_path = f'../gui/resource/{user_id}.jpg'
+                with open(file_path, 'wb') as f:
+                    recv_size = 0
+                    while recv_size < file_size:
+                        data = self.portrait_client.recv(1024)
+                        f.write(data)
+                        recv_size += len(data)
+            except Exception as e:
+                print('get portrait error', e)
+                break
 
-    def init_chatter(self):
+
+
+    def get_others_info(self):
+        threading.Thread(target=(self._get_others_portrait)).start()
+
+
+    def init_client_socket(self):
         self.chatter = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.chatter.connect(SERVER_ADDRESS)
         self.chatter.send(str(self.id).encode())
         receiver = threading.Thread(target=self.recv_message)
         receiver.setDaemon(True)
         receiver.start()
+
+        self.portrait_client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.portrait_client.connect(RESOURCE_SERVER_ADDRESS)
 
     def _flush(self):
         """
@@ -130,19 +155,19 @@ class ChatGUI(QWidget,Ui_Form):
 
     def _send_portrait(self):
         print('send portrait...')
-        client = socket.socket()
-        client.connect(RESOURCE_SERVER_ADDRESS)
+        #client = socket.socket()
+        #client.connect(RESOURCE_SERVER_ADDRESS)
         header = {
             'user_id': self.id,
             'file_size': os.path.getsize(self.portrait)
         }
         header_str = json.dumps(header).encode()
-        client.send(struct.pack('i', len(header_str)))
-        client.send(header_str)
+        self.portrait_client.send(struct.pack('i', len(header_str)))
+        self.portrait_client.send(header_str)
         with open(self.portrait, 'rb') as f:
             for line in f:
-                client.send(line)
-        client.close()
+                self.portrait_client.send(line)
+        # client.close()
         print('send done')
 
     def _update(self, params):
