@@ -36,9 +36,13 @@ class ChatGUI(QWidget,Ui_Form):
         self.db_conn = db_conn
 
         self.init_chatter()
+        self.get_others_portrait()
 
         self.textEdit_msg_box.setReadOnly(True)
         self.textEdit.installEventFilter(self)
+
+    def get_others_portrait(self):
+        pass
 
     def init_chatter(self):
         self.chatter = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -153,8 +157,6 @@ class ChatGUI(QWidget,Ui_Form):
         self.db_conn.edit(TABLE_NAME, [self.id, 'name', self.userName])
         self._flush()
         threading.Thread(target=self._send_portrait).start()
-
-        # TODO: 在服务端同步更新
 
     def eventFilter(self, obj, event):
         """
