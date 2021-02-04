@@ -36,13 +36,12 @@ class ReceiveMessageThread(QThread):
                 user_id = msg_ls[2]
                 msg = ' '.join(msg_ls[3:])
                 print(ltime)
-                msg_pack = {
+                pack = {
                     'time':ltime,
                     'user_id':user_id,
                     'message':msg
                 }
-                print(msg_pack)
-                self.msg_pack.emit(msg_pack)
+                self.msg_pack.emit(pack)
                 sleep(0.1)
             except Exception as e:
                 print('recv msg', e)
@@ -120,7 +119,6 @@ class ChatGUI(QWidget,Ui_Form):
         展示信息
         :return:
         """
-        print('in')
         time_ = msg_pack['time']
         user_id = msg_pack['user_id']
         user_name = self.db_conn.search('userinfo', ['id', user_id])[0][1]
@@ -139,11 +137,10 @@ class ChatGUI(QWidget,Ui_Form):
             layout_main.addWidget(portrait)
         else:
             layout_main.addWidget(portrait)
-            layout_main.addLayout(layout_main)
+            layout_main.addLayout(layout_msg)
         widget.setLayout(layout_main)
         item = QListWidgetItem()
         item.setSizeHint(QSize(200,70))
-        print('ddddd')
         self.msg_list.addItem(item)
         self.msg_list.setItemWidget(item, widget)
 
