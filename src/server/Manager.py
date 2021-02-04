@@ -52,18 +52,26 @@ class Manager(threading.Thread):
         user_name = header['user_name']
         if user_id in self._user2conn:
         # 重复登录，发送下线请求给当前登录用户
-            kickout_package = {'user_id': user_id,
-                               'user_name': user_name,
-                               'system_code':'KICK OUT'}
+            print('sending kickout')
+            kickout_package = {
+                'user_id':user_id,
+                'user_name':user_name,
+                'time':get_localtime(),
+                'message':'KICK OUT',
+                'system_code':'KICK OUT'}
             send_package(self._user2conn[user_id], kickout_package)
             response = fetch_package(self._user2conn[user_id])
+            print('receive response')
             if response['system_code'] == 'SUCCESS':
                 self._user2conn[user_id].close()
                 del self._user2conn[user_id]
                 print("KICK OUT SUCCESS")
-                response_package = {'user_id': user_id,
-                                   'user_name': user_name,
-                                   'system_code': 'SUCCESS'}
+                response_package = {
+                    'user_id':user_id,
+                    'user_name':user_name,
+                    'time':get_localtime(),
+                    'message':'KICK OUT SUCCESS',
+                    'system_code': 'SUCCESS'}
                 send_package(conn, response_package)
         self._user2conn[user_id] = conn
         header['time'] = get_localtime()

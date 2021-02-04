@@ -134,19 +134,24 @@ class ChatGUI(QWidget, Ui_Form):
         self.label_username.setText(self.userName)
         self.graphicsView.setStyleSheet(f"border-image: url({self.portrait});")
 
-    def system_information(self, msg_pack):
-        if msg_pack['system_code'] == 'KICK OUT':
+    def system_information(self, system_code):
+        print('sdfssdf')
+        if system_code == 'KICK OUT':
             # 将close 与kickout 信号连接
             self.dialog.close_signal.connect(self.close)
             # 发送下线成功的响应给服务器
-            kickout_package = {'system_code': 'SUCCESS'}
+            kickout_package = {
+                'user_id': self.id,
+                'user_name': self.userName,
+                'message': 'KICK OUT',
+                'system_code': 'SUCCESS'}
             pack_str = json.dumps(kickout_package).encode()
             self.chatter.send(struct.pack('i', len(pack_str)))
             self.chatter.send(pack_str)
             # 弹出提示框
             self.dialog = Dialog('KICK OUT')
             self.dialog.show()
-        if msg_pack['system_code'] == 'Login Repeat':
+        if system_code['system_code'] == 'Login Repeat':
             # 弹出提示框
             self.dialog = Dialog('LOGIN REPEAT')
             self.dialog.show()
@@ -156,8 +161,12 @@ class ChatGUI(QWidget, Ui_Form):
         展示信息
         :return:
         """
+        print('!!!')
+        print(msg_pack)
         if 'system_code' in msg_pack.keys():
-            self.system_information(msg_pack)
+            print('has system_code')
+            self.system_information(msg_pack['system_code'])
+        print('??')
         time_ = msg_pack['time']
         user_id = msg_pack['user_id']
         user_name = msg_pack['user_name']
