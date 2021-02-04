@@ -73,7 +73,7 @@ class ServerConnect(threading.Thread):
 class ConnectSQL():
     def __init__(self, server_address):
         self.cur = ServerConnect(server_address)
-        self.property_name = ['id', 'name', 'mail', 'password']
+        self.property_name = ['id', 'name', 'mail', 'password', 'online']
 
     def insert(self, table_name, user_data):
         """
