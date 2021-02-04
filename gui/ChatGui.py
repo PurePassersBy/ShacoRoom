@@ -134,8 +134,12 @@ class ChatGUI(QWidget,Ui_Form):
         portrait.setPixmap(img)
         layout_msg.addWidget(QLabel(f'{time_}  {user_name}'))
         layout_msg.addWidget(QLabel(msg))
-        layout_main.addWidget(portrait)
-        layout_main.addLayout(layout_msg)
+        if str(self.id) == user_id:
+            layout_main.addLayout(layout_msg)
+            layout_main.addWidget(portrait)
+        else:
+            layout_main.addWidget(portrait)
+            layout_main.addLayout(layout_main)
         widget.setLayout(layout_main)
         item = QListWidgetItem()
         item.setSizeHint(QSize(200,70))
