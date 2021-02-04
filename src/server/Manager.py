@@ -48,6 +48,7 @@ class Manager(threading.Thread):
         if user_id in self._user2conn:
             self._user2conn[user_id].close()
             del self._user2conn[user_id]
+        self._user2conn[user_id] = conn
         while True:
             try:
                 size = struct.unpack('i', conn.recv(4))[0]
