@@ -21,6 +21,18 @@ RESOURCE_SERVER_ADDRESS = ('39.106.169.58', 3979)
 PORTRAIT_PATH = '../gui/resource/portrait/%s.jpg'
 TABLE_NAME = 'userinfo'
 
+
+def send_package(conn, pack):
+    pack_str = json.dumps(pack).decode()
+    conn.send(struct.pack('i',len(pack_str)))
+    conn.send(pack_str)
+
+def fetch_package(conn):
+    size = struct.unpack('i', conn.recv(4))[0]
+    pack = json.loads(conn.recv(size).decode())
+    return pack
+
+
 class ReceiveMessageThread(QThread):
     msg_pack = pyqtSignal(dict)
     def __init__(self, chatter):
@@ -30,17 +42,7 @@ class ReceiveMessageThread(QThread):
     def run(self):
         while True:
             try:
-                msg = self.chatter.recv(1024).decode()
-                msg_ls = msg.split(' ')
-                ltime = ' '.join(msg_ls[:2])
-                user_id = msg_ls[2]
-                msg = ' '.join(msg_ls[3:])
-                print(ltime)
-                pack = {
-                    'time':ltime,
-                    'user_id':user_id,
-                    'message':msg
-                }
+                pack = fetch_package(self.chatter)
                 self.msg_pack.emit(pack)
                 sleep(0.1)
             except Exception as e:
@@ -96,7 +98,11 @@ class ChatGUI(QWidget,Ui_Form):
     def init_client(self):
         self.chatter = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.chatter.connect(SERVER_ADDRESS)
-        self.chatter.send(str(self.id).encode())
+        header = {
+            'user_id':self.id,
+            'user_name':self.userName
+        }
+        send_package(self.chatter, header)
         self.chatter_recv = ReceiveMessageThread(self.chatter)
         self.chatter_recv.msg_pack.connect(self.show_message)
         self.chatter_recv.start()
@@ -121,7 +127,7 @@ class ChatGUI(QWidget,Ui_Form):
         """
         time_ = msg_pack['time']
         user_id = msg_pack['user_id']
-        user_name = self.db_conn.search('userinfo', ['id', user_id])[0][1]
+        user_name = msg_pack['user_name']
         msg = msg_pack['message']
         widget = QWidget()
         layout_main = QHBoxLayout()
@@ -156,7 +162,12 @@ class ChatGUI(QWidget,Ui_Form):
             self.message_empty_info()
             return
         self.textEdit.clear()
-        self.chatter.send(msg.encode())
+        pack = {
+            'user_id': self.id,
+            'user_name':self.userName,
+            'message':msg
+        }
+        send_package(self.chatter, pack)
 
     def message_empty_info(self):
         """

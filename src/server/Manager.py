@@ -1,41 +1,71 @@
 import socket
+import struct
+import json
 from time import strftime, localtime, sleep
 import threading
 from queue import Queue
 
 msg_queue = Queue()
+SERVER_ADDRESS = ('0.0.0.0', 3976)
+MAX_CONNECTIONS = 200
+CHUNK = 2048
 
 
 def get_localtime():
     return strftime("%Y-%m-%d %H:%M:%S", localtime())
 
 
-class Command():
-    def __init__(self, id):
-        self._id = id
-    def getId(self):
-        return self._id
-
+def fetch_package(conn):
+    size = struct.unpack('i', conn.recv(4))[0]
+    pack = json.loads(conn.recv(size).decode())
+    return pack
 
 class Manager(threading.Thread):
-    def __init__(self, address=('0.0.0.0',3976), max_connections=200):
+    def __init__(self, address=SERVER_ADDRESS, max_connections=MAX_CONNECTIONS):
         super().__init__()
-        self._addr = address
-        self._max_connections = max_connections
         self._server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self._server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        self._server.bind(self._addr)
-        self._server.listen(self._max_connections)
+        self._server.bind(address)
+        self._server.listen(max_connections)
+
+        self._user2conn = dict()
+
+    def dispatch_message(self):
+        while True:
+            if not msg_queue.empty():
+                msg = msg_queue.get()
+                for conn in self._user2conn.values():
+                    conn.send(msg)
+
+            sleep(0.1)
+
+    def handle_connect(self, conn):
+        header = fetch_package(conn)
+        user_id = header['user_id']
+        user_name = header['user_name']
+        if user_id in self._user2conn:
+            self._user2conn[user_id].close()
+            del self._user2conn[user_id]
+        while True:
+            try:
+                pack = fetch_package(self._user2conn[user_id])
+                pack['time'] = get_localtime()
+                msg_queue.put(pack)
+            except Exception as e:
+                print(f'{get_localtime()}  {user_name} dirty shutdown : {e}')
+                del self._user2conn[user_id]
+                break
 
     def run(self):
         print(f"{get_localtime()}  Manager starts...")
-        dispatcher = Dispatcher()
+        dispatcher = threading.Thread(target=self.dispatch_message)
         dispatcher.setDaemon(True)
         dispatcher.start()
         while True:
             conn, addr = self._server.accept()
-            conn = Connection(conn, addr)
-            conn.start()
+            handler = threading.Thread(target=self.handle_connect, args=(conn,))
+            handler.setDaemon(True)
+            handler.start()
 
 
 class Dispatcher(threading.Thread):
