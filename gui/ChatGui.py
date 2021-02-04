@@ -13,7 +13,7 @@ from PyQt5.QtGui import *
 sys.path.append('..')
 from gui.VChat import Ui_Form
 from gui.SettingsGui import SettingsGui
-from authentication.controlGUI import Dialog
+from authentication.dialogGUI import Dialog
 
 SERVER_IP = '39.106.169.58'
 SERVER_ADDRESS = ('39.106.169.58', 3976)

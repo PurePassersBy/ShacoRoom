@@ -8,15 +8,13 @@ import json
 import struct
 
 from PyQt5.QtWidgets import QApplication, QMainWindow
-from PyQt5 import QtCore
 
 sys.path.append('..')
-
-from mailThread import Mail
-from verifyGUI import Ui_Verify
-from loginGUI import Ui_login
-from dialogGUI import Ui_Dialog
-from connecter.SQLConn import ConnectSQL
+from authentication.mailThread import Mail
+from authentication.verifyGUI import Ui_Verify
+from authentication.loginGUI import Ui_login
+from authentication.dialogGUI import Dialog
+from authentication.connecter.SQLConn import ConnectSQL
 from gui.ChatGui import ChatGUI
 
 
@@ -198,48 +196,6 @@ class RegisterForm(QMainWindow, Ui_Verify):
         else:
             self.codeStatus.setText("未收到邮件？请检查邮箱是否输入错误")
             pass
-
-
-class Dialog(QMainWindow, Ui_Dialog):
-    # pyqtSignal 要定义为一个类而不是属性，不能放到__init__里
-    close_signal = QtCore.pyqtSignal()
-
-    def __init__(self, infomation):
-        """
-        注意close_signal 要在类成员函数外定义
-        初始化CloseDialog类，将 确定 和 取消 按钮连接到self._close函数
-        :param
-        :return:
-        """
-        super(Dialog, self).__init__()
-        self.setupUi(self)
-        self.retranslateUi(self)
-        self.buttonBox.accepted.connect(self._close)
-        self.buttonBox.rejected.connect(self._close)
-        self.type = infomation
-        self._set_text()
-    def _set_text(self):
-        _translate = QtCore.QCoreApplication.translate
-        if self.type == 'REGISTER SUCCESS':
-            self.label.setText(_translate("Dialog", "注册成功！赶快加入马戏团"))
-            self.label_2.setText(_translate("Dialog", "和沙口们一起来场马戏的盛宴吧！"))
-        if self.type == 'LOGIN REPEAT':
-            self.label.setText(_translate("Dialog", "该账户已登录"))
-            self.label_2.setText(_translate("Dialog", "如非本人操作，请修改密码"))
-        if self.type =='KICK OUT':
-            self.label.setText(_translate("Dialog", "该账户已在另一客户端登录"))
-            self.label_2.setText(_translate("Dialog", "如非本人操作，请修改密码"))
-
-    def _close(self):
-        """
-        发送关闭信号给RegisterForm类，即关闭注册GUI
-        同时关闭CloseDialog类，即关闭本窗口
-        :param
-        :return:
-        """
-        self.close_signal.emit()
-        self.close()
-
 
 
 
