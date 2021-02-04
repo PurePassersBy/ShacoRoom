@@ -93,7 +93,7 @@ class ChatGUI(QWidget,Ui_Form):
         file_size = header['file_size']
         if file_size == 0:
             return
-        file_path = f'../gui/resource/{user_id}.jpg'
+        file_path = f'../gui/resource/portrait/{user_id}.jpg'
         print(file_size)
         with open(file_path, 'wb') as f:
             recv_size = 0
