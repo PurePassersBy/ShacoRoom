@@ -53,7 +53,7 @@ class ResourceManager(threading.Thread):
                 user_id = query['user_id']
                 portrait_path = f'./resource/portrait/{user_id}.jpg'
                 header = {
-                    'file_size': 0 if os.path.exists(portrait_path) else os.path.getsize(portrait_path)
+                    'file_size': os.path.getsize(portrait_path) if os.path.exists(portrait_path) else 0
                 }
                 send_package(conn, header)
                 with open(portrait_path, 'rb') as f:
