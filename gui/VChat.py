@@ -25,10 +25,6 @@ class Ui_Form(object):
         self.pushButton = QtWidgets.QPushButton(Form)
         self.pushButton.setGeometry(QtCore.QRect(430, 190, 93, 28))
         self.pushButton.setObjectName("pushButton")
-        self.textEdit_msg_box = QtWidgets.QTextEdit(Form)
-        self.textEdit_msg_box.setGeometry(QtCore.QRect(40, 230, 481, 511))
-        self.textEdit_msg_box.setStyleSheet("QTextEdit p{font-size=10px;}")
-        self.textEdit_msg_box.setObjectName("textEdit_msg_box")
         self.graphicsView = QtWidgets.QGraphicsView(Form)
         self.graphicsView.setGeometry(QtCore.QRect(550, 10, 171, 192))
         self.graphicsView.setStyleSheet("")
@@ -52,6 +48,9 @@ class Ui_Form(object):
         self.pushButton_2 = QtWidgets.QPushButton(Form)
         self.pushButton_2.setGeometry(QtCore.QRect(450, 10, 93, 28))
         self.pushButton_2.setObjectName("pushButton_2")
+        self.msg_list = QtWidgets.QListWidget(Form)
+        self.msg_list.setGeometry(QtCore.QRect(40, 240, 481, 501))
+        self.msg_list.setObjectName("msg_list")
 
         self.retranslateUi(Form)
         self.pushButton.clicked.connect(Form.send_message)
@@ -65,4 +64,4 @@ class Ui_Form(object):
         self.label_username.setText(_translate("Form", "TextLabel"))
         self.label_friends.setText(_translate("Form", "好友列表"))
         self.pushButton_2.setText(_translate("Form", "设置"))
-import gui.resources_rc
+import resources_rc
