@@ -143,6 +143,7 @@ class ChatGUI(QWidget,Ui_Form):
         item.setSizeHint(QSize(200,70))
         self.msg_list.addItem(item)
         self.msg_list.setItemWidget(item, widget)
+        self.msg_list.scrollToBottom()
 
     def send_message(self):
         """
