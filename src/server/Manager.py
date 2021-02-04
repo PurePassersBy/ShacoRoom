@@ -15,6 +15,12 @@ def get_localtime():
     return strftime("%Y-%m-%d %H:%M:%S", localtime())
 
 
+def send_package(conn, pack):
+    pack_str = json.dumps(pack).encode()
+    conn.send(struct.pack('i', len(pack_str)))
+    conn.send(pack_str)
+
+
 def fetch_package(conn):
     size = struct.unpack('i', conn.recv(4))[0]
     pack = json.loads(conn.recv(size).decode())
@@ -36,13 +42,12 @@ class Manager(threading.Thread):
             if not msg_queue.empty():
                 msg = msg_queue.get()
                 for conn in self._user2conn.values():
-                    conn.send(msg)
+                    send_package(conn, msg)
 
             sleep(0.1)
 
     def handle_connect(self, conn):
-        size = struct.unpack('i', conn.recv(4))[0]
-        header = json.loads(conn.recv(size).decode())
+        header = fetch_package(conn)
         user_id = header['user_id']
         user_name = header['user_name']
         if user_id in self._user2conn:
@@ -51,8 +56,7 @@ class Manager(threading.Thread):
         self._user2conn[user_id] = conn
         while True:
             try:
-                size = struct.unpack('i', conn.recv(4))[0]
-                pack = json.loads(conn.recv(size).decode())
+                pack = fetch_package(conn)
                 pack['time'] = get_localtime()
                 msg_queue.put(pack)
             except Exception as e:
