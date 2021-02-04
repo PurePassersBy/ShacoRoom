@@ -277,7 +277,6 @@ class LoginForm(QMainWindow, Ui_login):
             # result 返回的是一个二维tuple
             if result[0][3] == self.password:
                 self.passwordStatus.setText('密码正确')
-                self.conn.edit(TABLE_NAME, [str(result[0][0]), 'online', 'True'])
                 self.qt_chat = ChatGUI(
                     result[0][0], result[0][1], 'Stein Gates', True, self.conn)
                 self.qt_chat.show()
