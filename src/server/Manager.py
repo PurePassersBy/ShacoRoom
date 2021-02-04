@@ -54,6 +54,8 @@ class Manager(threading.Thread):
             self._user2conn[user_id].close()
             del self._user2conn[user_id]
         self._user2conn[user_id] = conn
+        header['message'] = 'Enters ShacoRoom'
+        send_package(conn, header)
         while True:
             try:
                 pack = fetch_package(conn)
