@@ -49,7 +49,8 @@ class Manager(threading.Thread):
             del self._user2conn[user_id]
         while True:
             try:
-                pack = fetch_package(self._user2conn[user_id])
+                size = struct.unpack('i', conn.recv(4))[0]
+                pack = json.loads(conn.recv(size).decode())
                 pack['time'] = get_localtime()
                 msg_queue.put(pack)
             except Exception as e:
