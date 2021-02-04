@@ -47,6 +47,7 @@ class Portrait(QLabel):
     def connect_customized_slot(self, func):
         self.clicked_signal.connect(func)
 
+
 class ReceiveMessageThread(QThread):
     msg_pack = pyqtSignal(dict)
     def __init__(self, chatter):
@@ -62,6 +63,7 @@ class ReceiveMessageThread(QThread):
             except Exception as e:
                 print('Receiver Message Error', e)
                 break
+
 
 class ChatGUI(QWidget,Ui_Form):
 
@@ -93,7 +95,6 @@ class ChatGUI(QWidget,Ui_Form):
         if file_size == 0:
             return
         file_path = f'../gui/resource/portrait/{user_id}.jpg'
-        print(file_size)
         with open(file_path, 'wb') as f:
             recv_size = 0
             while recv_size < file_size:
@@ -139,7 +140,7 @@ class ChatGUI(QWidget,Ui_Form):
         widget = QWidget()
         layout_main = QHBoxLayout()
         layout_msg = QVBoxLayout()
-        portrait = Portrait(user_id.id)
+        portrait = Portrait(int(user_id))
         portrait.connect_customized_slot(self._fetch_others_portrait)
         portrait.setFixedSize(50,50)
         img = QPixmap(PORTRAIT_PATH%user_id).scaled(50,50)
