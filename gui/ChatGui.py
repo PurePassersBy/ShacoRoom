@@ -10,8 +10,10 @@ from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 
+sys.path.append('..')
 from gui.VChat import Ui_Form
 from gui.SettingsGui import SettingsGui
+from authentication.controlGUI import Dialog
 
 SERVER_IP = '39.106.169.58'
 SERVER_ADDRESS = ('39.106.169.58', 3976)
@@ -50,6 +52,7 @@ class Portrait(QLabel):
 
 class ReceiveMessageThread(QThread):
     msg_pack = pyqtSignal(dict)
+
     def __init__(self, chatter):
         super().__init__()
         self.chatter = chatter
@@ -65,7 +68,7 @@ class ReceiveMessageThread(QThread):
                 break
 
 
-class ChatGUI(QWidget,Ui_Form):
+class ChatGUI(QWidget, Ui_Form):
 
     def __init__(self, user_id, user_name, fav_comic, is_know, db_conn):
         super(ChatGUI, self).__init__()
@@ -83,6 +86,9 @@ class ChatGUI(QWidget,Ui_Form):
         self.init_client()
 
         self.textEdit.installEventFilter(self)
+
+        # 初始化登出或登录通知
+        self.dialog = None
 
     def _fetch_others_portrait(self, user_id):
         query = {
@@ -128,11 +134,30 @@ class ChatGUI(QWidget,Ui_Form):
         self.label_username.setText(self.userName)
         self.graphicsView.setStyleSheet(f"border-image: url({self.portrait});")
 
+    def system_information(self, msg_pack):
+        if msg_pack['system_code'] == 'KICK OUT':
+            # 将close 与kickout 信号连接
+            self.dialog.close_signal.connect(self.close)
+            # 发送下线成功的响应给服务器
+            kickout_package = {'system_code': 'SUCCESS'}
+            pack_str = json.dumps(kickout_package).encode()
+            self.chatter.send(struct.pack('i', len(pack_str)))
+            self.chatter.send(pack_str)
+            # 弹出提示框
+            self.dialog = Dialog('KICK OUT')
+            self.dialog.show()
+        if msg_pack['system_code'] == 'Login Repeat':
+            # 弹出提示框
+            self.dialog = Dialog('LOGIN REPEAT')
+            self.dialog.show()
+
     def show_message(self, msg_pack):
         """
         展示信息
         :return:
         """
+        if 'system_code' in msg_pack.keys():
+            self.system_information(msg_pack)
         time_ = msg_pack['time']
         user_id = msg_pack['user_id']
         user_name = msg_pack['user_name']
@@ -142,8 +167,8 @@ class ChatGUI(QWidget,Ui_Form):
         layout_msg = QVBoxLayout()
         portrait = Portrait(int(user_id))
         portrait.connect_customized_slot(self._fetch_others_portrait)
-        portrait.setFixedSize(50,50)
-        img = QPixmap(PORTRAIT_PATH%user_id).scaled(50,50)
+        portrait.setFixedSize(50, 50)
+        img = QPixmap(PORTRAIT_PATH % user_id).scaled(50, 50)
         portrait.setPixmap(img)
         layout_msg.addWidget(QLabel(f'{time_}  {user_name}'))
         layout_msg.addWidget(QLabel(msg))
@@ -155,7 +180,7 @@ class ChatGUI(QWidget,Ui_Form):
             layout_main.addLayout(layout_msg)
         widget.setLayout(layout_main)
         item = QListWidgetItem()
-        item.setSizeHint(QSize(200,70))
+        item.setSizeHint(QSize(200, 70))
         self.msg_list.addItem(item)
         self.msg_list.setItemWidget(item, widget)
         self.msg_list.scrollToBottom()
@@ -165,7 +190,7 @@ class ChatGUI(QWidget,Ui_Form):
         发送消息
         :return:
         """
-        #msg = self.textEdit.toHtml()
+        # msg = self.textEdit.toHtml()
         msg = self.textEdit.toPlainText()
         if msg == '':
             self.message_empty_info()
@@ -246,6 +271,7 @@ class ChatGUI(QWidget,Ui_Form):
                 return True  # 表示过滤此事件
 
         return False
+
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
