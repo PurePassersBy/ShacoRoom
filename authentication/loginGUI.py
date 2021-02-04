@@ -20,7 +20,7 @@ class Ui_login(object):
         login.setWindowIcon(icon)
         login.setStyleSheet("")
         login.setMinimumSize(QtCore.QSize(800, 500))
-        login.setMaximumSize(QtCore.QSize(900, 500))
+        login.setMaximumSize(QtCore.QSize(800, 500))
         self.loginButton = QtWidgets.QPushButton(login)
         self.loginButton.setGeometry(QtCore.QRect(120, 420, 93, 28))
         self.loginButton.setObjectName("loginButton")
