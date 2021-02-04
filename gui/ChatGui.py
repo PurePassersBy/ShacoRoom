@@ -34,6 +34,19 @@ def fetch_package(conn):
     return pack
 
 
+class Portrait(QLabel):
+    clicked_signal = pyqtSignal(int)
+
+    def __init__(self, user_id, parent=None):
+        super().__init__(parent)
+        self.user_id = user_id
+
+    def mousePressEvent(self, QMouseEvent):
+        self.clicked_signal.emit(self.user_id)
+
+    def connect_customized_slot(self, func):
+        self.clicked_signal.connect(func)
+
 class ReceiveMessageThread(QThread):
     msg_pack = pyqtSignal(dict)
     def __init__(self, chatter):
@@ -47,7 +60,7 @@ class ReceiveMessageThread(QThread):
                 self.msg_pack.emit(pack)
                 sleep(0.1)
             except Exception as e:
-                print('recv msg', e)
+                print('Receiver Message Error', e)
                 break
 
 class ChatGUI(QWidget,Ui_Form):
@@ -66,34 +79,29 @@ class ChatGUI(QWidget,Ui_Form):
         self.db_conn = db_conn
 
         self.init_client()
-        #self.get_others_info()
 
         self.textEdit.installEventFilter(self)
 
-    def _get_others_portrait(self):
-        while True:
-            try:
-                header_size = struct.unpack('i', self.portrait_client.recv(4))[0]
-                header_str = self.portrait_client.recv(header_size)
-                header = json.loads(header_str.decode())
-                user_id = header['user_id']
-                file_size = header['file_size']
-                file_path = f'../gui/resource/{user_id}.jpg'
-                with open(file_path, 'wb') as f:
-                    recv_size = 0
-                    while recv_size < file_size:
-                        data = self.portrait_client.recv(1024)
-                        f.write(data)
-                        recv_size += len(data)
-            except Exception as e:
-                print('get portrait error', e)
-                break
-
-
-
-    def get_others_info(self):
-        threading.Thread(target=(self._get_others_portrait)).start()
-
+    def _fetch_others_portrait(self, user_id):
+        print('开始获取')
+        query = {
+            'type': 'fetch',
+            'user_id': user_id
+        }
+        send_package(self.portrait_client, query)
+        header = fetch_package(self.portrait_client)
+        file_size = header['file_size']
+        if file_size == 0:
+            return
+        file_path = f'../gui/resource/{user_id}.jpg'
+        print(file_size)
+        with open(file_path, 'wb') as f:
+            recv_size = 0
+            while recv_size < file_size:
+                data = self.portrait_client.recv(1024)
+                f.write(data)
+                recv_size += len(data)
+        print('获取成功')
 
     def init_client(self):
         self.chatter = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -132,7 +140,8 @@ class ChatGUI(QWidget,Ui_Form):
         widget = QWidget()
         layout_main = QHBoxLayout()
         layout_msg = QVBoxLayout()
-        portrait = QLabel()
+        portrait = Portrait(self.id)
+        portrait.connect_customized_slot(self._fetch_others_portrait)
         portrait.setFixedSize(50,50)
         img = QPixmap(PORTRAIT_PATH%user_id).scaled(50,50)
         portrait.setPixmap(img)
@@ -200,21 +209,15 @@ class ChatGUI(QWidget,Ui_Form):
         self.userSettings._signal.connect(self._update)
 
     def _send_portrait(self):
-        print('send portrait...')
-        #client = socket.socket()
-        #client.connect(RESOURCE_SERVER_ADDRESS)
         header = {
+            'type': 'send',
             'user_id': self.id,
             'file_size': os.path.getsize(self.portrait)
         }
-        header_str = json.dumps(header).encode()
-        self.portrait_client.send(struct.pack('i', len(header_str)))
-        self.portrait_client.send(header_str)
+        send_package(self.portrait_client, header)
         with open(self.portrait, 'rb') as f:
             for line in f:
                 self.portrait_client.send(line)
-        # client.close()
-        print('send done')
 
     def _update(self, params):
         """
