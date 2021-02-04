@@ -68,6 +68,7 @@ class ResourceManager(threading.Thread):
 
             except Exception as e:
                 print('handle Resource Connect error', e)
+                break
 
     def run(self):
         print(f"{get_localtime()}  ResourceManager starts...")
@@ -78,7 +79,7 @@ class ResourceManager(threading.Thread):
                 handler.setDaemon(True)
                 handler.start()
             except Exception as e:
-                print('Resource Error', e)
+                print('Resource Manager Error', e)
                 break
 
 if __name__ == '__main__':
