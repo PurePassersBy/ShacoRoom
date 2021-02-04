@@ -18,14 +18,10 @@ class Command():
 
 
 class Manager(threading.Thread):
-    def __init__(self, address=('0.0.0.0',3976), max_connections = 20):
+    def __init__(self, address=('0.0.0.0',3976), max_connections=200):
         super().__init__()
         self._addr = address
         self._max_connections = max_connections
-        self._server = None
-        self._init_server()
-
-    def _init_server(self):
         self._server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self._server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self._server.bind(self._addr)
