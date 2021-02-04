@@ -2,8 +2,11 @@
 import sys
 import random
 import time
-
 import threading
+import socket
+import json
+import struct
+
 from PyQt5.QtWidgets import QApplication, QMainWindow
 from PyQt5 import QtCore
 
@@ -13,12 +16,13 @@ from mailThread import Mail
 from verifyGUI import Ui_Verify
 from loginGUI import Ui_login
 from dialogGUI import Ui_Dialog
-from DAO.dataBase import ConnectSQL
+from connecter.SQLConn import ConnectSQL
 from gui.ChatGui import ChatGUI
 
 
 
 SERVER_ADDRESS = ('39.106.169.58', 3980)
+SERVER_IP = '39.106.169.58'
 TABLE_NAME = 'userinfo'
 
 class RegisterForm(QMainWindow, Ui_Verify):
@@ -31,10 +35,10 @@ class RegisterForm(QMainWindow, Ui_Verify):
         """
         super(RegisterForm, self).__init__()
         # 实例化子类dialog,这一步一定要在self.initUi前面,不然initUi中不能调用没有实例化的close_signal这个槽信
-        self.success_dialog = Dialog('register success')
+        self.success_dialog = Dialog('REGISTER SUCCESS')
         self.setupUi(self)
         self.retranslateUi(self)
-        # 接收来自登陆界面的DAO connect
+        # 接收来自登陆界面的DAO connecter
         self.conn = conn
         # 储存发送邮箱以及邮箱stmp授权码
         self.senderMail = senderMail
@@ -216,13 +220,13 @@ class Dialog(QMainWindow, Ui_Dialog):
         self._set_text()
     def _set_text(self):
         _translate = QtCore.QCoreApplication.translate
-        if self.type == 'register success':
+        if self.type == 'REGISTER SUCCESS':
             self.label.setText(_translate("Dialog", "注册成功！赶快加入马戏团"))
             self.label_2.setText(_translate("Dialog", "和沙口们一起来场马戏的盛宴吧！"))
-        if self.type == 'login repeat':
+        if self.type == 'LOGIN REPEAT':
             self.label.setText(_translate("Dialog", "该账户已登录"))
             self.label_2.setText(_translate("Dialog", "如非本人操作，请修改密码"))
-        if self.type =='kick out':
+        if self.type =='KICK OUT':
             self.label.setText(_translate("Dialog", "该账户已在另一客户端登录"))
             self.label_2.setText(_translate("Dialog", "如非本人操作，请修改密码"))
 
@@ -266,11 +270,12 @@ class LoginForm(QMainWindow, Ui_login):
         self.loginButton.clicked.connect(self._login)
         self.registerButton.clicked.connect(self._register)
         # 初始化用户重复登录通知
-        self.login_dialog = Dialog('login repeat')
+        self.login_dialog = Dialog('LOGIN REPEAT')
         # 初始化注册界面
         self.qt_register = RegisterForm("614446871@qq.com", "rduygnlorlpgbeec", self.conn)
         # 初始化聊天室界面
         self.qt_chat = None
+
     def _mail_check(self):
         """
         检测邮箱输入长度，太长则改变文本提示用户
@@ -316,12 +321,6 @@ class LoginForm(QMainWindow, Ui_login):
             # result 返回的是一个二维tuple
             if result[0][3] == self.password:
                 self.passwordStatus.setText('密码正确')
-                # 判断账号是否在线
-                if result[0][4] == 'True':
-                    # 向服务器发送kick out请求
-                    threading.Thread(target=self._send_kickout,).start()
-                    self.login_dialog.show()
-                # 接入聊天室
                 self.conn.edit(TABLE_NAME, [str(result[0][0]), 'online', 'True'])
                 self.qt_chat = ChatGUI(
                     result[0][0], result[0][1], 'Stein Gates', True, self.conn)
@@ -330,8 +329,7 @@ class LoginForm(QMainWindow, Ui_login):
             else:
                 self.passwordStatus.setText('密码错误')
 
-    def _send_kickout(self):
-        print('Sending kickout request...')
+
 
 
 
