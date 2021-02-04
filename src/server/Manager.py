@@ -41,7 +41,8 @@ class Manager(threading.Thread):
             sleep(0.1)
 
     def handle_connect(self, conn):
-        header = fetch_package(conn)
+        size = struct.unpack('i', conn.recv(4))[0]
+        header = json.loads(conn.recv(size).decode())
         user_id = header['user_id']
         user_name = header['user_name']
         if user_id in self._user2conn:
