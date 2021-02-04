@@ -31,6 +31,8 @@ class SettingsGui(QWidget, Ui_Dialog):
         """
         file_name, file_type = QFileDialog.getOpenFileName(self, "选取文件", './',
                                                            "图片文件 (*.jpg);;图片文件 (*.png)")
+        if file_type == '' and file_name == '':
+            return
         file_type = file_type[-4:-1]
         shutil.copyfile(file_name, f'../gui/resource/portrait/{self.id}.{file_type}') # 唯一标识符命名存储头像
 
