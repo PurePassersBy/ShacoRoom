@@ -1,3 +1,4 @@
+import os
 import socket
 import threading
 import struct
@@ -12,6 +13,18 @@ def get_localtime():
     return strftime("%Y-%m-%d %H:%M:%S", localtime())
 
 
+def send_package(conn, pack):
+    pack_str = json.dumps(pack).encode()
+    conn.send(struct.pack('i', len(pack_str)))
+    conn.send(pack_str)
+
+
+def fetch_package(conn):
+    size = struct.unpack('i', conn.recv(4))[0]
+    pack = json.loads(conn.recv(size).decode())
+    return pack
+
+
 class ResourceManager(threading.Thread):
     def __init__(self, addr):
         super().__init__()
@@ -21,10 +34,7 @@ class ResourceManager(threading.Thread):
         self.server.listen(20)
 
     def fetch_and_store(self, conn):
-        print('fetch file...')
-        header_size = struct.unpack('i', conn.recv(4))[0]
-        header_str = conn.recv(header_size)
-        header = json.loads(header_str.decode())
+        header = fetch_package(conn)
         user_id = header['user_id']
         file_size = header['file_size']
         file_path = f'./resource/portrait/{user_id}.jpg'
@@ -34,18 +44,34 @@ class ResourceManager(threading.Thread):
                 data = conn.recv(CHUNK)
                 f.write(data)
                 recv_size += len(data)
-        conn.close()
-        print('fetch done')
+
+    def handle_connect(self, conn):
+        self.fetch_and_store(conn)
+        while True:
+            try:
+                query = fetch_package(conn)
+                user_id = query['user_id']
+                portrait_path = f'./resource/portrait/{user_id}.jpg'
+                header = {
+                    'file_size': 0 if os.path.exists(portrait_path) else os.path.getsize(portrait_path)
+                }
+                send_package(conn, header)
+                with open(portrait_path, 'rb') as f:
+                    for line in f:
+                        conn.send(line)
+            except Exception as e:
+                print('handle Resource Connect error', e)
 
     def run(self):
         print(f"{get_localtime()}  ResourceManager starts...")
         while True:
             try:
                 conn, addr = self.server.accept()
-                print('ResourceManager accept one...')
-                threading.Thread(target=self.fetch_and_store, args=(conn,)).start()
-            except:
-                print('Resource Error')
+                handler = threading.Thread(target=self.handle_connect, args=(conn,))
+                handler.setDaemon(True)
+                handler.start()
+            except Exception as e:
+                print('Resource Error', e)
                 break
 
 if __name__ == '__main__':
