@@ -23,9 +23,10 @@ TABLE_NAME = 'userinfo'
 
 
 def send_package(conn, pack):
-    pack_str = json.dumps(pack).decode()
-    conn.send(struct.pack('i',len(pack_str)))
+    pack_str = json.dumps(pack).encode()
+    conn.send(struct.pack('i', len(pack_str)))
     conn.send(pack_str)
+
 
 def fetch_package(conn):
     size = struct.unpack('i', conn.recv(4))[0]
@@ -68,7 +69,6 @@ class ChatGUI(QWidget,Ui_Form):
         #self.get_others_info()
 
         self.textEdit.installEventFilter(self)
-        print('done')
 
     def _get_others_portrait(self):
         while True:
@@ -99,8 +99,8 @@ class ChatGUI(QWidget,Ui_Form):
         self.chatter = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.chatter.connect(SERVER_ADDRESS)
         header = {
-            'user_id':self.id,
-            'user_name':self.userName
+            'user_id': self.id,
+            'user_name': self.userName
         }
         send_package(self.chatter, header)
         self.chatter_recv = ReceiveMessageThread(self.chatter)
@@ -164,8 +164,8 @@ class ChatGUI(QWidget,Ui_Form):
         self.textEdit.clear()
         pack = {
             'user_id': self.id,
-            'user_name':self.userName,
-            'message':msg
+            'user_name': self.userName,
+            'message': msg
         }
         send_package(self.chatter, pack)
 
