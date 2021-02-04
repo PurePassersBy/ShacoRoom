@@ -33,7 +33,7 @@ class ResourceManager(threading.Thread):
         self.server.bind(addr)
         self.server.listen(20)
 
-    def fetch_and_store(self, conn):
+    def fetch_resource(self, conn):
         header = fetch_package(conn)
         user_id = header['user_id']
         file_size = header['file_size']
@@ -45,20 +45,27 @@ class ResourceManager(threading.Thread):
                 f.write(data)
                 recv_size += len(data)
 
+    def send_resource(self, conn, user_id):
+        portrait_path = f'./resource/portrait/{user_id}.jpg'
+        header = {
+            'file_size': os.path.getsize(portrait_path) if os.path.exists(portrait_path) else 0
+        }
+        send_package(conn, header)
+        with open(portrait_path, 'rb') as f:
+            for line in f:
+                conn.send(line)
+
     def handle_connect(self, conn):
-        self.fetch_and_store(conn)
         while True:
             try:
                 query = fetch_package(conn)
-                user_id = query['user_id']
-                portrait_path = f'./resource/portrait/{user_id}.jpg'
-                header = {
-                    'file_size': os.path.getsize(portrait_path) if os.path.exists(portrait_path) else 0
-                }
-                send_package(conn, header)
-                with open(portrait_path, 'rb') as f:
-                    for line in f:
-                        conn.send(line)
+                type_ = query['type']
+                if type_ == 'fetch':
+                    user_id = query['user_id']
+                    self.send_resource(conn, user_id)
+                else:
+                    self.fetch_resource(conn)
+
             except Exception as e:
                 print('handle Resource Connect error', e)
 
