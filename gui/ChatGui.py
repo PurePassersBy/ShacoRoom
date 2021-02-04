@@ -139,7 +139,7 @@ class ChatGUI(QWidget,Ui_Form):
         widget = QWidget()
         layout_main = QHBoxLayout()
         layout_msg = QVBoxLayout()
-        portrait = Portrait(self.id)
+        portrait = Portrait(user_id.id)
         portrait.connect_customized_slot(self._fetch_others_portrait)
         portrait.setFixedSize(50,50)
         img = QPixmap(PORTRAIT_PATH%user_id).scaled(50,50)
