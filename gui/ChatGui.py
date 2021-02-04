@@ -83,7 +83,6 @@ class ChatGUI(QWidget,Ui_Form):
         self.textEdit.installEventFilter(self)
 
     def _fetch_others_portrait(self, user_id):
-        print('开始获取')
         query = {
             'type': 'fetch',
             'user_id': user_id
@@ -101,7 +100,6 @@ class ChatGUI(QWidget,Ui_Form):
                 data = self.portrait_client.recv(1024)
                 f.write(data)
                 recv_size += len(data)
-        print('获取成功')
 
     def init_client(self):
         self.chatter = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -117,6 +115,7 @@ class ChatGUI(QWidget,Ui_Form):
 
         self.portrait_client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.portrait_client.connect(RESOURCE_SERVER_ADDRESS)
+        self._fetch_others_portrait(self.id)
 
     def _flush(self):
         """
