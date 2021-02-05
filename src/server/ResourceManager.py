@@ -64,8 +64,10 @@ class ResourceManager(threading.Thread):
                 print(query)
                 type_ = query['type']
                 if type_ == 'fetch':
+                    print(f'向用户发送{query["user_id"]}的头像')
                     user_id = query['user_id']
                     send_resource(conn, user_id)
+                    print('发送成功')
                 else:
                     fetch_resource(conn)
 

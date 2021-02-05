@@ -61,15 +61,8 @@ class Manager(threading.Thread):
                 'message': '该账号在其他客户端登录，您已被强制下线',
                 'system_code': 'KICK OUT'}
             send_package(self._user2conn[user_id], kickout_package)   # 发送下线请求给已存在的用户
-            # response = fetch_package(self._user2conn[user_id])        # 等待接收强制下线的客户端发来成功响应
-            # print('receive kick out response')
             self._user2conn[user_id].close()  # 确认强制下线客户端收到信息后，断开该用户id对应的conn连接
             del self._user2conn[user_id]
-            # if response['system_code'] == 'SUCCESS':
-            #     print("KICK OUT SUCCESS")
-            # else:
-            #     print(f'{get_localtime()}  {user_name} dirty shutdown')
-            # 给登录端上线用户发送异地登录的提醒
             header['system_code'] = 'LOGIN REPEAT'
         self._user2conn[user_id] = conn
         header['time'] = get_localtime()
@@ -87,6 +80,12 @@ class Manager(threading.Thread):
                 print(f'{get_localtime()}  {user_name} dirty shutdown : {e}')
                 if self._user2conn[user_id] == conn:
                     del self._user2conn[user_id]
+                pack = {
+                    'user_id': user_id,
+                    'message': 'Exits ShacoRoom',
+                    'time': get_localtime()
+                }
+                msg_queue.put(pack)
                 break
 
     def run(self):
