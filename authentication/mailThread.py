@@ -8,13 +8,14 @@ from email.utils import formataddr
 
 class Mail(threading.Thread):
     # 继承线程，完成邮件发送
-    def __init__(self, sender, password, receiver, verify_code):
+    def __init__(self, sender, password, receiver, verify_code, type):
         """
         发送邮件
         :param sender:      发送邮箱
         :param password:    stmp授权码
         :param receiver:    接收邮箱
         :param verify_code: 验证码
+        :param type:        发送邮件类型
         :return:Void:
         """
         # 第三方SMTP服务
@@ -22,6 +23,7 @@ class Mail(threading.Thread):
         self.mailSender = sender
         self.mailPassword = password
         self.mailReceiver = receiver
+        self.type = type
         # 生成6位随机验证码
         self.verifyCode = verify_code
         # sendResult初始状态，线程结束后更新状态为True 或者False
@@ -35,10 +37,16 @@ class Mail(threading.Thread):
         :return:
         """
         try:
-            msg = MIMEText('欢迎注册ShacoRoom 您的验证码为：' + str(self.verifyCode) + '\n请在十五分钟内完成验证', 'plain', 'utf-8')  # 邮件内容
-            msg['From'] = formataddr(["ShacoRoom", self.mailSender])  # 括号里的对应发件人邮箱昵称、发件人邮箱账号
-            msg['To'] = formataddr(["Dear ShacoRoom User", self.mailReceiver])  # 括号里的对应收件人邮箱昵称、收件人邮箱账号
-            msg['Subject'] = "ShacoRoom注册验证码"  # 邮件的主题，也可以说是标题
+            if self.type == 'REGISTER':
+                msg = MIMEText('欢迎注册ShacoRoom 您的验证码为：' + str(self.verifyCode) + '\n请在十五分钟内完成验证', 'plain', 'utf-8')  # 邮件内容
+                msg['From'] = formataddr(["ShacoRoom", self.mailSender])  # 括号里的对应发件人邮箱昵称、发件人邮箱账号
+                msg['To'] = formataddr(["Dear ShacoRoom User", self.mailReceiver])  # 括号里的对应收件人邮箱昵称、收件人邮箱账号
+                msg['Subject'] = "ShacoRoom注册验证码"  # 邮件的主题，也可以说是标题
+            if self.type == 'EDIT PASSWORD':
+                msg = MIMEText('有沙口弄丢了密码？要哭哭惹 您修改密码操作的验证码为：' + str(self.verifyCode) + '\n请在十五分钟内完成验证', 'plain', 'utf-8')  # 邮件内容
+                msg['From'] = formataddr(["ShacoRoom", self.mailSender])  # 括号里的对应发件人邮箱昵称、发件人邮箱账号
+                msg['To'] = formataddr(["Dear ShacoRoom User", self.mailReceiver])  # 括号里的对应收件人邮箱昵称、收件人邮箱账号
+                msg['Subject'] = "ShacoRoom修改密码验证码"  # 邮件的主题，也可以说是标题
             server = smtplib.SMTP_SSL("smtp.qq.com", 465)  # 发件人邮箱中的SMTP服务器，qqmail端口是465
             server.login(self.mailSender, self.mailPassword)  # 括号中对应的是发件人邮箱账号、邮箱密码
             server.sendmail(self.mailSender, [self.mailReceiver, ], msg.as_string())

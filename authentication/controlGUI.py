@@ -134,7 +134,7 @@ class RegisterForm(QMainWindow, Ui_Verify):
             print("邮箱合法")
             self.verifyCode = self._generate_code()
             print(self.senderMail + "   " + self.passwordMail + "verify code:" + str(self.verifyCode))
-            send_thread = Mail(self.senderMail, self.passwordMail, mailAddress, self.verifyCode)
+            send_thread = Mail(self.senderMail, self.passwordMail, mailAddress, self.verifyCode, 'REGISTER')
             # 用线程发送邮件 避免用户等待
             send_thread.start()
             # 用线程计时可重新发送邮件的等待时间 避免堵塞
@@ -298,7 +298,7 @@ class EditpasswordForm(QMainWindow, Ui_Edit):
             self.id = mail_repeat[0][0]
             self.verifyCode = self._generate_code()
             print(self.senderMail + "   " + self.passwordMail + "verify code:" + str(self.verifyCode))
-            send_thread = Mail(self.senderMail, self.passwordMail, mailAddress, self.verifyCode)
+            send_thread = Mail(self.senderMail, self.passwordMail, mailAddress, self.verifyCode, 'EDIT PASSWORD')
             # 用线程发送邮件 避免用户等待
             send_thread.start()
             # 用线程计时可重新发送邮件的等待时间 避免堵塞
