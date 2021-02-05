@@ -74,7 +74,8 @@ class Manager(threading.Thread):
         self._user2conn[user_id] = conn
         header['time'] = get_localtime()
         header['message'] = 'Enters ShacoRoom'
-        send_package(conn, header)
+        # send_package(conn, header)
+        msg_queue.put(pack)
         while True:
             try:
                 pack = fetch_package(conn)
