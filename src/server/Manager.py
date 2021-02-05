@@ -78,6 +78,8 @@ class Manager(threading.Thread):
         while True:
             try:
                 pack = fetch_package(conn)
+                if 'system_code' in pack:
+                    continue
                 pack['time'] = get_localtime()
                 msg_queue.put(pack)
             except Exception as e:
