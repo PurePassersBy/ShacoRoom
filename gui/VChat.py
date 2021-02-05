@@ -64,4 +64,4 @@ class Ui_Form(object):
         self.label_username.setText(_translate("Form", "TextLabel"))
         self.label_friends.setText(_translate("Form", "好友列表"))
         self.pushButton_2.setText(_translate("Form", "设置"))
-import resources_rc
+import gui.resources_rc
