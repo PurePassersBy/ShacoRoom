@@ -64,7 +64,7 @@ class Manager(threading.Thread):
             # response = fetch_package(self._user2conn[user_id])        # 等待接收强制下线的客户端发来成功响应
             # print('receive kick out response')
             self._user2conn[user_id].close()  # 确认强制下线客户端收到信息后，断开该用户id对应的conn连接
-            del self._user2conn[user_id]
+            # del self._user2conn[user_id]
             # if response['system_code'] == 'SUCCESS':
             #     print("KICK OUT SUCCESS")
             # else:
