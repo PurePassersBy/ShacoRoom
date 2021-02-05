@@ -149,7 +149,7 @@
     </rect>
    </property>
    <property name="text">
-    <string> </string>
+    <string/>
    </property>
   </widget>
   <widget class="QLineEdit" name="mailEdit">
@@ -172,7 +172,7 @@
     </rect>
    </property>
   </widget>
-  <widget class="QLabel" name="label">
+  <widget class="QLabel" name="shacoLabel">
    <property name="geometry">
     <rect>
      <x>430</x>
@@ -191,6 +191,35 @@
     <bool>true</bool>
    </property>
   </widget>
+  <widget class="QLabel" name="editLabel">
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>520</x>
+     <y>380</y>
+     <width>241</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>需要修改密码的沙口请点击沙口^^_</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="editButton">
+   <property name="geometry">
+    <rect>
+     <x>520</x>
+     <y>420</y>
+     <width>93</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>修改密码</string>
+   </property>
+  </widget>
   <zorder>mailLabel</zorder>
   <zorder>passwordStatus</zorder>
   <zorder>loginButton</zorder>
@@ -200,7 +229,9 @@
   <zorder>mailStatus</zorder>
   <zorder>mailEdit</zorder>
   <zorder>passwordEdit</zorder>
-  <zorder>label</zorder>
+  <zorder>shacoLabel</zorder>
+  <zorder>editLabel</zorder>
+  <zorder>editButton</zorder>
  </widget>
  <resources/>
  <connections/>
