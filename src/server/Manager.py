@@ -50,29 +50,25 @@ class Manager(threading.Thread):
         header = fetch_package(conn)
         user_id = header['user_id']
         user_name = header['user_name']
-        if user_id in self._user2conn:
-        # 重复登录，发送下线请求给当前登录用户
+        print(self._user2conn.keys())
+        if user_id in self._user2conn.keys():
+            # 重复登录，发送下线请求给当前登录用户
             print('sending kickout')
             kickout_package = {
-                'user_id':user_id,
-                'user_name':user_name,
-                'time':get_localtime(),
-                'message':'KICK OUT',
-                'system_code':'KICK OUT'}
-            send_package(self._user2conn[user_id], kickout_package)
-            response = fetch_package(self._user2conn[user_id])
+                'user_id': user_id,
+                'user_name': user_name,
+                'time': get_localtime(),
+                'message': 'KICK OUT',
+                'system_code': 'KICK OUT'}
+            send_package(self._user2conn[user_id], kickout_package)   # 发送下线请求给已存在的用户
+            response = fetch_package(self._user2conn[user_id])        # 等待接收强制下线的客户端发来成功响应
             print('receive response')
             if response['system_code'] == 'SUCCESS':
-                self._user2conn[user_id].close()
+                self._user2conn[user_id].close()                      # 断开该用户id对应的conn连接
                 del self._user2conn[user_id]
                 print("KICK OUT SUCCESS")
-                response_package = {
-                    'user_id':user_id,
-                    'user_name':user_name,
-                    'time':get_localtime(),
-                    'message':'KICK OUT SUCCESS',
-                    'system_code': 'SUCCESS'}
-                send_package(conn, response_package)
+        # 给登录端上线用户发送允许登录的通知
+        header['system_code'] = 'LOGIN PERMITTED'
         self._user2conn[user_id] = conn
         header['time'] = get_localtime()
         header['message'] = 'Enters ShacoRoom'

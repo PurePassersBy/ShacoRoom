@@ -161,12 +161,9 @@ class ChatGUI(QWidget, Ui_Form):
         展示信息
         :return:
         """
-        print('!!!')
         print(msg_pack)
         if 'system_code' in msg_pack.keys():
-            print('has system_code')
             self.system_information(msg_pack['system_code'])
-        print('??')
         time_ = msg_pack['time']
         user_id = msg_pack['user_id']
         user_name = msg_pack['user_name']
