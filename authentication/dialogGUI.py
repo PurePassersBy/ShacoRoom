@@ -69,12 +69,16 @@ class Dialog(QMainWindow, Ui_Dialog):
         if self.type == 'REGISTER SUCCESS':
             self.label.setText(_translate("Dialog", "注册成功！赶快加入马戏团"))
             self.label_2.setText(_translate("Dialog", "和沙口们一起来场马戏的盛宴吧！"))
+        if self.type =='EDIT SUCCESS':
+            self.label.setText(_translate("Dialog", "密码修改成功！"))
+            self.label_2.setText(_translate("Dialog", "注意保管好密码哦"))
         if self.type == 'LOGIN REPEAT':
             self.label.setText(_translate("Dialog", "该账户已登录"))
-            self.label_2.setText(_translate("Dialog", "如非本人操作，请修改密码"))
+            self.label_2.setText(_translate("Dialog", "如非本人登录，请修改密码"))
         if self.type =='KICK OUT':
-            self.label.setText(_translate("Dialog", "该账户已在另一客户端登录"))
+            self.label.setText(_translate("Dialog", "该账户已在另一客户端登录,您将被愉悦送走"))
             self.label_2.setText(_translate("Dialog", "如非本人操作，请修改密码"))
+
 
     def _close(self):
         """
