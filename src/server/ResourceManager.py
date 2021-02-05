@@ -39,10 +39,13 @@ def fetch_resource(conn):
 
 def send_resource(conn, user_id):
     portrait_path = f'./resource/portrait/{user_id}.jpg'
+    exists = os.path.exists(portrait_path)
     header = {
-        'file_size': os.path.getsize(portrait_path) if os.path.exists(portrait_path) else 0
+        'file_size': os.path.getsize(portrait_path) if exists else 0
     }
     send_package(conn, header)
+    if not exists:
+        return
     with open(portrait_path, 'rb') as f:
         for line in f:
             conn.send(line)
