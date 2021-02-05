@@ -82,6 +82,7 @@ class Manager(threading.Thread):
                     del self._user2conn[user_id]
                 pack = {
                     'user_id': user_id,
+                    'user_name': user_name,
                     'message': 'Exits ShacoRoom',
                     'time': get_localtime()
                 }
