@@ -48,6 +48,7 @@ def send_resource(conn, user_id):
     header = {
         'file_size': os.path.getsize(portrait_path) if exists else 0
     }
+    print(f'要发送的文件大小{header["file_size"]}')
     send_package(conn, header)
     if not exists:
         return
@@ -74,8 +75,8 @@ class ResourceManager(threading.Thread):
                 print(query)
                 type_ = query['type']
                 if type_ == 'fetch':
-                    print(f'向用户发送{query["user_id"]}的头像')
                     user_id = query['user_id']
+                    print(f'向用户发送{user_id}的头像')
                     send_resource(conn, user_id)
                     print('发送成功')
                 else:
