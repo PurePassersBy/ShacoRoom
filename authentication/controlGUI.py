@@ -5,6 +5,7 @@ import time
 import threading
 
 from PyQt5.QtWidgets import QApplication, QMainWindow
+from PyQt5.QtGui import *
 
 sys.path.append('..')
 from authentication.mailThread import Mail
@@ -372,7 +373,10 @@ class LoginForm(QMainWindow, Ui_login):
         self.mailEdit.textChanged['QString'].connect(self._mail_check)
         self.mailEdit.setToolTip('没有邮箱？请先注册')
         self.mailEdit.setMaxLength(21)
-
+        icon = QIcon()
+        icon.addPixmap(QPixmap("../gui/resource/shaco_logo.jpg"), QIcon.Normal, QIcon.Off)
+        self.setWindowIcon(icon)
+        # login.setStyleSheet("")
         self.passwordEdit.textChanged['QString'].connect(self._password_check)
         self.passwordEdit.setToolTip('长度不超过12')
         self.passwordEdit.setMaxLength(13)
