@@ -109,7 +109,10 @@ class ChatGUI(QWidget, Ui_Form):
         with open(file_path, 'wb') as f:
             recv_size = 0
             while recv_size < file_size:
-                data = self.portrait_client.recv(1024)
+                if recv_size + 1024 > file_size:
+                    data = self.portrait_client.recv(file_size - recv_size)
+                else:
+                    data = self.portrait_client.recv(1024)
                 f.write(data)
                 recv_size += len(data)
         print('接收成功')
@@ -241,10 +244,12 @@ class ChatGUI(QWidget, Ui_Form):
             'user_id': self.id,
             'file_size': os.path.getsize(self.portrait)
         }
+        print('发送头像', header)
         send_package(self.portrait_client, header)
         with open(self.portrait, 'rb') as f:
             for line in f:
                 self.portrait_client.send(line)
+        print('发送成功')
 
     def _update(self, params):
         """

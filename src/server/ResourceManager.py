@@ -32,14 +32,19 @@ def fetch_resource(conn):
     user_id = header['user_id']
     file_size = header['file_size']
     file_path = f'./resource/portrait/{user_id}.jpg'
+    print(f'接收{user_id}的头像，大小为{file_size}')
     lock.acquire()
     with open(file_path, 'wb') as f:
         recv_size = 0
         while recv_size < file_size:
-            data = conn.recv(CHUNK)
+            if recv_size + CHUNK > file_size:
+                data = conn.recv(file_size - recv_size)
+            else:
+                data = conn.recv(CHUNK)
             f.write(data)
             recv_size += len(data)
     lock.release()
+    print('接收头像成功')
 
 
 def send_resource(conn, user_id):
