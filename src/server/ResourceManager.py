@@ -8,6 +8,8 @@ from time import strftime, localtime
 CHUNK = 1024
 PAYLOAD_SIZE = struct.calcsize("L")
 RESOURCE_SERVER_ADDRESS = ('0.0.0.0', 3979)
+lock = threading.Lock()
+
 
 def get_localtime():
     return strftime("%Y-%m-%d %H:%M:%S", localtime())
@@ -24,17 +26,20 @@ def fetch_package(conn):
     pack = json.loads(conn.recv(size).decode())
     return pack
 
+
 def fetch_resource(conn):
     header = fetch_package(conn)
     user_id = header['user_id']
     file_size = header['file_size']
     file_path = f'./resource/portrait/{user_id}.jpg'
+    lock.acquire()
     with open(file_path, 'wb') as f:
         recv_size = 0
         while recv_size < file_size:
             data = conn.recv(CHUNK)
             f.write(data)
             recv_size += len(data)
+    lock.release()
 
 
 def send_resource(conn, user_id):
@@ -46,9 +51,11 @@ def send_resource(conn, user_id):
     send_package(conn, header)
     if not exists:
         return
+    lock.acquire()
     with open(portrait_path, 'rb') as f:
         for line in f:
             conn.send(line)
+    lock.release()
 
 
 class ResourceManager(threading.Thread):

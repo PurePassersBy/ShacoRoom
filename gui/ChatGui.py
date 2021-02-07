@@ -102,6 +102,7 @@ class ChatGUI(QWidget, Ui_Form):
         send_package(self.portrait_client, query)
         header = fetch_package(self.portrait_client)
         file_size = header['file_size']
+        print(f'接收 {user_id} 的头像，大小为{file_size}')
         if file_size == 0:
             return
         file_path = f'../gui/resource/portrait/{user_id}.jpg'
@@ -111,6 +112,7 @@ class ChatGUI(QWidget, Ui_Form):
                 data = self.portrait_client.recv(1024)
                 f.write(data)
                 recv_size += len(data)
+        print('接收成功')
 
     def init_client(self):
         self.chatter = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
