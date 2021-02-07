@@ -63,7 +63,9 @@ class Manager(threading.Thread):
             send_package(self._user2conn[user_id], kickout_package)   # 发送下线请求给已存在的用户
             self._user2conn[user_id].close()  # 确认强制下线客户端收到信息后，断开该用户id对应的conn连接
             del self._user2conn[user_id]
-            header['system_code'] = 'LOGIN REPEAT'
+            kickout_package['message'] = '该账号已登录，您已将之前登录的人挤下线'
+            kickout_package['system_code'] = 'LOGIN REPEAT'
+            send_package(conn, kickout_package)
         self._user2conn[user_id] = conn
         header['time'] = get_localtime()
         header['message'] = 'Enters ShacoRoom'
