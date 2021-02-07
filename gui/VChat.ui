@@ -13,10 +13,6 @@
   <property name="windowTitle">
    <string>ShacoRoom</string>
   </property>
-  <property name="windowIcon">
-   <iconset>
-    <normaloff>:/images/Shaco_Logo.jpg</normaloff>:/images/Shaco_Logo.jpg</iconset>
-  </property>
   <property name="styleSheet">
    <string notr="true"/>
   </property>

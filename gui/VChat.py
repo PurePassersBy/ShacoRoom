@@ -15,9 +15,6 @@ class Ui_Form(object):
     def setupUi(self, Form):
         Form.setObjectName("Form")
         Form.resize(732, 774)
-        icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap(":/images/Shaco_Logo.jpg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        Form.setWindowIcon(icon)
         Form.setStyleSheet("")
         self.textEdit = QtWidgets.QTextEdit(Form)
         self.textEdit.setGeometry(QtCore.QRect(40, 80, 481, 111))
@@ -64,4 +61,4 @@ class Ui_Form(object):
         self.label_username.setText(_translate("Form", "TextLabel"))
         self.label_friends.setText(_translate("Form", "好友列表"))
         self.pushButton_2.setText(_translate("Form", "设置"))
-import gui.resources_rc
+# import resources_rc

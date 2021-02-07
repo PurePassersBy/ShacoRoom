@@ -74,6 +74,10 @@ class ChatGUI(QWidget, Ui_Form):
         super(ChatGUI, self).__init__()
         self.setupUi(self)
 
+        icon = QIcon()
+        icon.addPixmap(QPixmap("../gui/resource/shaco_logo.jpg"), QIcon.Normal, QIcon.Off)
+        self.setWindowIcon(icon)
+
         self.id = user_id
         self.userName = user_name
         self.portrait = f'../gui/resource/portrait/{self.id}.jpg'

@@ -1,8 +1,0 @@
-<RCC>
-  <qresource prefix="images">
-    <file>resource/Saten_Ruiko.jpg</file>
-    <file>resource/Saten_Ruiko2.jpg</file>
-    <file>resource/shaco_img.jpg</file>
-    <file>resource/shaco_logo.jpg</file>
-  </qresource>
-</RCC>
