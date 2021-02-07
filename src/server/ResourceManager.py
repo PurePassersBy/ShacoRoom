@@ -27,10 +27,7 @@ def fetch_package(conn):
     return pack
 
 
-def fetch_resource(conn):
-    header = fetch_package(conn)
-    user_id = header['user_id']
-    file_size = header['file_size']
+def fetch_resource(conn, header):
     file_path = f'./resource/portrait/{user_id}.jpg'
     print(f'接收{user_id}的头像，大小为{file_size}')
     lock.acquire()
@@ -85,7 +82,7 @@ class ResourceManager(threading.Thread):
                     send_resource(conn, user_id)
                     print('发送成功')
                 else:
-                    fetch_resource(conn)
+                    fetch_resource(conn, query)
 
             except Exception as e:
                 print('handle Resource Connect error', e)
