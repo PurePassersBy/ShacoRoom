@@ -28,6 +28,8 @@ def fetch_package(conn):
 
 
 def fetch_resource(conn, header):
+    user_id = header['user_id']
+    file_size = header['file_size']
     file_path = f'./resource/portrait/{user_id}.jpg'
     print(f'接收{user_id}的头像，大小为{file_size}')
     lock.acquire()
