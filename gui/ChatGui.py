@@ -208,9 +208,9 @@ class ChatGUI(QWidget, Ui_Form):
         portrait.setPixmap(img)
         layout_msg.addWidget(QLabel(f'{time_}  {user_name}'))
         item = QListWidgetItem()
-        if 'shape' in msg_pack:
+        if 'image' in msg_pack:
             shape = msg_pack['shape']
-            image_np = np.frombuffer(np.array(msg_pack['image'], dtype='uint8'), dtype='uint8').reshape(shape)
+            image_np = np.frombuffer(msg_pack['image'], dtype='uint8').reshape(shape)
             image = Image.fromarray(image_np).convert('RGB')
             pixmap = QPixmap.fromImage(ImageQt.ImageQt(image)).scaled(400,200)
             image_label = QLabel()
@@ -332,7 +332,7 @@ class ChatGUI(QWidget, Ui_Form):
             'user_id': self.id,
             'user_name': self.userName,
             'shape': image_np.shape,
-            'image': image_np.tolist()
+            'image': image_np.tostring()
         }
         message_lock.acquire()
         print(f'开始发送图片包')
