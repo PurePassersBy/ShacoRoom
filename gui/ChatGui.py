@@ -6,6 +6,8 @@ from time import sleep
 import threading
 import socket
 
+import numpy as np
+from PIL import Image, ImageQt
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
@@ -24,7 +26,7 @@ PORTRAIT_PATH = '../gui/resource/portrait/%s.jpg'
 TABLE_NAME = 'userinfo'
 LINE_LENGTH = 39
 UNI2ASC = 40 / 24
-
+message_lock = threading.Lock()
 
 def split_message(msg):
     msg_list = []
@@ -146,7 +148,9 @@ class ChatGUI(QWidget, Ui_Form):
             'user_id': self.id,
             'user_name': self.userName
         }
+        message_lock.acquire()
         send_package(self.chatter, header)
+        message_lock.release()
         self.chatter_recv = ReceiveMessageThread(self.chatter)
         self.chatter_recv.msg_pack.connect(self.show_message)
         self.chatter_recv.start()
@@ -231,7 +235,9 @@ class ChatGUI(QWidget, Ui_Form):
             'user_name': self.userName,
             'message': msg
         }
+        message_lock.acquire()
         send_package(self.chatter, pack)
+        message_lock.release()
 
     def message_empty_info(self):
         """
@@ -302,6 +308,29 @@ class ChatGUI(QWidget, Ui_Form):
                                                            "图片文件 (*.jpg);;图片文件 (*.png)")
         if file_type == '' and file_name == '':
             return
+        image = Image.open(file_name)
+        image_np = np.array(image)
+        image_str = image_np.tostring()
+        size = len(image_str)
+        pack = {
+            'user_id': self.id,
+            'user_name': self.userName,
+            'shape': image_np.shape,
+            'size': size
+        }
+        message_lock.acquire()
+        send_package(self.chatter, pack)
+        send_size = 0
+        print(f'开始发送图片, 大小为{size}')
+        while send_size < size:
+            if send_size+1024 > size:
+                self.chatter.send(image_str[send_size:])
+                send_size = size
+            else:
+                self.chatter.send(image_str[send_size:send_size+1024])
+                send_size += 1024
+        message_lock.release()
+        print('发送成功')
 
 
     def send_file(self):
