@@ -93,6 +93,9 @@ class ChatGUI(QWidget, Ui_Form):
         icon = QIcon()
         icon.addPixmap(QPixmap("../gui/resource/shaco_logo.jpg"), QIcon.Normal, QIcon.Off)
         self.setWindowIcon(icon)
+        self.emoji_button.setIcon(QIcon("../gui/resource/button/emoji_button.png"))
+        self.image_button.setIcon(QIcon("../gui/resource/button/image_button.png"))
+        self.file_button.setIcon(QIcon("../gui/resource/button/file_button.png"))
 
         self.id = user_id
         self.userName = user_name
@@ -282,6 +285,15 @@ class ChatGUI(QWidget, Ui_Form):
         self.db_conn.edit(TABLE_NAME, [self.id, 'name', self.userName])
         self._flush()
         threading.Thread(target=self._send_portrait).start()
+
+    def send_emoji(self):
+        pass
+
+    def send_image(self):
+        pass
+
+    def send_file(self):
+        pass
 
     def eventFilter(self, obj, event):
         """

@@ -32,7 +32,7 @@
      <x>430</x>
      <y>190</y>
      <width>93</width>
-     <height>28</height>
+     <height>31</height>
     </rect>
    </property>
    <property name="text">
@@ -124,6 +124,39 @@
     </rect>
    </property>
   </widget>
+  <widget class="QWidget" name="horizontalLayoutWidget">
+   <property name="geometry">
+    <rect>
+     <x>39</x>
+     <y>190</y>
+     <width>131</width>
+     <height>51</height>
+    </rect>
+   </property>
+   <layout class="QHBoxLayout" name="horizontalLayout">
+    <item>
+     <widget class="QPushButton" name="emoji_button">
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QPushButton" name="image_button">
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QPushButton" name="file_button">
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
  </widget>
  <resources>
   <include location="resources.qrc"/>
@@ -161,9 +194,60 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>emoji_button</sender>
+   <signal>clicked()</signal>
+   <receiver>Form</receiver>
+   <slot>send_emoji()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>57</x>
+     <y>200</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>16</x>
+     <y>43</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>file_button</sender>
+   <signal>clicked()</signal>
+   <receiver>Form</receiver>
+   <slot>send_file()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>151</x>
+     <y>205</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>335</x>
+     <y>30</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>image_button</sender>
+   <signal>clicked()</signal>
+   <receiver>Form</receiver>
+   <slot>send_image()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>108</x>
+     <y>212</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>243</x>
+     <y>55</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>send_message()</slot>
   <slot>user_setting()</slot>
+  <slot>send_emoji()</slot>
+  <slot>send_image()</slot>
+  <slot>send_file()</slot>
  </slots>
 </ui>
