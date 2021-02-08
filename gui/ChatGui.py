@@ -287,13 +287,18 @@ class ChatGUI(QWidget, Ui_Form):
         threading.Thread(target=self._send_portrait).start()
 
     def send_emoji(self):
-        pass
+        dialog = QDialog(self)
+        dialog.setWindowTitle('你在肝肾莫')
+        dialog.resize(400,400)
+        label = QLabel("不会真有人以为我实现了这个功能吧^^_", dialog)
+        label.setGeometry(QRect(50,50,300,300))
+        dialog.show()
 
     def send_image(self):
         pass
 
     def send_file(self):
-        pass
+        self.send_emoji()
 
     def eventFilter(self, obj, event):
         """
