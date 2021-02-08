@@ -94,8 +94,11 @@ class ChatGUI(QWidget, Ui_Form):
         icon.addPixmap(QPixmap("../gui/resource/shaco_logo.jpg"), QIcon.Normal, QIcon.Off)
         self.setWindowIcon(icon)
         self.emoji_button.setIcon(QIcon("../gui/resource/button/emoji_button.png"))
+        self.emoji_button.setIconSize(QSize(39,28))
         self.image_button.setIcon(QIcon("../gui/resource/button/image_button.png"))
+        self.image_button.setIconSize(QSize(39, 28))
         self.file_button.setIcon(QIcon("../gui/resource/button/file_button.png"))
+        self.file_button.setIconSize(QSize(39, 28))
 
         self.id = user_id
         self.userName = user_name
@@ -295,7 +298,11 @@ class ChatGUI(QWidget, Ui_Form):
         dialog.show()
 
     def send_image(self):
-        pass
+        file_name, file_type = QFileDialog.getOpenFileName(self, "选取文件", './',
+                                                           "图片文件 (*.jpg);;图片文件 (*.png)")
+        if file_type == '' and file_name == '':
+            return
+
 
     def send_file(self):
         self.send_emoji()
