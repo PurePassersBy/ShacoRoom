@@ -50,7 +50,13 @@ def send_package(conn, pack):
 
 def fetch_package(conn):
     size = struct.unpack('i', conn.recv(4))[0]
-    pack = json.loads(conn.recv(size).decode())
+    data = ''.encode()
+    while len(data) < size:
+        if len(data) + 2048 > size:
+            data += conn.recv(size - len(data))
+        else:
+            data += conn.recv(2048)
+    pack = json.loads(data.decode())
     return pack
 
 
@@ -187,7 +193,6 @@ class ChatGUI(QWidget, Ui_Form):
         展示信息
         :return:
         """
-        print(msg_pack)
         if 'system_code' in msg_pack:
             self.system_information(msg_pack['system_code'])
         time_ = msg_pack['time']
@@ -202,21 +207,23 @@ class ChatGUI(QWidget, Ui_Form):
         img = QPixmap(PORTRAIT_PATH % user_id).scaled(50, 50)
         portrait.setPixmap(img)
         layout_msg.addWidget(QLabel(f'{time_}  {user_name}'))
+        item = QListWidgetItem()
         if 'shape' in msg_pack:
             shape = msg_pack['shape']
             image_np = np.frombuffer(np.array(msg_pack['image'], dtype='uint8'), dtype='uint8').reshape(shape)
             image = Image.fromarray(image_np).convert('RGB')
-            pixmap = QPixmap.fromImage(ImageQt.ImageQt(image))
+            pixmap = QPixmap.fromImage(ImageQt.ImageQt(image)).scaled(400,200)
             image_label = QLabel()
-            image_label.setFixedSize(80,80)
+            image_label.setFixedSize(400,200)
             image_label.setPixmap(pixmap)
             layout_msg.addWidget(image_label)
+            item.setSizeHint(QSize(400, 250))
         else:
             msg = msg_pack['message']
             msg_list = split_message(msg)
             for msg_splited in msg_list:
-                print(msg_splited)
                 layout_msg.addWidget(QLabel(msg_splited))
+            item.setSizeHint(QSize(200, 70 + (len(msg_list) - 1) * 35))
         if self.id == user_id:
             layout_main.addLayout(layout_msg)
             layout_main.addWidget(portrait)
@@ -224,8 +231,8 @@ class ChatGUI(QWidget, Ui_Form):
             layout_main.addWidget(portrait)
             layout_main.addLayout(layout_msg)
         widget.setLayout(layout_main)
-        item = QListWidgetItem()
-        item.setSizeHint(QSize(200, 70+(len(msg_list)-1)*35))
+
+
         self.msg_list.addItem(item)
         self.msg_list.setItemWidget(item, widget)
         self.msg_list.scrollToBottom()
