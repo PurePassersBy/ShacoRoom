@@ -23,7 +23,13 @@ def send_package(conn, pack):
 
 def fetch_package(conn):
     size = struct.unpack('i', conn.recv(4))[0]
-    pack = json.loads(conn.recv(size).decode())
+    data = ''.encode()
+    while len(data) < size:
+        if len(data) + CHUNK > size:
+            data += conn.recv(size - len(data))
+        else:
+            data += conn.recv(CHUNK)
+    pack = json.loads(data.decode())
     return pack
 
 
