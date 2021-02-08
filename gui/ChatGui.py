@@ -212,7 +212,7 @@ class ChatGUI(QWidget, Ui_Form):
             shape = msg_pack['shape']
             image_np = np.frombuffer(msg_pack['image'], dtype='uint8').reshape(shape)
             image = Image.fromarray(image_np).convert('RGB')
-            pixmap = image.toqpixmap().scaled(400,200)
+            pixmap = image.toqpixmap().scaled(200,200)
             image_label = QLabel()
             image_label.setFixedSize(400,200)
             image_label.setPixmap(pixmap)
