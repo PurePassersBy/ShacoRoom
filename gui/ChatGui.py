@@ -310,25 +310,15 @@ class ChatGUI(QWidget, Ui_Form):
             return
         image = Image.open(file_name)
         image_np = np.array(image)
-        image_str = image_np.tostring()
-        size = len(image_str)
         pack = {
             'user_id': self.id,
             'user_name': self.userName,
             'shape': image_np.shape,
-            'size': size
+            'image': image_np.tolist()
         }
         message_lock.acquire()
+        print(f'开始发送图片包')
         send_package(self.chatter, pack)
-        send_size = 0
-        print(f'开始发送图片, 大小为{size}')
-        while send_size < size:
-            if send_size+1024 > size:
-                self.chatter.send(image_str[send_size:])
-                send_size = size
-            else:
-                self.chatter.send(image_str[send_size:send_size+1024])
-                send_size += 1024
         message_lock.release()
         print('发送成功')
 
