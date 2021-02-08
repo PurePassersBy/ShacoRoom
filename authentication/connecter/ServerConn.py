@@ -1,7 +1,7 @@
 import socket
 import threading
 import struct
-import json
+import pickle
 from time import strftime, localtime
 
 
@@ -39,8 +39,7 @@ class ServerConnect(threading.Thread):
         """
         print(f"{get_localtime()}  SQL Request sending  starts...")
         try:
-            data_json = json.dumps(data)  # 把字典序列化
-            data_str = data_json.encode()  # 转换成二进制比特流
+            data_str = pickle.dumps(data)
             self._server.send(struct.pack('i', len(data_str)))  # 发送数据包大小
             self._server.send(data_str)
             print('Waiting for response from server...')
@@ -48,7 +47,7 @@ class ServerConnect(threading.Thread):
             pack_size = struct.unpack("i", self._server.recv(4))[0]
             pack_str = self._server.recv(pack_size)
             print(f'Received pack from server')
-            pack = json.loads(pack_str.decode())
+            pack = pickle.loads(pack_str)
             self.count = pack['count']
             self.result = pack['result']
             if self.count:
