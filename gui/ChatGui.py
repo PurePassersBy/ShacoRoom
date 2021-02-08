@@ -22,6 +22,22 @@ AUDIO_SERVER_ADDRESS = ('39.106.169.58', 3978)
 RESOURCE_SERVER_ADDRESS = ('39.106.169.58', 3979)
 PORTRAIT_PATH = '../gui/resource/portrait/%s.jpg'
 TABLE_NAME = 'userinfo'
+LINE_LENGTH = 39
+UNI2ASC = 40 / 24
+
+
+def split_message(msg):
+    msg_list = []
+    size = 0; now = ''
+    for char in msg:
+        size += 1 if ord(char)<128 else UNI2ASC
+        now += char
+        if size > LINE_LENGTH:
+            msg_list.append(now)
+            size = 0; now = ''
+    if len(now) > 0:
+        msg_list.append(now)
+    return msg_list
 
 
 def send_package(conn, pack):
@@ -167,6 +183,7 @@ class ChatGUI(QWidget, Ui_Form):
         user_id = msg_pack['user_id']
         user_name = msg_pack['user_name']
         msg = msg_pack['message']
+        msg_list = split_message(msg)
         widget = QWidget()
         layout_main = QHBoxLayout()
         layout_msg = QVBoxLayout()
@@ -176,7 +193,9 @@ class ChatGUI(QWidget, Ui_Form):
         img = QPixmap(PORTRAIT_PATH % user_id).scaled(50, 50)
         portrait.setPixmap(img)
         layout_msg.addWidget(QLabel(f'{time_}  {user_name}'))
-        layout_msg.addWidget(QLabel(msg))
+        for msg_splited in msg_list:
+            print(msg_splited)
+            layout_msg.addWidget(QLabel(msg_splited))
         if self.id == user_id:
             layout_main.addLayout(layout_msg)
             layout_main.addWidget(portrait)
@@ -185,7 +204,7 @@ class ChatGUI(QWidget, Ui_Form):
             layout_main.addLayout(layout_msg)
         widget.setLayout(layout_main)
         item = QListWidgetItem()
-        item.setSizeHint(QSize(200, 70))
+        item.setSizeHint(QSize(200, 70+(len(msg_list)-1)*35))
         self.msg_list.addItem(item)
         self.msg_list.setItemWidget(item, widget)
         self.msg_list.scrollToBottom()
