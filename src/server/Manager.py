@@ -1,6 +1,6 @@
 import socket
 import struct
-import json
+import pickle
 from time import strftime, localtime, sleep
 import threading
 from queue import Queue
@@ -16,7 +16,7 @@ def get_localtime():
 
 
 def send_package(conn, pack):
-    pack_str = json.dumps(pack).encode()
+    pack_str = pickle.dumps(pack)
     conn.send(struct.pack('i', len(pack_str)))
     conn.send(pack_str)
 
@@ -29,7 +29,7 @@ def fetch_package(conn):
             data += conn.recv(size - len(data))
         else:
             data += conn.recv(CHUNK)
-    pack = json.loads(data.decode())
+    pack = pickle.loads(data)
     return pack
 
 

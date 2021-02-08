@@ -1,6 +1,6 @@
 import sys
 import os
-import json
+import pickle
 import struct
 from time import sleep
 import threading
@@ -43,7 +43,7 @@ def split_message(msg):
 
 
 def send_package(conn, pack):
-    pack_str = json.dumps(pack).encode()
+    pack_str = pickle.dumps(pack)
     conn.send(struct.pack('i', len(pack_str)))
     conn.send(pack_str)
 
@@ -56,7 +56,7 @@ def fetch_package(conn):
             data += conn.recv(size - len(data))
         else:
             data += conn.recv(2048)
-    pack = json.loads(data.decode())
+    pack = pickle.loads(data)
     return pack
 
 

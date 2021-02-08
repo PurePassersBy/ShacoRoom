@@ -1,7 +1,7 @@
 import socket
 import threading
 import struct
-import json
+import pickle
 from time import strftime, localtime
 
 import pymysql
@@ -32,7 +32,7 @@ class DatabaseManager(threading.Thread):
                 pack_size = struct.unpack("i", conn.recv(4))[0]
                 print(f'pack size: {pack_size}')
                 pack_str = conn.recv(pack_size)
-                pack = json.loads(pack_str.decode())
+                pack = pickle.loads(pack_str)
                 sql = pack['sql']
                 args = pack['args']
                 print(pack)
@@ -44,7 +44,7 @@ class DatabaseManager(threading.Thread):
                     'count': cnt,
                     'result': res
                 }
-                send_pack_str = json.dumps(send_pack).encode()
+                send_pack_str = pickle.dumps(send_pack)
                 conn.send(struct.pack('i', len(send_pack_str)))
                 conn.send(send_pack_str)
             except Exception as e:
