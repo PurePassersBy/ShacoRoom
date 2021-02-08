@@ -181,6 +181,7 @@ class ChatGUI(QWidget, Ui_Form):
             self.dialog = Dialog('LOGIN REPEAT')
             self.dialog.show()
 
+
     def show_message(self, msg_pack):
         """
         展示信息
@@ -192,8 +193,6 @@ class ChatGUI(QWidget, Ui_Form):
         time_ = msg_pack['time']
         user_id = msg_pack['user_id']
         user_name = msg_pack['user_name']
-        msg = msg_pack['message']
-        msg_list = split_message(msg)
         widget = QWidget()
         layout_main = QHBoxLayout()
         layout_msg = QVBoxLayout()
@@ -203,9 +202,21 @@ class ChatGUI(QWidget, Ui_Form):
         img = QPixmap(PORTRAIT_PATH % user_id).scaled(50, 50)
         portrait.setPixmap(img)
         layout_msg.addWidget(QLabel(f'{time_}  {user_name}'))
-        for msg_splited in msg_list:
-            print(msg_splited)
-            layout_msg.addWidget(QLabel(msg_splited))
+        if 'shape' in msg_pack:
+            shape = msg_pack['shape']
+            image_np = np.frombuffer(np.array(msg_pack['image'], dtype='uint8'), dtype='uint8').reshape(shape)
+            image = Image.fromarray(image_np).convert('RGB')
+            pixmap = QPixmap.fromImage(ImageQt.ImageQt(image))
+            image_label = QLabel()
+            image_label.setFixedSize(80,80)
+            image_label.setPixmap(pixmap)
+            layout_msg.addWidget(image_label)
+        else:
+            msg = msg_pack['message']
+            msg_list = split_message(msg)
+            for msg_splited in msg_list:
+                print(msg_splited)
+                layout_msg.addWidget(QLabel(msg_splited))
         if self.id == user_id:
             layout_main.addLayout(layout_msg)
             layout_main.addWidget(portrait)
