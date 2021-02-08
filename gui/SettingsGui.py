@@ -3,6 +3,7 @@ import shutil
 
 from PyQt5 import QtCore
 from PyQt5.QtWidgets import QWidget, QApplication, QFileDialog
+from PyQt5.QtGui import *
 
 from gui.VSettings import Ui_Dialog
 
@@ -17,6 +18,10 @@ class SettingsGui(QWidget, Ui_Dialog):
         self.portrait = f'../gui/resource/portrait/{self.id}.jpg'
         self.favComic = fav_comic
         self.isKnow = is_know
+
+        icon = QIcon()
+        icon.addPixmap(QPixmap("../gui/resource/shaco_logo.jpg"), QIcon.Normal, QIcon.Off)
+        self.setWindowIcon(icon)
 
         self.graphicsView.setStyleSheet(f"border-image: url({self.portrait});")
         self.lineEdit_username.setText(self.userName)
