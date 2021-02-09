@@ -154,12 +154,12 @@ class Ui_Biography(object):
         self.line.setFrameShadow(QtWidgets.QFrame.Sunken)
         self.line.setObjectName("line")
         self.line_2 = QtWidgets.QFrame(self.centralwidget)
-        self.line_2.setGeometry(QtCore.QRect(395, 0, 10, 400))
+        self.line_2.setGeometry(QtCore.QRect(390, 0, 10, 400))
         self.line_2.setFrameShape(QtWidgets.QFrame.VLine)
         self.line_2.setFrameShadow(QtWidgets.QFrame.Sunken)
         self.line_2.setObjectName("line_2")
         self.line_3 = QtWidgets.QFrame(self.centralwidget)
-        self.line_3.setGeometry(QtCore.QRect(0, 395, 400, 10))
+        self.line_3.setGeometry(QtCore.QRect(0, 390, 400, 10))
         self.line_3.setFrameShape(QtWidgets.QFrame.HLine)
         self.line_3.setFrameShadow(QtWidgets.QFrame.Sunken)
         self.line_3.setObjectName("line_3")
@@ -199,7 +199,7 @@ class Biography(QMainWindow, Ui_Biography):
     # pyqtSignal 要定义为一个类而不是属性，不能放到__init__里
     close_signal = QtCore.pyqtSignal()
 
-    def __init__(self, userinfo):
+    def __init__(self, userinfo, x, y):
         """
         注意close_signal 要在类成员函数外定义
         初始化CloseDialog类，将 确定 和 取消 按钮连接到self._close函数
@@ -209,6 +209,7 @@ class Biography(QMainWindow, Ui_Biography):
         super(Biography, self).__init__()
         self.setupUi(self)
         self.retranslateUi(self)
+        self.setGeometry(x, y, 400, 400)
         self.userinfo = userinfo
         self.addButton.clicked.connect(self.addFriend)
         self.portraitLabel.setText("")

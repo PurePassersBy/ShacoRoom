@@ -63,13 +63,22 @@ def fetch_package(conn):
 
 class Portrait(QLabel):
     clicked_signal = pyqtSignal(int)
+    clicked_pos_signal = pyqtSignal(dict, int, int)
 
     def __init__(self, user_id, parent=None):
         super().__init__(parent)
         self.user_id = user_id
+        self.info = dict()
+        self.info['name'] = ' '
+        self.info['anime'] = '  '
 
     def mousePressEvent(self, QMouseEvent):
         self.clicked_signal.emit(self.user_id)
+        self.clicked_pos_signal.emit(self.info,
+                                     QMouseEvent.pos().x(), QMouseEvent.pos().y())
+
+    def connect_pos_slot(self, func):
+        self.clicked_pos_signal.connect(func)
 
     def connect_customized_slot(self, func):
         self.clicked_signal.connect(func)
@@ -127,6 +136,8 @@ class ChatGUI(QWidget, Ui_Form):
         # 初始化个人简介页面
         self.biography = None
 
+
+
     def _fetch_others_portrait(self, user_id):
         query = {
             'type': 'fetch',
@@ -178,11 +189,10 @@ class ChatGUI(QWidget, Ui_Form):
         self.label_username.setText(self.userName)
         self.graphicsView.setStyleSheet(f"border-image: url({self.portrait});")
 
-    def show_biography(self):
-        user_info = dict()
-        user_info['name'] = self.userName
-        user_info['anime'] = self.favComic
-        self.biography = Biography(user_info)
+    def show_biography(self, user_info, x, y):
+        print("!!!")
+        print(f"{user_info} {x} {y}")
+        self.biography = Biography(user_info, x, y)
         self.biography.show()
 
     def system_information(self, system_code):
@@ -213,7 +223,7 @@ class ChatGUI(QWidget, Ui_Form):
         layout_msg = QVBoxLayout()
         portrait = Portrait(int(user_id))
         portrait.connect_customized_slot(self._fetch_others_portrait)
-        portrait.connect_customized_slot(self.show_biography)
+        portrait.connect_pos_slot(self.show_biography)
         portrait.setFixedSize(50, 50)
         img = QPixmap(PORTRAIT_PATH % user_id).scaled(50, 50)
         portrait.setPixmap(img)
