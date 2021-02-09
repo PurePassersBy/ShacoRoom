@@ -10,7 +10,7 @@ def get_localtime():
 class ConnectSQL():
     def __init__(self, server_address):
         self.cur = ServerConnect(server_address)
-        self.property_name = ['id', 'name', 'mail', 'password']
+        self.property_name = ['id', 'name', 'mail', 'password', 'anime', 'biography']
 
     def insert(self, table_name, user_data):
         """
@@ -91,28 +91,76 @@ class ConnectSQL():
         """
         在数据库更改数据，输入要更改的表名，以及需要进行修改操作的用户id，需要修改的属性及内容
         :param table_name '需要操作的表名'
-        :param data['待修改用户id'， '属性名'， '该属性修改后的内容']
+        :param data: {'id':待修改用户的id, 'name':修改后的名字， 'mail'= 修改后的邮件, ’password' = 修改后的密码，
+                            'anime' = , 'biography'= }
         :return 修改后该用户的数据  出错则返回None
         """
-        for i in self.property_name:
-            if i == data[1]:
-                try:
-                    if self.search(table_name, ['id', data[0]]) is None:
-                        print(f'未查找到到id为{data[0]}的用户')
-                        return None
-                    else:
-                        sql = f'update {table_name} set {data[1]} = %s where id = %s;'
-                        send_data = {'sql': sql, 'args': [data[2], data[0]]}
-                        print('?')
-                        self.cur.send_sql('edit', send_data)
-
-                        print(f'修改{self.cur.get_count()}条数据')
-                        return self.cur.get_result()
-
-                except Exception:
-                    # 发生错误
-                    print('修改发生错误')
+        flag = False
+        if 'id' in data:
+            if self.search(table_name, ['id', data['id']]) is None:
+                print(f'未查找到到id为{data["id"]}的用户')
+                return None
+            for i in data:
+                if i not in self.property_name:
+                    # 如果表中没有相应property 则说明用户使用函数错误
+                    print('使用edit函数错误，edit(table_name, data)中 data["属性名"]应为数据表中的属性')
                     return None
-        # 如果表中没有相应property 则说明用户使用函数错误
-        print('使用edit函数错误，edit(table_name, data)中 data[1]应为数据表中的属性')
-        return None
+            sql = 'update '+table_name+' set '
+            arg = []
+            for i in self.property_name:
+                if i == 'id':
+                    continue
+                if i not in data:
+                    data[i] = i
+                    sql = sql+i+' = '+i+', '
+                else:
+                    sql = sql+i+' = %s, '
+                    arg.append(data[i])
+            sql = sql[:-2]
+            sql = sql+' '
+            sql = sql+'where id = %s;'
+            arg.append(data['id'])
+            print(sql)
+            print(arg)
+            # sql = f'update {table_name} set name = %s, mail = %s, password = %s, anime = %s, biography = %s  where id = %s;'
+            print(type(sql),type(arg))
+            send_data = {'sql': sql, 'args': arg}
+            import pymysql
+            self.db_conn = pymysql.connect(host='39.106.169.58', port=3306, user='Shaco', password='Badwoman',
+                                           db='ShacoRoomDB')
+            self.cur = self.db_conn.cursor()
+            # send_data = {'sql':f'update userinfo set name = %s, mail = mail, password = password, anime = %s, biography = biography where id = %s;'
+            #              ,'args':['admin', '少女终末旅行', '1']}
+            self.cur.execute(send_data)
+            print(f'修改{self.cur.get_count()}条数据')
+            return self.cur.get_result()
+
+        else:
+            print('使用edit函数错误，edit(table_name, data)中 data应有键值对data["id"]="待修改用户id"')
+
+
+
+        # for i in data:
+        #     if i in self.property_name:
+        #         try:
+        #             if i == 'id':
+        #                 flag = True
+        #                 if self.search(table_name, ['id', data['id']]) is None:
+        #                     print(f'未查找到到id为{data[0]}的用户')
+        #                     return None
+        #                 else:
+        #                     sql = f'update {table_name} set {data[1]} = %s where id = %s;'
+        #                     send_data = {'sql': sql, 'args': [data[2], data[0]]}
+        #                     print('?')
+        #                     self.cur.send_sql('edit', send_data)
+        #
+        #                     print(f'修改{self.cur.get_count()}条数据')
+        #                     return self.cur.get_result()
+        #
+        #         except Exception as e:
+        #             # 发生错误
+        #             print(f'修改发生错误:{e}')
+        #             return None
+        # # 如果表中没有相应property 则说明用户使用函数错误
+        # print('使用edit函数错误，edit(table_name, data)中 data[1]应为数据表中的属性')
+        # return None
