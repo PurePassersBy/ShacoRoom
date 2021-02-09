@@ -101,7 +101,7 @@ class ReceiveMessageThread(QThread):
 
 class ChatGUI(QWidget, Ui_Form):
 
-    def __init__(self, user_id, user_name, fav_comic, is_know, db_conn):
+    def __init__(self, user_id, user_name, fav_comic, profile, db_conn):
         super(ChatGUI, self).__init__()
         self.setupUi(self)
 
@@ -119,7 +119,7 @@ class ChatGUI(QWidget, Ui_Form):
         self.userName = user_name
         self.portrait = f'../gui/resource/portrait/{self.id}.jpg'
         self.favComic = fav_comic
-        self.isKnow = is_know
+        self.profile = profile
         self._flush()
 
         self.db_conn = db_conn
@@ -325,7 +325,7 @@ class ChatGUI(QWidget, Ui_Form):
         """
         self.userName = params['user_name']
         self.favComic = params['fav_comic']
-        self.isKnow = params['is_know']
+        self.profile = params['profile']
         self.db_conn.edit(TABLE_NAME, [self.id, 'name', self.userName])
         self.db_conn.edit(TABLE_NAME, [self.id, 'anime', self.favComic])
         self._flush()
