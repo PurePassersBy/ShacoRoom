@@ -10,7 +10,7 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import Qt, QEvent
-from PyQt5.QtGui import QPalette, QBrush, QPixmap
+from PyQt5.QtGui import QPalette, QBrush, QPixmap, QPainter
 from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton
 
 
@@ -96,6 +96,7 @@ class Dialog(QMainWindow, Ui_Dialog):
 
 
 
+
 class Ui_Biography(object):
     def setupUi(self, Biography):
         Biography.setObjectName("Biography")
@@ -142,11 +143,37 @@ class Ui_Biography(object):
         self.toolBar = QtWidgets.QToolBar(Biography)
         self.toolBar.setObjectName("toolBar")
         Biography.addToolBar(QtCore.Qt.RightToolBarArea, self.toolBar)
+        self.toolBar.setVisible(False)
+        self.statusbar.setVisible(False)
 
-        palette = QPalette()
-        palette.setBrush(QPalette.Background, QBrush(QPixmap("resources/pic/助手与凶真.jpg").scaled(400,400)))
-        self.setPalette(palette)
-        self.setWindowOpacity(0.9)
+        self.setStyleSheet("background-color:rgb(255,255,255);")
+        # 绘制边框
+        self.line = QtWidgets.QFrame(self.centralwidget)
+        self.line.setGeometry(QtCore.QRect(5, 0, 10, 400))
+        self.line.setFrameShape(QtWidgets.QFrame.VLine)
+        self.line.setFrameShadow(QtWidgets.QFrame.Sunken)
+        self.line.setObjectName("line")
+        self.line_2 = QtWidgets.QFrame(self.centralwidget)
+        self.line_2.setGeometry(QtCore.QRect(395, 0, 10, 400))
+        self.line_2.setFrameShape(QtWidgets.QFrame.VLine)
+        self.line_2.setFrameShadow(QtWidgets.QFrame.Sunken)
+        self.line_2.setObjectName("line_2")
+        self.line_3 = QtWidgets.QFrame(self.centralwidget)
+        self.line_3.setGeometry(QtCore.QRect(0, 395, 400, 10))
+        self.line_3.setFrameShape(QtWidgets.QFrame.HLine)
+        self.line_3.setFrameShadow(QtWidgets.QFrame.Sunken)
+        self.line_3.setObjectName("line_3")
+        self.line_4 = QtWidgets.QFrame(self.centralwidget)
+        self.line_4.setGeometry(QtCore.QRect(0, 0, 400, 10))
+        self.line_4.setFrameShape(QtWidgets.QFrame.HLine)
+        self.line_4.setFrameShadow(QtWidgets.QFrame.Sunken)
+        self.line_4.setObjectName("line_4")
+        self.line_5 = QtWidgets.QFrame(self.centralwidget)
+        self.line_5.setGeometry(QtCore.QRect(80, 200, 230, 10))
+        self.line_5.setFrameShape(QtWidgets.QFrame.HLine)
+        self.line_5.setFrameShadow(QtWidgets.QFrame.Sunken)
+        self.line_5.setObjectName("line_5")
+
 
 
 
