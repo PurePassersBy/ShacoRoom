@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file './gui/VSettings.ui'
+# Form implementation generated from reading ui file 'gui/VSettings.ui'
 #
 # Created by: PyQt5 UI code generator 5.15.2
 #
@@ -35,12 +35,12 @@ class Ui_Dialog(object):
         self.lineEdit_fav_comic = QtWidgets.QLineEdit(Dialog)
         self.lineEdit_fav_comic.setGeometry(QtCore.QRect(120, 40, 271, 21))
         self.lineEdit_fav_comic.setObjectName("lineEdit_fav_comic")
-        self.checkBox_yes = QtWidgets.QCheckBox(Dialog)
-        self.checkBox_yes.setGeometry(QtCore.QRect(220, 180, 71, 20))
-        self.checkBox_yes.setObjectName("checkBox_yes")
         self.label_2 = QtWidgets.QLabel(Dialog)
-        self.label_2.setGeometry(QtCore.QRect(160, 150, 191, 20))
+        self.label_2.setGeometry(QtCore.QRect(220, 80, 72, 15))
         self.label_2.setObjectName("label_2")
+        self.textEdit = QtWidgets.QTextEdit(Dialog)
+        self.textEdit.setGeometry(QtCore.QRect(120, 100, 271, 121))
+        self.textEdit.setObjectName("textEdit")
 
         self.retranslateUi(Dialog)
         self.buttonBox.accepted.connect(Dialog.accept)
@@ -53,5 +53,4 @@ class Ui_Dialog(object):
         Dialog.setWindowTitle(_translate("Dialog", "Settings"))
         self.pushButton.setText(_translate("Dialog", "修改头像"))
         self.label.setText(_translate("Dialog", "最喜欢的动漫"))
-        self.checkBox_yes.setText(_translate("Dialog", "暴杀！"))
-        self.label_2.setText(_translate("Dialog", "懂不懂s6第一王者的含金量？"))
+        self.label_2.setText(_translate("Dialog", "个人简介"))

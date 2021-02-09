@@ -10,14 +10,14 @@ from gui.VSettings import Ui_Dialog
 
 class SettingsGui(QWidget, Ui_Dialog):
     _signal = QtCore.pyqtSignal(dict)
-    def __init__(self, user_id, user_name, fav_comic, is_know):
+    def __init__(self, user_id, user_name, fav_comic, profile):
         super(SettingsGui, self).__init__()
         self.setupUi(self)
         self.id = user_id
         self.userName = user_name
         self.portrait = f'../gui/resource/portrait/{self.id}.jpg'
         self.favComic = fav_comic
-        self.isKnow = is_know
+        self.profile = profile
 
         icon = QIcon()
         icon.addPixmap(QPixmap("../gui/resource/shaco_logo.jpg"), QIcon.Normal, QIcon.Off)
@@ -26,8 +26,7 @@ class SettingsGui(QWidget, Ui_Dialog):
         self.graphicsView.setStyleSheet(f"border-image: url({self.portrait});")
         self.lineEdit_username.setText(self.userName)
         self.lineEdit_fav_comic.setText(self.favComic)
-        if self.isKnow:
-            self.checkBox_yes.setCheckState(QtCore.Qt.Checked)
+        self.textEdit.setText(self.profile)
 
     def load_file(self):
         """
@@ -49,8 +48,8 @@ class SettingsGui(QWidget, Ui_Dialog):
         self.graphicsView.setStyleSheet(f"border-image: url({self.portrait});")
         self.lineEdit_username.setText(self.userName)
         self.lineEdit_fav_comic.setText(self.favComic)
-        if self.isKnow:
-            self.checkBox_yes.setCheckState(QtCore.Qt.Checked)
+        self.textEdit.setText(self.profile)
+
 
     def accept(self):
         """
@@ -60,7 +59,7 @@ class SettingsGui(QWidget, Ui_Dialog):
         dic = dict()
         dic['user_name'] = self.lineEdit_username.text()
         dic['fac_comic'] = self.lineEdit_fav_comic.text()
-        dic['is_know'] = bool(self.checkBox_yes.checkState())
+        dic['profile'] = self.profile
         self._signal.emit(dic)
 
     def reject(self):
@@ -71,7 +70,7 @@ if __name__ == '__main__':
     user_id = 0
     user_name = 's6第一个王者'
     fav_comic = 'Attack on Titan'
-    is_know = True
-    setting = SettingsGui(user_id, user_name, fav_comic, is_know)
+    profile = '寄！'
+    setting = SettingsGui(user_id, user_name, fav_comic, profile)
     setting.show()
     sys.exit(app.exec_())
