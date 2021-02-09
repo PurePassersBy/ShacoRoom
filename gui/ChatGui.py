@@ -324,7 +324,7 @@ class ChatGUI(QWidget, Ui_Form):
         :return:
         """
         self.userName = params['user_name']
-        self.favComic = params['fac_comic']
+        self.favComic = params['fav_comic']
         self.isKnow = params['is_know']
         self.db_conn.edit(TABLE_NAME, [self.id, 'name', self.userName])
         self.db_conn.edit(TABLE_NAME, [self.id, 'anime', self.favComic])

@@ -58,7 +58,7 @@ class SettingsGui(QWidget, Ui_Dialog):
         """
         dic = dict()
         dic['user_name'] = self.lineEdit_username.text()
-        dic['fac_comic'] = self.lineEdit_fav_comic.text()
+        dic['fav_comic'] = self.lineEdit_fav_comic.text()
         dic['profile'] = self.profile
         self._signal.emit(dic)
 
