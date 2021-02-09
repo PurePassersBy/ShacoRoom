@@ -4,14 +4,12 @@ from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 
 from authentication.dialogGUI import Biography
+from authentication.connecter.SQLConn import ConnectSQL
 
-
-
+SERVER_ADDRESS = ('39.106.169.58', 3980)
+TABLE_NAME = 'userinfo'
 if __name__ == '__main__':
-    app=QApplication(sys.argv)
-    user_info = dict()
-    user_info['name'] = '??'
-    user_info['anime'] = 'Steins Gate'
-    demo=Biography(user_info, 0,0)
-    demo.show()
-    sys.exit(app.exec_())
+    conn = ConnectSQL(SERVER_ADDRESS)
+
+    conn.edit(TABLE_NAME, ['1','biography','sadfsfsdfdsfsfsfsf!'])
+

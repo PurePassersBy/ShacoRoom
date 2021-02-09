@@ -328,6 +328,7 @@ class ChatGUI(QWidget, Ui_Form):
         self.profile = params['profile']
         self.db_conn.edit(TABLE_NAME, [self.id, 'name', self.userName])
         self.db_conn.edit(TABLE_NAME, [self.id, 'anime', self.favComic])
+        self.db_conn.edit(TABLE_NAME, [self.id, 'biography', self.profile])
         self._flush()
         threading.Thread(target=self._send_portrait).start()
 
