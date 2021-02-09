@@ -10,6 +10,7 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import Qt, QEvent
+from PyQt5.QtGui import QPalette, QBrush, QPixmap
 from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton
 
 
@@ -141,6 +142,13 @@ class Ui_Biography(object):
         self.toolBar = QtWidgets.QToolBar(Biography)
         self.toolBar.setObjectName("toolBar")
         Biography.addToolBar(QtCore.Qt.RightToolBarArea, self.toolBar)
+
+        palette = QPalette()
+        palette.setBrush(QPalette.Background, QBrush(QPixmap("resources/pic/助手与凶真.jpg").scaled(400,400)))
+        self.setPalette(palette)
+        self.setWindowOpacity(0.9)
+
+
 
         self.retranslateUi(Biography)
         QtCore.QMetaObject.connectSlotsByName(Biography)
