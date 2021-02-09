@@ -442,7 +442,7 @@ class LoginForm(QMainWindow, Ui_login):
             if result[0][3] == self.password:
                 self.passwordStatus.setText('密码正确')
                 self.qt_chat = ChatGUI(
-                    result[0][0], result[0][1], 'Stein Gates', True, self.conn)
+                    result[0][0], result[0][1], 'Steins; Gate', True, self.conn)
                 self.qt_chat.show()
                 self.close()
             else:
