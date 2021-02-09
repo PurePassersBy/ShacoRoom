@@ -63,19 +63,15 @@ def fetch_package(conn):
 
 class Portrait(QLabel):
     clicked_signal = pyqtSignal(int)
-    clicked_pos_signal = pyqtSignal(dict, int, int)
+    clicked_pos_signal = pyqtSignal(int, int, int)
 
     def __init__(self, user_id, parent=None):
         super().__init__(parent)
         self.user_id = user_id
-        self.info = dict()
-        self.info['id'] = '0'
-        self.info['name'] = ' '
-        self.info['anime'] = '  '
 
     def mousePressEvent(self, QMouseEvent):
         self.clicked_signal.emit(self.user_id)
-        self.clicked_pos_signal.emit(self.info,
+        self.clicked_pos_signal.emit(self.user_id,
                                      QMouseEvent.globalPos().x(), QMouseEvent.globalPos().y())
 
     def connect_pos_slot(self, func):
@@ -190,9 +186,9 @@ class ChatGUI(QWidget, Ui_Form):
         self.label_username.setText(self.userName)
         self.graphicsView.setStyleSheet(f"border-image: url({self.portrait});")
 
-    def show_biography(self, user_info, x, y):
-        print(f"{user_info} {x} {y}")
-        self.biography = Biography(user_info, x, y)
+    def show_biography(self, user_id, x, y):
+        print(f"{user_id} {x} {y}")
+        self.biography = Biography(user_id, x, y, PORTRAIT_PATH, self.db_conn, TABLE_NAME)
         self.biography.show()
 
     def system_information(self, system_code):
@@ -223,8 +219,6 @@ class ChatGUI(QWidget, Ui_Form):
         layout_msg = QVBoxLayout()
         portrait = Portrait(int(user_id))
         portrait.connect_customized_slot(self._fetch_others_portrait)
-        portrait.info['name'] = user_name
-        portrait.info['id'] = user_id
         portrait.connect_pos_slot(self.show_biography)
         portrait.setFixedSize(50, 50)
         img = QPixmap(PORTRAIT_PATH % user_id).scaled(50, 50)
@@ -333,6 +327,7 @@ class ChatGUI(QWidget, Ui_Form):
         self.favComic = params['fac_comic']
         self.isKnow = params['is_know']
         self.db_conn.edit(TABLE_NAME, [self.id, 'name', self.userName])
+        self.db_conn.edit(TABLE_NAME, [self.id, 'anime', self.favComic])
         self._flush()
         threading.Thread(target=self._send_portrait).start()
 

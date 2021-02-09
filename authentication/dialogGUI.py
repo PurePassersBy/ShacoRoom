@@ -81,7 +81,9 @@ class Dialog(QMainWindow, Ui_Dialog):
         if self.type =='KICK OUT':
             self.label.setText(_translate("Dialog", "该账户已在另一客户端登录,您将被愉悦送走"))
             self.label_2.setText(_translate("Dialog", "如非本人操作，请修改密码"))
-
+        if self.type =='UNDER CONSTRUCTION':
+            self.label.setText(_translate("Dialog", "该功能正在施工中"))
+            self.label_2.setText(_translate("Dialog", "敬请期待"))
 
     def _close(self):
         """
@@ -199,7 +201,7 @@ class Biography(QMainWindow, Ui_Biography):
     # pyqtSignal 要定义为一个类而不是属性，不能放到__init__里
     close_signal = QtCore.pyqtSignal()
 
-    def __init__(self, userinfo, x, y, PORTRAIT_PATH = '../gui/resource/portrait/%s.jpg'):
+    def __init__(self, userid, x, y, PORTRAIT_PATH, conn, table_name):
         """
         注意close_signal 要在类成员函数外定义
         初始化CloseDialog类，将 确定 和 取消 按钮连接到self._close函数
@@ -210,14 +212,17 @@ class Biography(QMainWindow, Ui_Biography):
         self.setupUi(self)
         self.retranslateUi(self)
         self.setGeometry(x, y, 400, 400)
-        self.userinfo = userinfo
-        self.id = userinfo['id']
+        self.id = userid
+        self.conn = conn
+        res = self.conn.search(table_name, ['id', self.id])
+        self.userinfo = res[0]
         self.addButton.clicked.connect(self.addFriend)
         self.portraitLabel.setText("")
         img = QPixmap(PORTRAIT_PATH % self.id).scaled(141, 141)
         self.portraitLabel.setPixmap(img)
         self._set()
-        self.addApply = AddApply()
+        # 初始化添加朋友窗口
+        self.addApply = None
         # 点击个人简介外的地方则关闭个人简介
         # 激活窗口，这样在点击母窗口的时候，eventFilter里会捕获到WindowDeactivate事件，从而关闭窗口
         self.activateWindow()
@@ -225,13 +230,14 @@ class Biography(QMainWindow, Ui_Biography):
 
 
     def _set(self):
-        self.usernameLabel.setText(self.userinfo['name'])
-        self.useranimeLabel.setText(self.userinfo['anime'])
+        self.usernameLabel.setText(self.userinfo[1])
+        self.useranimeLabel.setText(self.userinfo[4])
+        self.label.setText(self.userinfo[5])
         # 设置用户头像
         pass
 
     def addFriend(self):
-        self.addApply.show()
+        self.addApply = Dialog('UNDER CONSTRUCTION')
 
     def eventFilter(self, obj, event):
         """
