@@ -59,7 +59,7 @@ class SettingsGui(QWidget, Ui_Dialog):
         dic = dict()
         dic['user_name'] = self.lineEdit_username.text()
         dic['fav_comic'] = self.lineEdit_fav_comic.text()
-        dic['profile'] = self.profile
+        dic['profile'] = self.textEdit.toPlainText()
         self._signal.emit(dic)
 
     def reject(self):
