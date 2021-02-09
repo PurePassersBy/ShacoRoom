@@ -69,6 +69,7 @@ class Portrait(QLabel):
         super().__init__(parent)
         self.user_id = user_id
         self.info = dict()
+        self.info['id'] = '0'
         self.info['name'] = ' '
         self.info['anime'] = '  '
 
@@ -223,6 +224,7 @@ class ChatGUI(QWidget, Ui_Form):
         portrait = Portrait(int(user_id))
         portrait.connect_customized_slot(self._fetch_others_portrait)
         portrait.info['name'] = user_name
+        portrait.info['id'] = user_id
         portrait.connect_pos_slot(self.show_biography)
         portrait.setFixedSize(50, 50)
         img = QPixmap(PORTRAIT_PATH % user_id).scaled(50, 50)

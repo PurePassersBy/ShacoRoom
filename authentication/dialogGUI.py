@@ -199,7 +199,7 @@ class Biography(QMainWindow, Ui_Biography):
     # pyqtSignal 要定义为一个类而不是属性，不能放到__init__里
     close_signal = QtCore.pyqtSignal()
 
-    def __init__(self, userinfo, x, y):
+    def __init__(self, userinfo, x, y, PORTRAIT_PATH = '../gui/resource/portrait/%s.jpg'):
         """
         注意close_signal 要在类成员函数外定义
         初始化CloseDialog类，将 确定 和 取消 按钮连接到self._close函数
@@ -211,9 +211,11 @@ class Biography(QMainWindow, Ui_Biography):
         self.retranslateUi(self)
         self.setGeometry(x, y, 400, 400)
         self.userinfo = userinfo
+        self.id = userinfo['id']
         self.addButton.clicked.connect(self.addFriend)
         self.portraitLabel.setText("")
-        self.portraitLabel.setPixmap(QtGui.QPixmap("resources/pic/助手1.jpg").scaled(141, 141))
+        img = QPixmap(PORTRAIT_PATH % self.id).scaled(141, 141)
+        self.portraitLabel.setPixmap(img)
         self._set()
         self.addApply = AddApply()
         # 点击个人简介外的地方则关闭个人简介
