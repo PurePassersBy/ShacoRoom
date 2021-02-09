@@ -9,7 +9,9 @@
 
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtWidgets import QApplication, QMainWindow
+from PyQt5.QtCore import Qt
+from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton
+
 
 class Ui_Dialog(object):
     def setupUi(self, Dialog):
@@ -89,3 +91,123 @@ class Dialog(QMainWindow, Ui_Dialog):
         """
         self.close_signal.emit()
         self.close()
+
+
+
+
+class Ui_Biography(object):
+    def setupUi(self, Biography):
+        Biography.setObjectName("Biography")
+        Biography.resize(400, 400)
+        Biography.setMinimumSize(QtCore.QSize(400, 400))
+        Biography.setMaximumSize(QtCore.QSize(400, 400))
+        Biography.setMouseTracking(True)
+        Biography.setAnimated(True)
+        Biography.setDocumentMode(False)
+        Biography.setTabShape(QtWidgets.QTabWidget.Rounded)
+        # 设置成无边框
+        self.setWindowFlags(Qt.FramelessWindowHint)
+        self.centralwidget = QtWidgets.QWidget(Biography)
+        self.centralwidget.setObjectName("centralwidget")
+        self.addButton = QtWidgets.QPushButton(self.centralwidget)
+        self.addButton.setGeometry(QtCore.QRect(270, 160, 93, 28))
+        self.addButton.setObjectName("addButton")
+        self.portraitLabel = QtWidgets.QLabel(self.centralwidget)
+        self.portraitLabel.setGeometry(QtCore.QRect(240, 10, 141, 141))
+        self.portraitLabel.setText("")
+        self.portraitLabel.setObjectName("portraitLabel")
+        self.nameLabel = QtWidgets.QLabel(self.centralwidget)
+        self.nameLabel.setGeometry(QtCore.QRect(20, 40, 72, 15))
+        self.nameLabel.setObjectName("nameLabel")
+        self.animeLabel = QtWidgets.QLabel(self.centralwidget)
+        self.animeLabel.setGeometry(QtCore.QRect(20, 100, 91, 16))
+        self.animeLabel.setObjectName("animeLabel")
+        self.bioLabel = QtWidgets.QLabel(self.centralwidget)
+        self.bioLabel.setGeometry(QtCore.QRect(20, 220, 72, 15))
+        self.bioLabel.setObjectName("bioLabel")
+        self.usernameLabel = QtWidgets.QLabel(self.centralwidget)
+        self.usernameLabel.setGeometry(QtCore.QRect(90, 40, 91, 16))
+        self.usernameLabel.setObjectName("usernameLabel")
+        self.useranimeLabel = QtWidgets.QLabel(self.centralwidget)
+        self.useranimeLabel.setGeometry(QtCore.QRect(40, 140, 151, 20))
+        self.useranimeLabel.setObjectName("useranimeLabel")
+        self.label = QtWidgets.QLabel(self.centralwidget)
+        self.label.setGeometry(QtCore.QRect(80, 250, 251, 111))
+        self.label.setObjectName("label")
+        Biography.setCentralWidget(self.centralwidget)
+        self.statusbar = QtWidgets.QStatusBar(Biography)
+        self.statusbar.setObjectName("statusbar")
+        Biography.setStatusBar(self.statusbar)
+        self.toolBar = QtWidgets.QToolBar(Biography)
+        self.toolBar.setObjectName("toolBar")
+        Biography.addToolBar(QtCore.Qt.RightToolBarArea, self.toolBar)
+
+        self.retranslateUi(Biography)
+        QtCore.QMetaObject.connectSlotsByName(Biography)
+
+    def retranslateUi(self, Biography):
+        _translate = QtCore.QCoreApplication.translate
+        Biography.setWindowTitle(_translate("Biography", "MainWindow"))
+        self.addButton.setText(_translate("Biography", "添加好友"))
+        self.nameLabel.setText(_translate("Biography", "用户名："))
+        self.animeLabel.setText(_translate("Biography", "喜欢的动漫："))
+        self.bioLabel.setText(_translate("Biography", "个人介绍："))
+        self.usernameLabel.setText(_translate("Biography", "test"))
+        self.useranimeLabel.setText(_translate("Biography", "Steins Gate"))
+        self.label.setText(_translate("Biography", "EL PSY KONGROO"))
+        self.toolBar.setWindowTitle(_translate("Biography", "toolBar"))
+
+class Biography(QMainWindow, Ui_Biography):
+    # pyqtSignal 要定义为一个类而不是属性，不能放到__init__里
+    close_signal = QtCore.pyqtSignal()
+
+    def __init__(self, userinfo):
+        """
+        注意close_signal 要在类成员函数外定义
+        初始化CloseDialog类，将 确定 和 取消 按钮连接到self._close函数
+        :param
+        :return:
+        """
+        super(Biography, self).__init__()
+        self.setupUi(self)
+        self.retranslateUi(self)
+        self.userinfo = userinfo
+        self.addButton.clicked.connect(self.addFriend)
+        self.portraitLabel.setText("")
+        self.portraitLabel.setPixmap(QtGui.QPixmap("resources/pic/助手1.jpg").scaled(141,141))
+        self._set()
+        self.addApply = AddApply()
+        # 点击个人简介外的地方则关闭个人简介
+        self.setFocus()
+        self.setFocusPolicy(Qt.ClickFocus)
+        QtWidgets.qApp.focusChanged.connect(self.on_focusChanged)
+
+
+
+    def _set(self):
+        self.usernameLabel.setText(self.userinfo['name'])
+        self.useranimeLabel.setText(self.userinfo['anime'])
+        # 设置用户头像
+        pass
+
+    def addFriend(self):
+        self.addApply.show()
+
+
+    def on_focusChanged(self, old, now):
+        if now == None:
+            self.close
+
+    def _close(self):
+        """
+        发送关闭信号给RegisterForm类，即关闭注册GUI
+        同时关闭CloseDialog类，即关闭本窗口
+        :param
+        :return:
+        """
+        self.close_signal.emit()
+        self.close()
+
+
+class AddApply:
+    pass
