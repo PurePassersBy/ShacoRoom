@@ -16,6 +16,7 @@ sys.path.append('..')
 from gui.VChat import Ui_Form
 from gui.SettingsGui import SettingsGui
 from authentication.dialogGUI import Dialog
+from authentication.dialogGUI import Biography
 
 SERVER_IP = '39.106.169.58'
 SERVER_ADDRESS = ('39.106.169.58', 3976)
@@ -123,6 +124,8 @@ class ChatGUI(QWidget, Ui_Form):
 
         # 初始化登出或登录通知
         self.dialog = None
+        # 初始化个人简介页面
+        self.biography = None
 
     def _fetch_others_portrait(self, user_id):
         query = {
@@ -175,6 +178,13 @@ class ChatGUI(QWidget, Ui_Form):
         self.label_username.setText(self.userName)
         self.graphicsView.setStyleSheet(f"border-image: url({self.portrait});")
 
+    def show_biography(self):
+        user_info = dict()
+        user_info['name'] = self.userName
+        user_info['anime'] = self.favComic
+        self.biography = Biography(user_info)
+        self.biography.show()
+
     def system_information(self, system_code):
         if system_code == 'KICK OUT':
             # 将close 与kickout 信号连接
@@ -203,6 +213,7 @@ class ChatGUI(QWidget, Ui_Form):
         layout_msg = QVBoxLayout()
         portrait = Portrait(int(user_id))
         portrait.connect_customized_slot(self._fetch_others_portrait)
+        portrait.connect_customized_slot(self.show_biography)
         portrait.setFixedSize(50, 50)
         img = QPixmap(PORTRAIT_PATH % user_id).scaled(50, 50)
         portrait.setPixmap(img)
