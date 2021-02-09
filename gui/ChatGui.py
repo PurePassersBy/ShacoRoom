@@ -182,7 +182,7 @@ class ChatGUI(QWidget, Ui_Form):
         每次设置成功后调用
         :return:
         """
-        self.userSettings = SettingsGui(self.id, self.userName, self.favComic, self.isKnow)
+        self.userSettings = SettingsGui(self.id, self.userName, self.favComic, self.profile)
         self.label_username.setText(self.userName)
         self.graphicsView.setStyleSheet(f"border-image: url({self.portrait});")
 
