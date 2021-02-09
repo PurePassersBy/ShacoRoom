@@ -75,7 +75,7 @@ class Portrait(QLabel):
     def mousePressEvent(self, QMouseEvent):
         self.clicked_signal.emit(self.user_id)
         self.clicked_pos_signal.emit(self.info,
-                                     QMouseEvent.pos().x(), QMouseEvent.pos().y())
+                                     QMouseEvent.globalPos().x(), QMouseEvent.globalPos().y())
 
     def connect_pos_slot(self, func):
         self.clicked_pos_signal.connect(func)
@@ -190,7 +190,6 @@ class ChatGUI(QWidget, Ui_Form):
         self.graphicsView.setStyleSheet(f"border-image: url({self.portrait});")
 
     def show_biography(self, user_info, x, y):
-        print("!!!")
         print(f"{user_info} {x} {y}")
         self.biography = Biography(user_info, x, y)
         self.biography.show()
