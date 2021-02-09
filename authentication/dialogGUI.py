@@ -9,7 +9,7 @@
 
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, QEvent
 from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton
 
 
@@ -157,6 +157,9 @@ class Ui_Biography(object):
         self.label.setText(_translate("Biography", "EL PSY KONGROO"))
         self.toolBar.setWindowTitle(_translate("Biography", "toolBar"))
 
+
+
+
 class Biography(QMainWindow, Ui_Biography):
     # pyqtSignal 要定义为一个类而不是属性，不能放到__init__里
     close_signal = QtCore.pyqtSignal()
@@ -174,14 +177,13 @@ class Biography(QMainWindow, Ui_Biography):
         self.userinfo = userinfo
         self.addButton.clicked.connect(self.addFriend)
         self.portraitLabel.setText("")
-        self.portraitLabel.setPixmap(QtGui.QPixmap("resources/pic/助手1.jpg").scaled(141,141))
+        self.portraitLabel.setPixmap(QtGui.QPixmap("resources/pic/助手1.jpg").scaled(141, 141))
         self._set()
         self.addApply = AddApply()
         # 点击个人简介外的地方则关闭个人简介
-        self.setFocus()
-        self.setFocusPolicy(Qt.ClickFocus)
-        QtWidgets.qApp.focusChanged.connect(self.on_focusChanged)
-
+        # 激活窗口，这样在点击母窗口的时候，eventFilter里会捕获到WindowDeactivate事件，从而关闭窗口
+        self.activateWindow()
+        self.installEventFilter(self)
 
 
     def _set(self):
@@ -193,18 +195,17 @@ class Biography(QMainWindow, Ui_Biography):
     def addFriend(self):
         self.addApply.show()
 
-
-    def on_focusChanged(self, old, now):
-        if now == None:
-            self.close
+    def eventFilter(self, obj, event):
+        """
+        事件过滤
+        """
+        if event.type() == QEvent.WindowDeactivate:
+            self.close()  # 点击其他程序窗口，会关闭该对话框
+            return True
+        else:
+            return super(Biography, self).eventFilter(obj, event)
 
     def _close(self):
-        """
-        发送关闭信号给RegisterForm类，即关闭注册GUI
-        同时关闭CloseDialog类，即关闭本窗口
-        :param
-        :return:
-        """
         self.close_signal.emit()
         self.close()
 
