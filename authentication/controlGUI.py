@@ -34,7 +34,7 @@ class RegisterForm(QMainWindow, Ui_Verify):
         self.success_dialog = Dialog('REGISTER SUCCESS')
         self.setupUi(self)
         self.retranslateUi(self)
-        # 接收来自登陆界面的DAO connecter
+        # 接收来自登陆界面的SQLconnecter
         self.conn = conn
         # 储存发送邮箱以及邮箱stmp授权码
         self.senderMail = senderMail
@@ -53,7 +53,7 @@ class RegisterForm(QMainWindow, Ui_Verify):
         self.passwordEdit.setToolTip('长度不超过12')
         self.passwordEdit.setMaxLength(13)
         self.mailEdit.textChanged['QString'].connect(self._mail_check)
-        self.nameEdit.setToolTip('输入您的邮箱')
+        self.nameEdit.setToolTip('输入您的用户名')
         self.mailEdit.setMaxLength(21)
         # 检测验证码是否正确
         self.codeEdit.textChanged['QString'].connect(self._code_check)
@@ -371,7 +371,7 @@ class LoginForm(QMainWindow, Ui_login):
         self.conn = ConnectSQL(SERVER_ADDRESS)
         # 添加检测验证码文本变化信号和槽 mil password主要检测长度
         self.mailEdit.textChanged['QString'].connect(self._mail_check)
-        self.mailEdit.setToolTip('没有邮箱？请先注册')
+        self.mailEdit.setToolTip('还未使用邮箱注册？请先注册')
         self.mailEdit.setMaxLength(21)
         icon = QIcon()
         icon.addPixmap(QPixmap("../gui/resource/shaco_logo.jpg"), QIcon.Normal, QIcon.Off)
@@ -383,6 +383,9 @@ class LoginForm(QMainWindow, Ui_login):
         # 点击发送验证邮件按钮 调用send函数
         self.loginButton.clicked.connect(self._login)
         self.registerButton.clicked.connect(self._register)
+        # 关闭与最小化按钮
+        self.closeButton.clicked.connect(self.close)
+        self.miniButton.clicked.connect(self.showMinimized)
         # 初始化注册界面
         self.qt_register = RegisterForm("614446871@qq.com", "rduygnlorlpgbeec", self.conn)
         # 初始化修改密码界面

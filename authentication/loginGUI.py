@@ -9,6 +9,7 @@
 
 
 from PyQt5 import Qt, QtCore, QtGui, QtWidgets
+from PyQt5.QtGui import QPalette, QColor
 
 
 class MyQLabel(Qt.QLabel):
@@ -27,27 +28,18 @@ class MyQLabel(Qt.QLabel):
 class Ui_login(object):
     def setupUi(self, login):
         login.setObjectName("login")
-        login.resize(800, 500)
-        login.setMinimumSize(QtCore.QSize(800, 500))
-        login.setMaximumSize(QtCore.QSize(900, 500))
-        # icon = QtGui.QIcon()
-        # icon.addPixmap(QtGui.QPixmap(":/images/Shaco_Logo.jpg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        # login.setWindowIcon(icon)
-        # login.setStyleSheet("")
-        self.loginButton = QtWidgets.QPushButton(login)
-        self.loginButton.setGeometry(QtCore.QRect(120, 420, 93, 28))
-        self.loginButton.setObjectName("loginButton")
-        self.registerButton = QtWidgets.QPushButton(login)
-        self.registerButton.setGeometry(QtCore.QRect(320, 420, 93, 28))
-        self.registerButton.setObjectName("registerButton")
+        login.resize(500, 400)
+        login.setMinimumSize(QtCore.QSize(500, 400))
+        login.setMaximumSize(QtCore.QSize(900, 400))
         self.titleLabel = QtWidgets.QLabel(login)
-        self.titleLabel.setGeometry(QtCore.QRect(170, 30, 150, 150))
+        self.titleLabel.setEnabled(True)
+        self.titleLabel.setGeometry(QtCore.QRect(80, 10, 141, 41))
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.titleLabel.sizePolicy().hasHeightForWidth())
         self.titleLabel.setSizePolicy(sizePolicy)
-        self.titleLabel.setMinimumSize(QtCore.QSize(150, 150))
+        self.titleLabel.setMinimumSize(QtCore.QSize(0, 0))
         self.titleLabel.setMaximumSize(QtCore.QSize(150, 150))
         font = QtGui.QFont()
         font.setFamily("Bahnschrift")
@@ -60,62 +52,194 @@ class Ui_login(object):
         self.titleLabel.setMouseTracking(False)
         self.titleLabel.setContextMenuPolicy(QtCore.Qt.NoContextMenu)
         self.titleLabel.setObjectName("titleLabel")
-        self.mailLabel = QtWidgets.QLabel(login)
-        self.mailLabel.setGeometry(QtCore.QRect(40, 240, 72, 15))
-        self.mailLabel.setObjectName("mailLabel")
-        self.passwordLabel = QtWidgets.QLabel(login)
-        self.passwordLabel.setGeometry(QtCore.QRect(40, 320, 72, 15))
-        self.passwordLabel.setObjectName("passwordLabel")
-        self.passwordStatus = QtWidgets.QLabel(login)
-        self.passwordStatus.setGeometry(QtCore.QRect(110, 360, 321, 20))
-        self.passwordStatus.setText("")
-        self.passwordStatus.setObjectName("passwordStatus")
-        self.mailStatus = QtWidgets.QLabel(login)
-        self.mailStatus.setGeometry(QtCore.QRect(120, 270, 311, 21))
-        self.mailStatus.setText("")
-        self.mailStatus.setObjectName("mailStatus")
-        self.mailEdit = QtWidgets.QLineEdit(login)
-        self.mailEdit.setGeometry(QtCore.QRect(110, 230, 300, 30))
-        self.mailEdit.setObjectName("mailEdit")
-        self.passwordEdit = QtWidgets.QLineEdit(login)
-        self.passwordEdit.setGeometry(QtCore.QRect(110, 310, 300, 30))
-        self.passwordEdit.setObjectName("passwordEdit")
         self.shacoLabel = MyQLabel(login)
-        self.shacoLabel.setGeometry(QtCore.QRect(430, 20, 331, 251))
+        self.shacoLabel.setGeometry(QtCore.QRect(10, 10, 71, 61))
         self.shacoLabel.setText("")
         self.shacoLabel.setPixmap(QtGui.QPixmap("resources/pic/shaco.jpg"))
         self.shacoLabel.setScaledContents(True)
         self.shacoLabel.setObjectName("shacoLabel")
+        self.verticalLayoutWidget = QtWidgets.QWidget(login)
+        self.verticalLayoutWidget.setGeometry(QtCore.QRect(90, 180, 281, 188))
+        self.verticalLayoutWidget.setObjectName("verticalLayoutWidget")
+        self.midLayout = QtWidgets.QVBoxLayout(self.verticalLayoutWidget)
+        self.midLayout.setContentsMargins(0, 0, 0, 0)
+        self.midLayout.setSpacing(10)
+        self.midLayout.setObjectName("midLayout")
+        self.mailEdit = QtWidgets.QLineEdit(self.verticalLayoutWidget)
+        self.mailEdit.setObjectName("mailEdit")
+        self.midLayout.addWidget(self.mailEdit)
+        self.mailStatus = QtWidgets.QLabel(self.verticalLayoutWidget)
+        self.mailStatus.setLayoutDirection(QtCore.Qt.LeftToRight)
+        self.mailStatus.setAlignment(QtCore.Qt.AlignCenter)
+        self.mailStatus.setObjectName("mailStatus")
+        self.midLayout.addWidget(self.mailStatus)
+        self.passwordEdit = QtWidgets.QLineEdit(self.verticalLayoutWidget)
+        self.passwordEdit.setObjectName("passwordEdit")
+        self.midLayout.addWidget(self.passwordEdit)
+        self.passwordStatus = QtWidgets.QLabel(self.verticalLayoutWidget)
+        self.passwordStatus.setAlignment(QtCore.Qt.AlignCenter)
+        self.passwordStatus.setObjectName("passwordStatus")
+        self.midLayout.addWidget(self.passwordStatus)
+        self.setLayout = QtWidgets.QHBoxLayout()
+        self.setLayout.setContentsMargins(5, -1, -1, -1)
+        self.setLayout.setSpacing(20)
+        self.setLayout.setObjectName("setLayout")
+        self.rememberBox = QtWidgets.QCheckBox(self.verticalLayoutWidget)
+        font = QtGui.QFont()
+        font.setPointSize(8)
+        self.rememberBox.setFont(font)
+        self.rememberBox.setObjectName("rememberBox")
+        self.setLayout.addWidget(self.rememberBox)
+        self.registerButton = QtWidgets.QPushButton(self.verticalLayoutWidget)
+        self.registerButton.setObjectName("registerButton")
+        self.setLayout.addWidget(self.registerButton)
+        self.editButton = QtWidgets.QPushButton(self.verticalLayoutWidget)
+        self.editButton.setObjectName("editButton")
+        self.setLayout.addWidget(self.editButton)
+        self.midLayout.addLayout(self.setLayout)
+        self.loginButton = QtWidgets.QPushButton(self.verticalLayoutWidget)
+        self.loginButton.setObjectName("loginButton")
+        self.midLayout.addWidget(self.loginButton)
+        self.horizontalLayoutWidget_2 = QtWidgets.QWidget(login)
+        self.horizontalLayoutWidget_2.setGeometry(QtCore.QRect(415, -18, 100, 61))
+        self.horizontalLayoutWidget_2.setObjectName("horizontalLayoutWidget_2")
+        self.topButtonLayout = QtWidgets.QHBoxLayout(self.horizontalLayoutWidget_2)
+        self.topButtonLayout.setContentsMargins(0, 0, 0, 0)
+        self.topButtonLayout.setObjectName("topButtonLayout")
+        self.miniButton = QtWidgets.QPushButton(self.horizontalLayoutWidget_2)
+        self.miniButton.setObjectName("miniButton")
+        self.topButtonLayout.addWidget(self.miniButton)
+        self.closeButton = QtWidgets.QPushButton(self.horizontalLayoutWidget_2)
+        self.closeButton.setObjectName("closeButton")
+        self.topButtonLayout.addWidget(self.closeButton)
+        self.verticalLayoutWidget_3 = QtWidgets.QWidget(login)
+        self.verticalLayoutWidget_3.setGeometry(QtCore.QRect(50, 180, 41, 80))
+        self.verticalLayoutWidget_3.setObjectName("verticalLayoutWidget_3")
+        self.leftlLayout = QtWidgets.QVBoxLayout(self.verticalLayoutWidget_3)
+        self.leftlLayout.setContentsMargins(0, 0, 0, 0)
+        self.leftlLayout.setSpacing(45)
+        self.leftlLayout.setObjectName("leftlLayout")
+        self.mailLabel = QtWidgets.QLabel(self.verticalLayoutWidget_3)
+        self.mailLabel.setObjectName("mailLabel")
+        self.leftlLayout.addWidget(self.mailLabel)
+        self.passwordLabel = QtWidgets.QLabel(self.verticalLayoutWidget_3)
+        self.passwordLabel.setObjectName("passwordLabel")
+        self.leftlLayout.addWidget(self.passwordLabel)
         self.editLabel = QtWidgets.QLabel(login)
         self.editLabel.setEnabled(True)
-        self.editLabel.setGeometry(QtCore.QRect(520, 380, 241, 41))
+        self.editLabel.setGeometry(QtCore.QRect(390, 270, 99, 111))
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Preferred)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.editLabel.sizePolicy().hasHeightForWidth())
+        self.editLabel.setSizePolicy(sizePolicy)
+        self.editLabel.setWordWrap(True)
         self.editLabel.setObjectName("editLabel")
-        self.editButton = QtWidgets.QPushButton(login)
-        self.editButton.setGeometry(QtCore.QRect(520, 420, 93, 28))
-        self.editButton.setObjectName("editButton")
-        self.mailLabel.raise_()
-        self.passwordStatus.raise_()
-        self.loginButton.raise_()
-        self.passwordLabel.raise_()
-        self.registerButton.raise_()
-        self.titleLabel.raise_()
-        self.mailStatus.raise_()
-        self.mailEdit.raise_()
-        self.passwordEdit.raise_()
-        self.shacoLabel.raise_()
-        self.editLabel.raise_()
-        self.editButton.raise_()
+        # 设置背景
+        self.backgroundLabel = QtWidgets.QLabel(login)
+        self.backgroundLabel.setGeometry(QtCore.QRect(0, 0, 500, 150))
+        self.backgroundLabel.setPixmap(QtGui.QPixmap("resources/pic/whiteBackground.jpg"))
+        self.backgroundLabel.setScaledContents(True)
+        self.backgroundLabel.lower()
+        # 设置背景2
+        self.backgroundLabel = QtWidgets.QLabel(login)
+        self.backgroundLabel.setGeometry(QtCore.QRect(0, 150, 500, 250))
+        self.backgroundLabel.setPixmap(QtGui.QPixmap("resources/pic/grayBackground.jpg"))
+        self.backgroundLabel.setScaledContents(True)
+        self.backgroundLabel.lower()
+
+        # 设置提示
+        self.closeButton.setToolTip('关闭窗口')
+        self.miniButton.setToolTip('最小化窗口')
+        self.rememberBox.setToolTip('还未实现0.0')
 
         self.retranslateUi(login)
         QtCore.QMetaObject.connectSlotsByName(login)
 
+        # 开始QSS设置
+        self.setQSS()
+
+    def setQSS(self):
+        self.closeButton.setFixedSize(20, 20)  # 设置关闭按钮的大小
+        self.miniButton.setFixedSize(20, 20)   # 设置最小化按钮大小
+        self.closeButton.setStyleSheet(
+            '''QPushButton{background:#F76677;border-radius:5px;}QPushButton:hover{background:red;}''')
+        self.miniButton.setStyleSheet(
+            '''QPushButton{background:#6DDF6D;border-radius:5px;}QPushButton:hover{background:green;}''')
+
+        edit_qss =             '''QLineEdit{
+                     border:1px solid gray;
+                     width:300px;
+                     border-radius:10px;
+                     padding:2px 4px; }'''
+        self.mailEdit.setStyleSheet(edit_qss)
+        self.passwordEdit.setStyleSheet(edit_qss)
+        button_qss = '''     QPushButton{
+                 border:none;         
+                 color:gray;         
+                 font-size:12px;         
+                 height:40px;         
+                 padding-left:5px;         
+                 padding-right:10px;         
+                 }     
+                            QPushButton:hover{         
+                 color:black;         
+                 border:1px solid #F3F3F5;         
+                 border-radius:10px;         
+                 background:LightGray;     
+                 } '''
+        self.editButton.setStyleSheet(button_qss)
+        self.registerButton.setStyleSheet(button_qss)
+
+        box_qss = '''     QCheckBox{
+                 border:none;         
+                 color:gray;         
+                 font-size:12px;         
+                 height:40px;         
+                 padding-left:5px;         
+                 padding-right:10px;         
+                 }     
+                            QCheckBox:hover{         
+                 color:black;         
+                 border:1px solid #F3F3F5;         
+                 border-radius:10px;         
+                 background:LightGray;     
+                 } '''
+        self.rememberBox.setStyleSheet(box_qss)
+
+        label_qss = '''QLabel{
+                    color:white
+                    }
+                    QLabel:hover{
+                    color:gray
+                    }
+        '''
+        self.mailLabel.setStyleSheet(label_qss)
+        self.passwordLabel.setStyleSheet(label_qss)
+        self.passwordStatus.setStyleSheet(label_qss)
+        self.mailStatus.setStyleSheet(label_qss)
+        self.editLabel.setStyleSheet(label_qss)
+
+        self.setWindowFlag(QtCore.Qt.FramelessWindowHint)  # 隐藏边框
+
+        self.setWindowOpacity(0.95)  # 设置窗口透明度
+        self.setAttribute(QtCore.Qt.WA_TranslucentBackground) # 设置窗口背景透明
+
+
     def retranslateUi(self, login):
         _translate = QtCore.QCoreApplication.translate
-        login.setWindowTitle(_translate("login", "ShacoRoom v1.0.2"))
-        self.loginButton.setText(_translate("login", "登录"))
-        self.registerButton.setText(_translate("login", "注册"))
+        login.setWindowTitle(_translate("login", "ShacoRoomv1.1.0"))
         self.titleLabel.setText(_translate("login", "ShacoRoom"))
+        self.mailStatus.setText(_translate("login", " "))
+        self.passwordStatus.setText(_translate("login", " "))
+        self.rememberBox.setText(_translate("login", "记住密码"))
+        self.registerButton.setText(_translate("login", "注册"))
+        self.editButton.setText(_translate("login", "找回密码"))
+        self.loginButton.setText(_translate("login", "登录"))
+        self.miniButton.setText(_translate("login", " "))
+        self.closeButton.setText(_translate("login", " "))
         self.mailLabel.setText(_translate("login", "邮箱"))
         self.passwordLabel.setText(_translate("login", "密码"))
         self.editLabel.setText(_translate("login", "需要修改密码的沙口请点击沙口^^_"))
-        self.editButton.setText(_translate("login", "修改密码"))
+
+
