@@ -152,7 +152,6 @@ class Ui_login(object):
         # 设置提示
         self.closeButton.setToolTip('关闭窗口')
         self.miniButton.setToolTip('最小化窗口')
-        self.rememberBox.setToolTip('还未实现0.0')
 
         # 设置edit
         self.passwordEdit.setEchoMode(QLineEdit.Password)
