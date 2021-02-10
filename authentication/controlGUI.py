@@ -399,6 +399,8 @@ class LoginForm(QMainWindow, Ui_login):
         self.shacoLabel.clicked_signal.connect(self._edit)
         # 初始化聊天室界面
         self.qt_chat = None
+        # 加载用户config
+        self._load_config()
 
     def _mail_check(self):
         """
@@ -447,12 +449,54 @@ class LoginForm(QMainWindow, Ui_login):
             # result 返回的是一个二维tuple
             if result[0][3] == self.password:
                 self.passwordStatus.setText('密码正确')
+                # 密码正确后，储存user.ini ，更新config 的mail,并记录rememberBox状态
+                config = configparser.ConfigParser()
+                if self.rememberBox.isChecked():
+                    config['DEFAULT'] = {
+                        'mail': self.mail,
+                        'password': self.password,
+                        'remember': self.rememberBox.isChecked()
+                    }
+                else:
+                    config['DEFAULT'] = {
+                        'mail': self.mail,
+                        'password': self.password,
+                        'remember': self.rememberBox.isChecked()
+                    }
+                with open('user.ini', 'w')as configfile:
+                    config.write((configfile))
+
                 self.qt_chat = ChatGUI(
                     result[0][0], result[0][1], result[0][4], result[0][5], self.conn)
                 self.qt_chat.show()
                 self.close()
             else:
                 self.passwordStatus.setText('密码错误')
+
+
+    def _load_config(self):
+        """
+        预加载用户设置
+        :param:
+        :return:
+        """
+        config = configparser.ConfigParser()
+        file = config.read('user.ini')
+        config_dict = config.defaults()
+        # 第一次使用，进行初始化
+        if 'mail' not in config_dict:
+            config_dict['mail'] = ''
+            config_dict['password'] = ''
+            config_dict['remember'] = 'False'
+        self.mailEdit.setText(config_dict['mail'])
+        if config_dict['remember'] == 'True':
+            self.passwordEdit.setText(config_dict['password'])
+            self.rememberBox.setChecked(True)
+        else:
+            self.rememberBox.setChecked(False)
+
+
+
 
     def _register(self):
         # 跳转到注册界面
