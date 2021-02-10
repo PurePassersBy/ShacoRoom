@@ -10,7 +10,7 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import Qt, QEvent
-from PyQt5.QtGui import QPalette, QBrush, QPixmap, QPainter
+from PyQt5.QtGui import QPalette, QBrush, QPixmap, QPainter, QIcon
 from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton
 
 
@@ -18,6 +18,9 @@ class Ui_Dialog(object):
     def setupUi(self, Dialog):
         Dialog.setObjectName("Dialog")
         Dialog.resize(400, 300)
+        icon = QIcon()
+        icon.addPixmap(QPixmap("../gui/resource/shaco_logo.jpg"), QIcon.Normal, QIcon.Off)
+        self.setWindowIcon(icon)
         self.setMinimumSize(QtCore.QSize(400, 300))
         self.setMaximumSize(QtCore.QSize(400, 300))
         self.buttonBox = QtWidgets.QDialogButtonBox(Dialog)
@@ -43,11 +46,56 @@ class Ui_Dialog(object):
         self.retranslateUi(Dialog)
         QtCore.QMetaObject.connectSlotsByName(Dialog)
 
+        # 设置背景
+        self.backgroundLabel = QtWidgets.QLabel(Dialog)
+        self.backgroundLabel.setGeometry(QtCore.QRect(0, 0, 400, 300))
+        self.backgroundLabel.setPixmap(QtGui.QPixmap("resources/pic/whiteBackground.jpg"))
+        self.backgroundLabel.setScaledContents(True)
+        self.backgroundLabel.lower()
+
+        self.setQSS()
+
+
+    def setQSS(self):
+
+
+        button_qss = '''     QDialogButtonBox{  
+                                     border:2px solid #F3F3F5;   
+                                     color:black;         
+                                     font-size:12px;         
+                                     height:40px;         
+                                     padding-left:5px;         
+                                     padding-right:10px;         
+                                     }     
+                                               QDialogButtonBox:hover{         
+                                     color:brown;         
+                                     border:2px solid #F3F3F5;         
+                                     border-radius:10px;         
+                                     background:LightGray;     
+                                     } '''
+        self.buttonBox.setStyleSheet(button_qss)
+
+        label_qss = '''QLabel{
+                                        color:black
+                                        }
+                                        QLabel:hover{
+                                        color:gray
+                                        }
+                            '''
+        self.label.setStyleSheet(label_qss)
+        self.label_2.setStyleSheet(label_qss)
+
+        self.setWindowOpacity(0.95)  # 设置窗口透明度
+        self.setAttribute(QtCore.Qt.WA_TranslucentBackground)  # 设置窗口背景透明
+
+
     def retranslateUi(self, Dialog):
         _translate = QtCore.QCoreApplication.translate
         Dialog.setWindowTitle(_translate("Dialog", "Dialog"))
         self.label.setText(_translate("Dialog", "注册成功！赶快加入马戏团"))
         self.label_2.setText(_translate("Dialog", "和沙口们一起来场马戏的盛宴吧！"))
+
+
 
 class Dialog(QMainWindow, Ui_Dialog):
     # pyqtSignal 要定义为一个类而不是属性，不能放到__init__里
