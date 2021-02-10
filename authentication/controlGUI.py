@@ -437,6 +437,8 @@ class LoginForm(QMainWindow, Ui_login):
         result = self.conn.search(TABLE_NAME, send_data)
         if result is None:
             self.mailStatus.setText('该邮箱未注册，请先注册')
+        elif result is False:
+            self.mailStatus.setText('与服务器连接失败，请检查网络设置')
         else:
             # result 返回的是一个二维tuple
             if result[0][3] == self.password:
