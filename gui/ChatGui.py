@@ -223,7 +223,10 @@ class ChatGUI(QWidget, Ui_Form):
         portrait.setFixedSize(50, 50)
         img = QPixmap(PORTRAIT_PATH % user_id).scaled(50, 50)
         portrait.setPixmap(img)
-        layout_msg.addWidget(QLabel(f'{time_}  {user_name}'))
+        head = QLabel(f'{time_}  {user_name}')
+        head.setFont(QFont("Microsoft YaHei"))
+        head.setStyleSheet("font: bold")
+        layout_msg.addWidget(head)
         item = QListWidgetItem()
         if 'image' in msg_pack:
             shape = msg_pack['shape']
