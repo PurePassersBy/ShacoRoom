@@ -10,6 +10,7 @@
 
 from PyQt5 import Qt, QtCore, QtGui, QtWidgets
 from PyQt5.QtGui import QPalette, QColor
+from PyQt5.QtWidgets import QLineEdit
 
 
 class MyQLabel(Qt.QLabel):
@@ -152,6 +153,11 @@ class Ui_login(object):
         self.closeButton.setToolTip('关闭窗口')
         self.miniButton.setToolTip('最小化窗口')
         self.rememberBox.setToolTip('还未实现0.0')
+
+        # 设置edit
+        self.passwordEdit.setEchoMode(QLineEdit.Password)
+        self.passwordEdit.setClearButtonEnabled(True)
+        self.mailEdit.setClearButtonEnabled(True)
 
         self.retranslateUi(login)
         QtCore.QMetaObject.connectSlotsByName(login)

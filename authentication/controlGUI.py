@@ -6,6 +6,7 @@ import threading
 
 from PyQt5.QtWidgets import QApplication, QMainWindow
 from PyQt5.QtGui import *
+import configparser
 
 sys.path.append('..')
 from authentication.mailThread import Mail
