@@ -17,7 +17,7 @@ class ConnectSQL():
         向数据库插入数据，不允许留空
         :param : table_name '需要操作的表名'
         :param : user_data['name','mail','password']
-        :return:
+        :return: 插入失败则返回False
         """
         try:
             sql = f'select * from {table_name};'
@@ -30,16 +30,17 @@ class ConnectSQL():
             data = {'sql': sql, 'args': user_data}
             self.cur.send_sql('insert', data)
             print(f'提交成功，更新{self.cur.get_count()}条数据')
-        except Exception:
+        except Exception as e:
             # 发生错误
-            print("提交新用户数据发生错误")
+            print(f"提交新用户数据发生错误:{e}")
+            return False
 
     def search(self, table_name, data):
         """
         在数据库查询数据，输入表名以及一个数组包含 查询的属性 对应内容，返回该用户的所有数据
         :param table_name '需要操作的表名'
         :param data['属性名', '该属性需查找的内容']
-        :return results:一个n维数组[n][id, name, mail, password] 未查到则返回 None
+        :return results:一个n维数组[n][id, name, mail, password] 未查到则返回 None,查询失败而返回False
         """
         for i in self.property_name:
             if i == data[0]:
@@ -54,20 +55,20 @@ class ConnectSQL():
                     else:
                         print(f'没有查找到{data[0]}为{data[1]}的用户')
                         return None
-                except Exception:
+                except Exception as e:
                     # 发生错误
-                    print('查询发生错误')
-                    return None
+                    print(f'查询发生错误:{e}')
+                    return False
         # 如果表中没有相应property 则说明用户使用函数错误
         print('使用search函数错误，search(table_name, data)data[0]应为数据表中的属性')
-        return None
+        return False
 
     def delete(self, table_name, data):
         """
         删除数据库中的指定数据,data数据留空则删除最后一条
         :param table_name '需要操作的表名'
         :param data['属性名', '该属性需删除的内容']
-        :return results:删除的数量  发生错误则返回None
+        :return results:删除的数量  发生错误则返回NFalse
         """
         try:
             # if data:
@@ -82,17 +83,17 @@ class ConnectSQL():
             send_data = {'sql': sql, 'args': data[1]}
             self.cur.send_sql('delete', send_data)
             return self.cur.get_count()
-        except Exception:
+        except Exception as e:
             # 发生错误
-            print('删除发生错误')
-            return None
+            print(f'删除发生错误:{e}')
+            return False
 
     def edit(self, table_name, data):
         """
         在数据库更改数据，输入要更改的表名，以及需要进行修改操作的用户id，需要修改的属性及内容
         :param table_name '需要操作的表名'
         :param data['待修改用户id'， '属性名'， '该属性修改后的内容']
-        :return 修改后该用户的数据  出错则返回None
+        :return 修改后该用户的数据  未查找到相关用户则返回None, 查询失败则返回False
         """
         for i in self.property_name:
             if i == data[1]:
@@ -109,10 +110,10 @@ class ConnectSQL():
                         print(f'修改{self.cur.get_count()}条数据')
                         return self.cur.get_result()
 
-                except Exception:
+                except Exception as e:
                     # 发生错误
-                    print('修改发生错误')
-                    return None
+                    print(f'修改发生错误:{e}')
+                    return False
         # 如果表中没有相应property 则说明用户使用函数错误
         print('使用edit函数错误，edit(table_name, data)中 data[1]应为数据表中的属性')
-        return None
+        return False

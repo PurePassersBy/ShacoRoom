@@ -35,7 +35,7 @@ class ServerConnect(threading.Thread):
         """
         向服务器发送sql请求，
         :param :
-        :return:返回查询结果，查询失败则返回None
+        :return:返回查询结果，未查询到相关结果则返回None， 查询失败则返回False
         """
         print(f"{get_localtime()}  SQL Request sending  starts...")
         try:
@@ -59,6 +59,7 @@ class ServerConnect(threading.Thread):
 
         except Exception as e:
             print('sql error', e)
+            return False
 
     def get_result(self):
         return self.result
