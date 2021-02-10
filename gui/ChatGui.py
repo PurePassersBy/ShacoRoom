@@ -6,7 +6,6 @@ from time import sleep
 import threading
 import socket
 
-import emoji
 import numpy as np
 from PIL import Image, ImageQt
 from PyQt5.QtCore import *
@@ -16,6 +15,7 @@ from PyQt5.QtGui import *
 sys.path.append('..')
 from gui.VChat import Ui_Form
 from gui.SettingsGui import SettingsGui
+from gui.EmojiWindow import EmojiWindow
 from authentication.dialogGUI import Dialog
 from authentication.dialogGUI import Biography
 
@@ -29,6 +29,7 @@ TABLE_NAME = 'userinfo'
 LINE_LENGTH = 39
 UNI2ASC = 40 / 24
 message_lock = threading.Lock()
+
 
 def split_message(msg):
     msg_list = []
@@ -134,7 +135,8 @@ class ChatGUI(QWidget, Ui_Form):
         # 初始化个人简介页面
         self.biography = None
 
-
+        self.emoji_window = EmojiWindow()
+        self.emoji_window.connect_slot(self.insert_emoji)
 
     def _fetch_others_portrait(self, user_id):
         query = {
@@ -192,6 +194,9 @@ class ChatGUI(QWidget, Ui_Form):
         self.biography = Biography(user_id, x, y, PORTRAIT_PATH, self.db_conn, TABLE_NAME)
         self.biography.show()
 
+    def insert_emoji(self, emo):
+        self.textEdit.append(emo)
+
     def system_information(self, system_code):
         if system_code == 'KICK OUT':
             # 将close 与kickout 信号连接
@@ -203,7 +208,6 @@ class ChatGUI(QWidget, Ui_Form):
             # 弹出提示框
             self.dialog = Dialog('LOGIN REPEAT')
             self.dialog.show()
-
 
     def show_message(self, msg_pack):
         """
@@ -337,12 +341,7 @@ class ChatGUI(QWidget, Ui_Form):
         threading.Thread(target=self._send_portrait).start()
 
     def send_emoji(self):
-        dialog = QDialog(self)
-        dialog.setWindowTitle('你在肝肾莫')
-        dialog.resize(400,400)
-        label = QLabel("不会真有人以为我实现了这个功能吧^^_", dialog)
-        label.setGeometry(QRect(50,50,300,300))
-        dialog.show()
+        self.emoji_window.show()
 
     def send_image(self):
         file_name, file_type = QFileDialog.getOpenFileName(self, "选取文件", './',
@@ -358,10 +357,8 @@ class ChatGUI(QWidget, Ui_Form):
             'image': image_np.tostring()
         }
         message_lock.acquire()
-        print(f'开始发送图片包')
         send_package(self.chatter, pack)
         message_lock.release()
-        print('发送成功')
 
 
     def send_file(self):

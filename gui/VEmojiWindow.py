@@ -84,4 +84,4 @@ class Ui_emoji(object):
     def retranslateUi(self, emoji):
         _translate = QtCore.QCoreApplication.translate
         emoji.setWindowTitle(_translate("emoji", "Dialog"))
-from gui.EmojiWindow import EmojiLabel
+from gui.EmojiLabel import EmojiLabel

@@ -1,6 +1,5 @@
 import sys
 
-import emoji
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
@@ -14,36 +13,16 @@ EMOJI_LIST = [':clown_face:', ':grinning_face_with_big_eyes:', ':beaming_face_wi
               ]
 
 
-class EmojiLabel(QLabel):
-    _signal = pyqtSignal(str)
-
-    def __init__(self, parent=None):
-        super().__init__(parent)
-        self.setStyleSheet("font:25px")
-        self.setAlignment(Qt.AlignCenter)
-        self.setCursor(Qt.PointingHandCursor)
-
-    def get_init(self, emo, func):
-        self.setEmoji(emo)
-        self.connect_slot(func)
-
-    def setEmoji(self, emo):
-        self.emoji = emoji.emojize(emo)
-        self.setText(self.emoji)
-
-    def mousePressEvent(self, QMouseEvent):
-        self._signal.emit(self.emoji)
-
-    def connect_slot(self, func):
-        self._signal.connect(func)
-
-
 class EmojiWindow(QWidget, Ui_emoji):
     emoji_signal = pyqtSignal(str)
 
     def __init__(self, emoji_list=None):
         super().__init__()
         self.setupUi(self)
+        icon = QIcon()
+        icon.addPixmap(QPixmap("../gui/resource/shaco_logo.jpg"), QIcon.Normal, QIcon.Off)
+        self.setWindowIcon(icon)
+        self.setWindowTitle('emoji')
         if emoji_list is None:
             self.emoji_list = EMOJI_LIST
         for i in range(len(self.emoji_list)):
@@ -54,8 +33,8 @@ class EmojiWindow(QWidget, Ui_emoji):
             exec(code)
 
     def send_emoji_signal(self, emoji):
-        self.close()
         self.emoji_signal.emit(emoji)
+        self.close()
 
     def connect_slot(self, func):
         self.emoji_signal.connect(func)
