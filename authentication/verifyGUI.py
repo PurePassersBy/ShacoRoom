@@ -9,74 +9,157 @@
 
 
 from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5.QtGui import QIcon, QPixmap
+from PyQt5.QtWidgets import QLineEdit
 
 
 class Ui_Verify(object):
     def setupUi(self, Verify):
         Verify.setObjectName("Verify")
-        Verify.resize(600, 300)
-        icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap(":/images/Shaco_Logo.jpg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        Verify.setWindowIcon(icon)
-        Verify.setStyleSheet("")
-        Verify.setMinimumSize(QtCore.QSize(600, 300))
-        Verify.setMaximumSize(QtCore.QSize(600, 300))
-        self.sendButton = QtWidgets.QPushButton(Verify)
-        self.sendButton.setGeometry(QtCore.QRect(440, 120, 111, 30))
-        self.sendButton.setObjectName("sendButton")
-        self.mailLabel = QtWidgets.QLabel(Verify)
-        self.mailLabel.setGeometry(QtCore.QRect(50, 130, 72, 15))
-        self.mailLabel.setObjectName("mailLabel")
-        self.codeLabel = QtWidgets.QLabel(Verify)
-        self.codeLabel.setGeometry(QtCore.QRect(60, 190, 72, 15))
-        self.codeLabel.setObjectName("codeLabel")
-        self.mailEdit = QtWidgets.QLineEdit(Verify)
-        self.mailEdit.setGeometry(QtCore.QRect(130, 120, 300, 30))
+        Verify.resize(400, 300)
+        Verify.setMinimumSize(QtCore.QSize(400, 300))
+        Verify.setMaximumSize(QtCore.QSize(400, 300))
+        icon = QIcon()
+        icon.addPixmap(QPixmap("../gui/resource/shaco_logo.jpg"), QIcon.Normal, QIcon.Off)
+        self.setWindowIcon(icon)
+        self.gridLayoutWidget = QtWidgets.QWidget(Verify)
+        self.gridLayoutWidget.setGeometry(QtCore.QRect(10, 30, 381, 201))
+        self.gridLayoutWidget.setObjectName("gridLayoutWidget")
+        self.gridLayout = QtWidgets.QGridLayout(self.gridLayoutWidget)
+        self.gridLayout.setContentsMargins(0, 0, 0, 0)
+        self.gridLayout.setSpacing(10)
+        self.gridLayout.setObjectName("gridLayout")
+        self.mailEdit = QtWidgets.QLineEdit(self.gridLayoutWidget)
         self.mailEdit.setObjectName("mailEdit")
-        self.codeEdit = QtWidgets.QLineEdit(Verify)
-        self.codeEdit.setGeometry(QtCore.QRect(130, 180, 300, 30))
-        self.codeEdit.setObjectName("codeEdit")
-        self.confirmButton = QtWidgets.QPushButton(Verify)
-        self.confirmButton.setGeometry(QtCore.QRect(230, 270, 93, 28))
-        self.confirmButton.setObjectName("confirmButton")
-        self.nameLabel = QtWidgets.QLabel(Verify)
-        self.nameLabel.setGeometry(QtCore.QRect(50, 80, 72, 15))
-        self.nameLabel.setObjectName("nameLabel")
-        self.passwordLabel = QtWidgets.QLabel(Verify)
-        self.passwordLabel.setGeometry(QtCore.QRect(50, 30, 72, 15))
-        self.passwordLabel.setObjectName("passwordLabel")
-        self.nameEdit = QtWidgets.QLineEdit(Verify)
-        self.nameEdit.setGeometry(QtCore.QRect(130, 20, 300, 30))
-        self.nameEdit.setObjectName("nameEdit")
-        self.passwordEdit = QtWidgets.QLineEdit(Verify)
-        self.passwordEdit.setGeometry(QtCore.QRect(130, 70, 300, 30))
-        self.passwordEdit.setObjectName("passwordEdit")
-        self.nameStatus = QtWidgets.QLabel(Verify)
-        self.nameStatus.setGeometry(QtCore.QRect(450, 30, 131, 16))
-        self.nameStatus.setText("")
+        self.gridLayout.addWidget(self.mailEdit, 3, 1, 1, 1)
+        self.nameStatus = QtWidgets.QLabel(self.gridLayoutWidget)
         self.nameStatus.setObjectName("nameStatus")
-        self.passwordStatus = QtWidgets.QLabel(Verify)
-        self.passwordStatus.setGeometry(QtCore.QRect(450, 80, 131, 16))
-        self.passwordStatus.setText("")
-        self.passwordStatus.setObjectName("passwordStatus")
-        self.codeStatus = QtWidgets.QLabel(Verify)
-        self.codeStatus.setGeometry(QtCore.QRect(130, 220, 411, 21))
-        self.codeStatus.setText("")
-        self.codeStatus.setObjectName("codeStatus")
-        self.mailStatus = QtWidgets.QLabel(Verify)
-        self.mailStatus.setGeometry(QtCore.QRect(140, 160, 291, 16))
-        self.mailStatus.setText("")
+        self.gridLayout.addWidget(self.nameStatus, 0, 2, 1, 1)
+        self.passwordLabel = QtWidgets.QLabel(self.gridLayoutWidget)
+        self.passwordLabel.setObjectName("passwordLabel")
+        self.gridLayout.addWidget(self.passwordLabel, 0, 0, 1, 1)
+        self.codeEdit = QtWidgets.QLineEdit(self.gridLayoutWidget)
+        self.codeEdit.setObjectName("codeEdit")
+        self.gridLayout.addWidget(self.codeEdit, 5, 1, 1, 1)
+        self.mailStatus = QtWidgets.QLabel(self.gridLayoutWidget)
         self.mailStatus.setObjectName("mailStatus")
+        self.gridLayout.addWidget(self.mailStatus, 3, 2, 1, 1)
+        self.passwordEdit = QtWidgets.QLineEdit(self.gridLayoutWidget)
+        self.passwordEdit.setObjectName("passwordEdit")
+        self.gridLayout.addWidget(self.passwordEdit, 1, 1, 1, 1)
+        self.passwordStatus = QtWidgets.QLabel(self.gridLayoutWidget)
+        self.passwordStatus.setObjectName("passwordStatus")
+        self.gridLayout.addWidget(self.passwordStatus, 1, 2, 1, 1)
+        self.nameEdit = QtWidgets.QLineEdit(self.gridLayoutWidget)
+        self.nameEdit.setObjectName("nameEdit")
+        self.gridLayout.addWidget(self.nameEdit, 0, 1, 1, 1)
+        self.nameLabel = QtWidgets.QLabel(self.gridLayoutWidget)
+        self.nameLabel.setObjectName("nameLabel")
+        self.gridLayout.addWidget(self.nameLabel, 1, 0, 1, 1)
+        self.mailLabel = QtWidgets.QLabel(self.gridLayoutWidget)
+        self.mailLabel.setObjectName("mailLabel")
+        self.gridLayout.addWidget(self.mailLabel, 3, 0, 1, 1)
+        self.codeLabel = QtWidgets.QLabel(self.gridLayoutWidget)
+        self.codeLabel.setObjectName("codeLabel")
+        self.gridLayout.addWidget(self.codeLabel, 5, 0, 1, 1)
+        self.codeStatus = QtWidgets.QLabel(self.gridLayoutWidget)
+        self.codeStatus.setObjectName("codeStatus")
+        self.gridLayout.addWidget(self.codeStatus, 5, 2, 1, 1)
+        self.gridLayout.setColumnStretch(0, 1)
+        self.gridLayout.setColumnStretch(1, 5)
+        self.gridLayout.setColumnStretch(2, 2)
+        self.horizontalLayoutWidget = QtWidgets.QWidget(Verify)
+        self.horizontalLayoutWidget.setGeometry(QtCore.QRect(60, 240, 281, 41))
+        self.horizontalLayoutWidget.setObjectName("horizontalLayoutWidget")
+        self.horizontalLayout = QtWidgets.QHBoxLayout(self.horizontalLayoutWidget)
+        self.horizontalLayout.setContentsMargins(0, 0, 0, 0)
+        self.horizontalLayout.setSpacing(80)
+        self.horizontalLayout.setObjectName("horizontalLayout")
+        self.sendButton = QtWidgets.QPushButton(self.horizontalLayoutWidget)
+        self.sendButton.setObjectName("sendButton")
+        self.horizontalLayout.addWidget(self.sendButton)
+        self.confirmButton = QtWidgets.QPushButton(self.horizontalLayoutWidget)
+        self.confirmButton.setObjectName("confirmButton")
+        self.horizontalLayout.addWidget(self.confirmButton)
 
         self.retranslateUi(Verify)
         QtCore.QMetaObject.connectSlotsByName(Verify)
 
+        # 设置背景
+        self.backgroundLabel = QtWidgets.QLabel(Verify)
+        self.backgroundLabel.setGeometry(QtCore.QRect(0, 0, 400, 300))
+        self.backgroundLabel.setPixmap(QtGui.QPixmap("resources/pic/whiteBackground.jpg"))
+        self.backgroundLabel.setScaledContents(True)
+        self.backgroundLabel.lower()
+
+        # 设置提示
+        self.mailEdit.setToolTip('输入您未注册的邮箱')
+        self.nameEdit.setToolTip('长度不超过8')
+        self.passwordEdit.setToolTip('密码长度不超过12')
+        self.codeEdit.setToolTip('未收到验证码？请检查邮箱是否正确')
+
+
+        # 设置edit
+        self.passwordEdit.setEchoMode(QLineEdit.Password)
+        self.passwordEdit.setClearButtonEnabled(True)
+        self.mailEdit.setClearButtonEnabled(True)
+
+        # 开始QSS设置
+        self.setQSS()
+
+    def setQSS(self):
+        edit_qss = '''QLineEdit{
+                                         border:1px solid gray;
+                                         width:300px;
+                                         border-radius:10px;
+                                         padding:2px 4px; }'''
+        self.mailEdit.setStyleSheet(edit_qss)
+        self.passwordEdit.setStyleSheet(edit_qss)
+        self.codeEdit.setStyleSheet(edit_qss)
+        self.nameEdit.setStyleSheet(edit_qss)
+
+        button_qss = '''     QPushButton{  
+                                     border:2px solid #F3F3F5;   
+                                     color:black;         
+                                     font-size:12px;         
+                                     height:40px;         
+                                     padding-left:5px;         
+                                     padding-right:10px;         
+                                     }     
+                                                QPushButton:hover{         
+                                     color:brown;         
+                                     border:2px solid #F3F3F5;         
+                                     border-radius:10px;         
+                                     background:LightGray;     
+                                     } '''
+        self.confirmButton.setStyleSheet(button_qss)
+        self.sendButton.setStyleSheet(button_qss)
+
+        label_qss = '''QLabel{
+                                        color:black
+                                        }
+                                        QLabel:hover{
+                                        color:gray
+                                        }
+                            '''
+        self.mailLabel.setStyleSheet(label_qss)
+        self.mailStatus.setStyleSheet(label_qss)
+        self.passwordLabel.setStyleSheet(label_qss)
+        self.passwordStatus.setStyleSheet(label_qss)
+        self.nameLabel.setStyleSheet(label_qss)
+        self.nameStatus.setStyleSheet(label_qss)
+        self.codeLabel.setStyleSheet(label_qss)
+        self.codeStatus.setStyleSheet(label_qss)
+
+        self.setWindowOpacity(0.95)  # 设置窗口透明度
+        self.setAttribute(QtCore.Qt.WA_TranslucentBackground)  # 设置窗口背景透明
+
     def retranslateUi(self, Verify):
         _translate = QtCore.QCoreApplication.translate
         Verify.setWindowTitle(_translate("Verify", "注册ShacoRoom"))
-        self.sendButton.setText(_translate("Verify", "发送验证邮件"))
+        self.passwordLabel.setText(_translate("Verify", "用户名"))
+        self.nameLabel.setText(_translate("Verify", "密码"))
         self.mailLabel.setText(_translate("Verify", "邮箱地址"))
         self.codeLabel.setText(_translate("Verify", "验证码"))
-        self.confirmButton.setText(_translate("Verify", "确定"))
-        self.nameLabel.setText(_translate("Verify", "密码"))
-        self.passwordLabel.setText(_translate("Verify", "用户名"))
+        self.sendButton.setText(_translate("Verify", "发送验证邮件"))
+        self.confirmButton.setText(_translate("Verify", "注册"))

@@ -9,63 +9,149 @@
 
 
 from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5.QtGui import QIcon, QPixmap
+from PyQt5.QtWidgets import QLineEdit
 
 
 class Ui_Edit(object):
     def setupUi(self, Edit):
         Edit.setObjectName("Edit")
-        Edit.resize(600, 300)
-        Edit.setMinimumSize(QtCore.QSize(600, 300))
-        Edit.setMaximumSize(QtCore.QSize(600, 300))
-        icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap(":/images/Shaco_Logo.jpg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        Edit.setWindowIcon(icon)
-        Edit.setStyleSheet("")
-        self.sendButton = QtWidgets.QPushButton(Edit)
-        self.sendButton.setGeometry(QtCore.QRect(440, 120, 111, 30))
-        self.sendButton.setObjectName("sendButton")
-        self.mailLabel = QtWidgets.QLabel(Edit)
-        self.mailLabel.setGeometry(QtCore.QRect(50, 130, 72, 15))
+        Edit.resize(400, 300)
+        Edit.setMinimumSize(QtCore.QSize(400, 300))
+        Edit.setMaximumSize(QtCore.QSize(400, 300))
+        icon = QIcon()
+        icon.addPixmap(QPixmap("../gui/resource/shaco_logo.jpg"), QIcon.Normal, QIcon.Off)
+        self.setWindowIcon(icon)
+        self.gridLayoutWidget = QtWidgets.QWidget(Edit)
+        self.gridLayoutWidget.setGeometry(QtCore.QRect(10, 40, 381, 174))
+        self.gridLayoutWidget.setObjectName("gridLayoutWidget")
+        self.gridLayout = QtWidgets.QGridLayout(self.gridLayoutWidget)
+        self.gridLayout.setContentsMargins(0, 0, 0, 0)
+        self.gridLayout.setHorizontalSpacing(10)
+        self.gridLayout.setVerticalSpacing(7)
+        self.gridLayout.setObjectName("gridLayout")
+        self.mailLabel = QtWidgets.QLabel(self.gridLayoutWidget)
         self.mailLabel.setObjectName("mailLabel")
-        self.codeLabel = QtWidgets.QLabel(Edit)
-        self.codeLabel.setGeometry(QtCore.QRect(60, 190, 72, 15))
+        self.gridLayout.addWidget(self.mailLabel, 3, 0, 1, 1)
+        self.codeLabel = QtWidgets.QLabel(self.gridLayoutWidget)
         self.codeLabel.setObjectName("codeLabel")
-        self.mailEdit = QtWidgets.QLineEdit(Edit)
-        self.mailEdit.setGeometry(QtCore.QRect(130, 120, 300, 30))
+        self.gridLayout.addWidget(self.codeLabel, 5, 0, 1, 1)
+        self.passwordLabel = QtWidgets.QLabel(self.gridLayoutWidget)
+        self.passwordLabel.setObjectName("passwordLabel")
+        self.gridLayout.addWidget(self.passwordLabel, 1, 0, 1, 1)
+        self.mailEdit = QtWidgets.QLineEdit(self.gridLayoutWidget)
         self.mailEdit.setObjectName("mailEdit")
-        self.codeEdit = QtWidgets.QLineEdit(Edit)
-        self.codeEdit.setGeometry(QtCore.QRect(130, 180, 300, 30))
+        self.gridLayout.addWidget(self.mailEdit, 3, 1, 1, 1)
+        self.passwordStatus = QtWidgets.QLabel(self.gridLayoutWidget)
+        self.passwordStatus.setText("")
+        self.passwordStatus.setObjectName("passwordStatus")
+        self.gridLayout.addWidget(self.passwordStatus, 1, 2, 1, 1)
+        self.codeEdit = QtWidgets.QLineEdit(self.gridLayoutWidget)
         self.codeEdit.setObjectName("codeEdit")
-        self.confirmButton = QtWidgets.QPushButton(Edit)
-        self.confirmButton.setGeometry(QtCore.QRect(230, 270, 93, 28))
-        self.confirmButton.setObjectName("confirmButton")
-        self.newpasswordLabel = QtWidgets.QLabel(Edit)
-        self.newpasswordLabel.setGeometry(QtCore.QRect(60, 60, 61, 21))
-        self.newpasswordLabel.setObjectName("newpasswordLabel")
-        self.newpasswordEdit = QtWidgets.QLineEdit(Edit)
-        self.newpasswordEdit.setGeometry(QtCore.QRect(130, 60, 300, 30))
-        self.newpasswordEdit.setObjectName("newpasswordEdit")
-        self.newpasswordStatus = QtWidgets.QLabel(Edit)
-        self.newpasswordStatus.setGeometry(QtCore.QRect(130, 90, 331, 16))
-        self.newpasswordStatus.setText("")
-        self.newpasswordStatus.setObjectName("newpasswordStatus")
-        self.codeStatus = QtWidgets.QLabel(Edit)
-        self.codeStatus.setGeometry(QtCore.QRect(130, 220, 411, 21))
-        self.codeStatus.setText("")
-        self.codeStatus.setObjectName("codeStatus")
-        self.mailStatus = QtWidgets.QLabel(Edit)
-        self.mailStatus.setGeometry(QtCore.QRect(140, 160, 291, 16))
+        self.gridLayout.addWidget(self.codeEdit, 5, 1, 1, 1)
+        self.passwordEdit = QtWidgets.QLineEdit(self.gridLayoutWidget)
+        self.passwordEdit.setObjectName("passwordEdit")
+        self.gridLayout.addWidget(self.passwordEdit, 1, 1, 1, 1)
+        self.mailStatus = QtWidgets.QLabel(self.gridLayoutWidget)
         self.mailStatus.setText("")
         self.mailStatus.setObjectName("mailStatus")
+        self.gridLayout.addWidget(self.mailStatus, 3, 2, 1, 1)
+        self.codeStatus = QtWidgets.QLabel(self.gridLayoutWidget)
+        self.codeStatus.setText("")
+        self.codeStatus.setObjectName("codeStatus")
+        self.gridLayout.addWidget(self.codeStatus, 5, 2, 1, 1)
+        self.gridLayout.setColumnMinimumWidth(0, 1)
+        self.gridLayout.setColumnMinimumWidth(1, 5)
+        self.gridLayout.setColumnMinimumWidth(2, 1)
+        self.gridLayout.setColumnStretch(0, 1)
+        self.gridLayout.setColumnStretch(1, 5)
+        self.gridLayout.setColumnStretch(2, 2)
+        self.horizontalLayoutWidget = QtWidgets.QWidget(Edit)
+        self.horizontalLayoutWidget.setGeometry(QtCore.QRect(60, 220, 274, 80))
+        self.horizontalLayoutWidget.setObjectName("horizontalLayoutWidget")
+        self.horizontalLayout = QtWidgets.QHBoxLayout(self.horizontalLayoutWidget)
+        self.horizontalLayout.setContentsMargins(0, 0, 0, 0)
+        self.horizontalLayout.setSpacing(80)
+        self.horizontalLayout.setObjectName("horizontalLayout")
+        self.sendButton = QtWidgets.QPushButton(self.horizontalLayoutWidget)
+        self.sendButton.setObjectName("sendButton")
+        self.horizontalLayout.addWidget(self.sendButton)
+        self.confirmButton = QtWidgets.QPushButton(self.horizontalLayoutWidget)
+        self.confirmButton.setObjectName("confirmButton")
+        self.horizontalLayout.addWidget(self.confirmButton)
 
         self.retranslateUi(Edit)
         QtCore.QMetaObject.connectSlotsByName(Edit)
+        # 设置背景
+        self.backgroundLabel = QtWidgets.QLabel(Edit)
+        self.backgroundLabel.setGeometry(QtCore.QRect(0, 0, 500, 300))
+        self.backgroundLabel.setPixmap(QtGui.QPixmap("resources/pic/whiteBackground.jpg"))
+        self.backgroundLabel.setScaledContents(True)
+        self.backgroundLabel.lower()
+
+        # 设置提示
+        self.mailEdit.setToolTip('输入您未注册的邮箱')
+        self.passwordEdit.setToolTip('密码长度不超过12')
+        self.codeEdit.setToolTip('未收到验证码？请检查邮箱是否正确')
+
+
+        # 设置edit
+        self.passwordEdit.setEchoMode(QLineEdit.Password)
+        self.passwordEdit.setClearButtonEnabled(True)
+        self.mailEdit.setClearButtonEnabled(True)
+
+        # 开始QSS设置
+        self.setQSS()
+
+    def setQSS(self):
+        edit_qss = '''QLineEdit{
+                                         border:1px solid gray;
+                                         width:300px;
+                                         border-radius:10px;
+                                         padding:2px 4px; }'''
+        self.mailEdit.setStyleSheet(edit_qss)
+        self.passwordEdit.setStyleSheet(edit_qss)
+        self.codeEdit.setStyleSheet(edit_qss)
+
+        button_qss = '''     QPushButton{  
+                                     border:2px solid #F3F3F5;   
+                                     color:black;         
+                                     font-size:12px;         
+                                     height:40px;         
+                                     padding-left:5px;         
+                                     padding-right:10px;         
+                                     }     
+                                                QPushButton:hover{         
+                                     color:brown;         
+                                     border:2px solid #F3F3F5;         
+                                     border-radius:10px;         
+                                     background:LightGray;     
+                                     } '''
+        self.confirmButton.setStyleSheet(button_qss)
+        self.sendButton.setStyleSheet(button_qss)
+
+        label_qss = '''QLabel{
+                                        color:black
+                                        }
+                                        QLabel:hover{
+                                        color:gray
+                                        }
+                            '''
+        self.mailLabel.setStyleSheet(label_qss)
+        self.mailStatus.setStyleSheet(label_qss)
+        self.passwordLabel.setStyleSheet(label_qss)
+        self.passwordStatus.setStyleSheet(label_qss)
+        self.codeLabel.setStyleSheet(label_qss)
+        self.codeStatus.setStyleSheet(label_qss)
+
+        self.setWindowOpacity(0.95)  # 设置窗口透明度
+        self.setAttribute(QtCore.Qt.WA_TranslucentBackground)  # 设置窗口背景透明
 
     def retranslateUi(self, Edit):
         _translate = QtCore.QCoreApplication.translate
         Edit.setWindowTitle(_translate("Edit", "修改密码"))
-        self.sendButton.setText(_translate("Edit", "发送验证邮件"))
         self.mailLabel.setText(_translate("Edit", "邮箱地址"))
         self.codeLabel.setText(_translate("Edit", "验证码"))
+        self.passwordLabel.setText(_translate("Edit", "新密码"))
+        self.sendButton.setText(_translate("Edit", "发送验证邮件"))
         self.confirmButton.setText(_translate("Edit", "确定"))
-        self.newpasswordLabel.setText(_translate("Edit", "新密码"))
