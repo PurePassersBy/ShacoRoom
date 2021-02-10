@@ -6,6 +6,7 @@ from time import sleep
 import threading
 import socket
 
+import emoji
 import numpy as np
 from PIL import Image, ImageQt
 from PyQt5.QtCore import *
