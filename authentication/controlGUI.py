@@ -4,6 +4,7 @@ import random
 import time
 import threading
 
+from PyQt5 import QtWidgets
 from PyQt5.QtWidgets import QApplication, QMainWindow
 from PyQt5.QtGui import *
 import configparser
@@ -395,7 +396,7 @@ class LoginForm(QMainWindow, Ui_login):
         # 修改密码提示隐形
         self.editLabel.setVisible(False)
         # 点击按钮提示显示
-        self.editButton.clicked.connect(lambda: self.editLabel.setVisible(True))
+        self.editButton.clicked.connect(self._edit_tip)
         # 点击沙口头像修改密码
         self.shacoLabel.clicked_signal.connect(self._edit)
         # 初始化聊天室界面
@@ -427,6 +428,27 @@ class LoginForm(QMainWindow, Ui_login):
             self.passwordStatus.setText('Too long')
         else:
             self.passwordStatus.setText('Oook')
+
+    def _edit_tip(self):
+
+        if not self.editLabel.isVisible():
+            self.editLabel.setVisible(True)
+            # 用线程计时修改密码恶作剧的提示 避免堵塞
+            threading.Thread(target=self._count_down, args=()).start()
+
+    def _count_down(self):
+        count = 0
+        opacity = 1.0
+        op = QtWidgets.QGraphicsOpacityEffect()
+        while count <= 10:
+            op.setOpacity(opacity)
+            opacity = opacity-0.1
+            count = count+1
+            self.editLabel.setGraphicsEffect(op)
+            time.sleep(0.15)
+        self.editLabel.setVisible(False)
+
+
 
     def _login(self):
         """
@@ -495,7 +517,6 @@ class LoginForm(QMainWindow, Ui_login):
             self.rememberBox.setChecked(True)
         else:
             self.rememberBox.setChecked(False)
-
 
 
 
