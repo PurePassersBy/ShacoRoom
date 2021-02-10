@@ -196,7 +196,7 @@ class ChatGUI(QWidget, Ui_Form):
         self.biography.show()
 
     def insert_emoji(self, emo):
-        self.textEdit.append(emo)
+        self.textEdit.insertPlainText(emo)
 
     def system_information(self, system_code):
         if system_code == 'KICK OUT':

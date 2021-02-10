@@ -10,7 +10,10 @@ class EmojiLabel(QLabel):
 
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.setStyleSheet("font:25px")
+        self.setStyleSheet("QLabel{font:25px;}"
+                           "QLabel:hover{background-color:green;}")
+        self.setFrameShape(QFrame.Box)
+        self.setFrameShadow(QFrame.Raised)
         self.setAlignment(Qt.AlignCenter)
         self.setCursor(Qt.PointingHandCursor)
 
