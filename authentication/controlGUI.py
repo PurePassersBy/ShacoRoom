@@ -54,7 +54,7 @@ class RegisterForm(QMainWindow, Ui_Verify):
         self.passwordEdit.setToolTip('长度不超过12')
         self.passwordEdit.setMaxLength(13)
         self.mailEdit.textChanged['QString'].connect(self._mail_check)
-        self.nameEdit.setToolTip('输入您的用户名')
+        self.mailEdit.setToolTip('请输入未注册的邮箱')
         self.mailEdit.setMaxLength(21)
         # 检测验证码是否正确
         self.codeEdit.textChanged['QString'].connect(self._code_check)
@@ -107,7 +107,7 @@ class RegisterForm(QMainWindow, Ui_Verify):
         :param
         :return:
         """
-        code = int(self.codeEdit.text())
+        code = self.codeEdit.text()
         if code != self.verifyCode:
             self.codeStatus.setText("Wrong")
 
@@ -172,7 +172,7 @@ class RegisterForm(QMainWindow, Ui_Verify):
         :return:
         """
         code = random.randint(100000, 999999)  # 生成六位随机数
-        return code
+        return str(code)
 
     def _update_userinfo(self):
         """
@@ -222,12 +222,13 @@ class EditpasswordForm(QMainWindow, Ui_Edit):
         # 储存生存的验证码
         self.verifyCode = None
         # 添加检测文本变化信号和槽 设置长度限制提示  设置最大输入字符数
-        self.newpasswordEdit.textChanged['QString'].connect(self._newpassword_check)
-        self.newpasswordEdit.setToolTip('长度不超过12')
-        self.newpasswordEdit.setMaxLength(13)
+        self.passwordEdit.textChanged['QString'].connect(self._password_check)
+        self.passwordEdit.setToolTip('长度不超过12')
+        self.passwordEdit.setMaxLength(13)
         self.mailEdit.textChanged['QString'].connect(self._mail_check)
         self.mailEdit.setToolTip('输入您的邮箱')
         self.mailEdit.setMaxLength(21)
+        self.codeEdit.setMaxLength(8)
         # 检测验证码是否正确
         self.codeEdit.textChanged['QString'].connect(self._code_check)
         # 点击发送验证邮件按钮 调用send函数
@@ -249,17 +250,17 @@ class EditpasswordForm(QMainWindow, Ui_Edit):
         else:
             self.mailStatus.setText("Ok")
 
-    def _newpassword_check(self):
+    def _password_check(self):
         """
         检测密码输入长度，太长则提示用户
         :param
         :return:
         """
-        newpassword = self.newpasswordEdit.text()
-        if len(newpassword) > 12:
-            self.newpasswordStatus.setText("Too long")
+        password = self.passwordEdit.text()
+        if len(password) > 12:
+            self.passwordStatus.setText("Too long")
         else:
-            self.newpasswordStatus.setText("Ok")
+            self.passwordStatus.setText("Ok")
 
     def _code_check(self):
         """
@@ -267,7 +268,7 @@ class EditpasswordForm(QMainWindow, Ui_Edit):
         :param
         :return:
         """
-        code = int(self.codeEdit.text())
+        code = self.codeEdit.text()
         if code != self.verifyCode:
             self.codeStatus.setText("Wrong")
 
@@ -332,7 +333,7 @@ class EditpasswordForm(QMainWindow, Ui_Edit):
         :return:
         """
         code = random.randint(100000, 999999)  # 生成六位随机数
-        return code
+        return str(code)
 
     def _update_userinfo(self):
         """
@@ -344,11 +345,11 @@ class EditpasswordForm(QMainWindow, Ui_Edit):
         """
         # 初始化封装在dataBase的连接
         mail_enter = str(self.mailEdit.text())
-        newpassword_enter = str(self.newpasswordEdit.text())
+        password_enter = str(self.passwordEdit.text())
 
         if self.flag:
             # 将用户信息添加到数据库
-            data_send = [self.id, 'password', newpassword_enter]
+            data_send = [self.id, 'password', password_enter]
             self.conn.edit(TABLE_NAME, data_send)
             self.success_dialog.show()
         else:
