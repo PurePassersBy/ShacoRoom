@@ -128,6 +128,7 @@ class ChatGUI(QWidget, Ui_Form):
 
         self.init_client()
 
+        self.textEdit.setStyleSheet("font:20px")
         self.textEdit.installEventFilter(self)
 
         # 初始化登出或登录通知
@@ -341,6 +342,8 @@ class ChatGUI(QWidget, Ui_Form):
         threading.Thread(target=self._send_portrait).start()
 
     def send_emoji(self):
+        pos = self.emoji_button.mapToGlobal(self.emoji_button.pos())
+        self.emoji_window.move(pos.x(), pos.y()-200)
         self.emoji_window.show()
 
     def send_image(self):

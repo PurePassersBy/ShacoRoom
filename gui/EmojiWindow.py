@@ -22,7 +22,8 @@ class EmojiWindow(QWidget, Ui_emoji):
         icon = QIcon()
         icon.addPixmap(QPixmap("../gui/resource/shaco_logo.jpg"), QIcon.Normal, QIcon.Off)
         self.setWindowIcon(icon)
-        self.setWindowTitle('emoji')
+        self.setWindowFlags(Qt.FramelessWindowHint)
+
         if emoji_list is None:
             self.emoji_list = EMOJI_LIST
         for i in range(len(self.emoji_list)):
@@ -31,6 +32,9 @@ class EmojiWindow(QWidget, Ui_emoji):
             else:
                 code = 'self.label_%d.get_init("%s", self.send_emoji_signal)' % (i+1, self.emoji_list[i])
             exec(code)
+
+        self.activateWindow()
+        self.installEventFilter(self)
 
     def send_emoji_signal(self, emoji):
         self.emoji_signal.emit(emoji)
