@@ -43,7 +43,7 @@ class Mail(threading.Thread):
                 msg['To'] = formataddr(["Dear ShacoRoom User", self.mailReceiver])  # 括号里的对应收件人邮箱昵称、收件人邮箱账号
                 msg['Subject'] = "ShacoRoom注册验证码"  # 邮件的主题，也可以说是标题
             if self.type == 'EDIT PASSWORD':
-                msg = MIMEText('有沙口弄丢了密码？要哭哭惹 您修改密码操作的验证码为：' + str(self.verifyCode) + '\n请在十五分钟内完成验证', 'plain', 'utf-8')  # 邮件内容
+                msg = MIMEText('您正在尝试找回ShacoRoom的密码 本次修改密码操作的验证码为：' + str(self.verifyCode) + '\n请在十五分钟内完成验证', 'plain', 'utf-8')  # 邮件内容
                 msg['From'] = formataddr(["ShacoRoom", self.mailSender])  # 括号里的对应发件人邮箱昵称、发件人邮箱账号
                 msg['To'] = formataddr(["Dear ShacoRoom User", self.mailReceiver])  # 括号里的对应收件人邮箱昵称、收件人邮箱账号
                 msg['Subject'] = "ShacoRoom修改密码验证码"  # 邮件的主题，也可以说是标题
