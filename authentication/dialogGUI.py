@@ -181,7 +181,7 @@ class Ui_Biography(object):
         self.usernameLabel.setGeometry(QtCore.QRect(90, 40, 120, 16))
         self.usernameLabel.setObjectName("usernameLabel")
         self.useranimeLabel = QtWidgets.QLabel(self.centralwidget)
-        self.useranimeLabel.setGeometry(QtCore.QRect(40, 140, 151, 20))
+        self.useranimeLabel.setGeometry(QtCore.QRect(40, 140, 180, 40))
         self.useranimeLabel.setObjectName("useranimeLabel")
         self.label = QtWidgets.QLabel(self.centralwidget)
         self.label.setGeometry(QtCore.QRect(80, 250, 251, 111))
@@ -280,6 +280,8 @@ class Biography(QMainWindow, Ui_Biography):
     def _set(self):
         self.usernameLabel.setText(self.userinfo[1])
         self.useranimeLabel.setText(self.userinfo[4])
+
+        # 设置自动换行
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Preferred)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -288,6 +290,11 @@ class Biography(QMainWindow, Ui_Biography):
         self.label.setSizePolicy(sizePolicy)
         self.label.setWordWrap(True)
         self.label.setText(self.userinfo[5])
+
+        sizePolicy.setHeightForWidth(self.useranimeLabel.sizePolicy().hasHeightForWidth())
+        self.useranimeLabel.setSizePolicy(sizePolicy)
+        self.useranimeLabel.setWordWrap(True)
+
 
         # 设置用户头像
         pass
