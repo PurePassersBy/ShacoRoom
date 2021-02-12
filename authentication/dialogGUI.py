@@ -26,7 +26,7 @@ class Ui_Dialog(object):
         self.buttonBox = QtWidgets.QDialogButtonBox(Dialog)
         self.buttonBox.setGeometry(QtCore.QRect(30, 240, 341, 32))
         self.buttonBox.setOrientation(QtCore.Qt.Horizontal)
-        self.buttonBox.setStandardButtons(QtWidgets.QDialogButtonBox.Cancel|QtWidgets.QDialogButtonBox.Ok)
+        self.buttonBox.setStandardButtons(QtWidgets.QDialogButtonBox.Cancel | QtWidgets.QDialogButtonBox.Ok)
         self.buttonBox.setObjectName("buttonBox")
         self.label = QtWidgets.QLabel(Dialog)
         self.label.setGeometry(QtCore.QRect(60, 60, 291, 91))
@@ -55,10 +55,7 @@ class Ui_Dialog(object):
 
         self.setQSS()
 
-
     def setQSS(self):
-
-
         button_qss = '''     QDialogButtonBox{  
                                      border:2px solid #F3F3F5;   
                                      color:black;         
@@ -88,13 +85,11 @@ class Ui_Dialog(object):
         self.setWindowOpacity(0.95)  # 设置窗口透明度
         self.setAttribute(QtCore.Qt.WA_TranslucentBackground)  # 设置窗口背景透明
 
-
     def retranslateUi(self, Dialog):
         _translate = QtCore.QCoreApplication.translate
         Dialog.setWindowTitle(_translate("Dialog", "Dialog"))
         self.label.setText(_translate("Dialog", "注册成功！赶快加入马戏团"))
         self.label_2.setText(_translate("Dialog", "和沙口们一起来场马戏的盛宴吧！"))
-
 
 
 class Dialog(QMainWindow, Ui_Dialog):
@@ -115,21 +110,22 @@ class Dialog(QMainWindow, Ui_Dialog):
         self.buttonBox.rejected.connect(self._close)
         self.type = infomation
         self._set_text()
+
     def _set_text(self):
         _translate = QtCore.QCoreApplication.translate
         if self.type == 'REGISTER SUCCESS':
             self.label.setText(_translate("Dialog", "注册成功！赶快加入马戏团"))
             self.label_2.setText(_translate("Dialog", "和沙口们一起来场马戏的盛宴吧！"))
-        if self.type =='EDIT SUCCESS':
+        if self.type == 'EDIT SUCCESS':
             self.label.setText(_translate("Dialog", "密码修改成功！"))
             self.label_2.setText(_translate("Dialog", "注意保管好密码哦"))
         if self.type == 'LOGIN REPEAT':
             self.label.setText(_translate("Dialog", "该账户已登录"))
             self.label_2.setText(_translate("Dialog", "如非本人登录，请修改密码"))
-        if self.type =='KICK OUT':
+        if self.type == 'KICK OUT':
             self.label.setText(_translate("Dialog", "该账户已在另一客户端登录,您将被愉悦送走"))
             self.label_2.setText(_translate("Dialog", "如非本人操作，请修改密码"))
-        if self.type =='UNDER CONSTRUCTION':
+        if self.type == 'UNDER CONSTRUCTION':
             self.label.setText(_translate("Dialog", "该功能正在施工中"))
             self.label_2.setText(_translate("Dialog", "敬请期待"))
 
@@ -142,9 +138,6 @@ class Dialog(QMainWindow, Ui_Dialog):
         """
         self.close_signal.emit()
         self.close()
-
-
-
 
 
 class Ui_Biography(object):
@@ -224,9 +217,6 @@ class Ui_Biography(object):
         self.line_5.setFrameShadow(QtWidgets.QFrame.Sunken)
         self.line_5.setObjectName("line_5")
 
-
-
-
         self.retranslateUi(Biography)
         QtCore.QMetaObject.connectSlotsByName(Biography)
 
@@ -243,13 +233,11 @@ class Ui_Biography(object):
         self.toolBar.setWindowTitle(_translate("Biography", "toolBar"))
 
 
-
-
 class Biography(QMainWindow, Ui_Biography):
     # pyqtSignal 要定义为一个类而不是属性，不能放到__init__里
     close_signal = QtCore.pyqtSignal()
 
-    def __init__(self, userid, x, y, PORTRAIT_PATH, conn, table_name):
+    def __init__(self, userid, x, y, PORTRAIT_PATH, db_conn, table_name, server_conn):
         """
         注意close_signal 要在类成员函数外定义
         初始化CloseDialog类，将 确定 和 取消 按钮连接到self._close函数
@@ -261,8 +249,9 @@ class Biography(QMainWindow, Ui_Biography):
         self.retranslateUi(self)
         self.setGeometry(x, y, 400, 400)
         self.id = userid
-        self.conn = conn
-        res = self.conn.search(table_name, ['id', self.id])
+        self.db_conn = db_conn
+        self.server_conn = server_conn
+        res = self.db_conn.search(table_name, ['id', self.id])
         self.userinfo = res[0]
         self.addButton.clicked.connect(self.addFriend)
         self.portraitLabel.setText("")
@@ -275,7 +264,6 @@ class Biography(QMainWindow, Ui_Biography):
         # 激活窗口，这样在点击母窗口的时候，eventFilter里会捕获到WindowDeactivate事件，从而关闭窗口
         self.activateWindow()
         self.installEventFilter(self)
-
 
     def _set(self):
         self.usernameLabel.setText(self.userinfo[1])
@@ -295,12 +283,14 @@ class Biography(QMainWindow, Ui_Biography):
         self.useranimeLabel.setSizePolicy(sizePolicy)
         self.useranimeLabel.setWordWrap(True)
 
-
         # 设置用户头像
         pass
 
     def addFriend(self):
-        self.addApply = Dialog('UNDER CONSTRUCTION')
+        # self.addApply = Dialog('UNDER CONSTRUCTION')
+        # self.addApply.show()
+        self.addApply = FriendApply(self.server_conn)
+        self.addApply.show()
 
     def eventFilter(self, obj, event):
         """
@@ -317,5 +307,95 @@ class Biography(QMainWindow, Ui_Biography):
         self.close()
 
 
-class AddApply:
-    pass
+class Ui_ApplyDialog(object):
+    def setupUi(self, ApplyDialog):
+        ApplyDialog.setObjectName("ApplyDialog")
+        ApplyDialog.resize(400, 300)
+        self.buttonBox = QtWidgets.QDialogButtonBox(ApplyDialog)
+        self.buttonBox.setGeometry(QtCore.QRect(200, 250, 191, 32))
+        self.buttonBox.setOrientation(QtCore.Qt.Horizontal)
+        self.buttonBox.setStandardButtons(QtWidgets.QDialogButtonBox.Cancel|QtWidgets.QDialogButtonBox.Ok)
+        self.buttonBox.setObjectName("buttonBox")
+        self.titleLabel = QtWidgets.QLabel(ApplyDialog)
+        self.titleLabel.setGeometry(QtCore.QRect(10, 10, 72, 15))
+        self.titleLabel.setObjectName("titleLabel")
+        self.closeButton = QtWidgets.QPushButton(ApplyDialog)
+        self.closeButton.setGeometry(QtCore.QRect(370, 0, 93, 28))
+        self.closeButton.setObjectName("closeButton")
+        self.psLabel = QtWidgets.QLabel(ApplyDialog)
+        self.psLabel.setGeometry(QtCore.QRect(40, 230, 301, 16))
+        self.psLabel.setObjectName("psLabel")
+        self.textEdit = QtWidgets.QTextEdit(ApplyDialog)
+        self.textEdit.setGeometry(QtCore.QRect(20, 70, 361, 151))
+        self.textEdit.setObjectName("textEdit")
+
+        self.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint)  # 置顶
+        # 设置背景
+        self.backgroundLabel = QtWidgets.QLabel(ApplyDialog)
+        self.backgroundLabel.setGeometry(QtCore.QRect(0, 0, 400, 300))
+        self.backgroundLabel.setPixmap(QtGui.QPixmap("resources/pic/whiteBackground.jpg"))
+        self.backgroundLabel.setScaledContents(True)
+        self.backgroundLabel.lower()
+
+        self.setQSS()
+        self.retranslateUi(ApplyDialog)
+        QtCore.QMetaObject.connectSlotsByName(ApplyDialog)
+
+    def setQSS(self):
+        self.closeButton.setFixedSize(20, 20)  # 设置关闭按钮的大小
+        self.closeButton.setStyleSheet(
+            '''QPushButton{background:#F76677;border-radius:5px;}QPushButton:hover{background:red;}''')
+
+        button_qss = '''     QDialogButtonBox{
+                                     border:2px solid #F3F3F5;
+                                     color:black;
+                                     font-size:12px;
+                                     height:40px;
+                                     padding-left:5px;
+                                     padding-right:10px;
+                                     }
+                                               QDialogButtonBox:hover{
+                                     color:brown;
+                                     border:2px solid #F3F3F5;
+                                     border-radius:10px;
+                                     background:LightGray;
+                                     } '''
+        self.buttonBox.setStyleSheet(button_qss)
+
+        label_qss = '''QLabel{color:gray}'''
+        self.psLabel.setStyleSheet(label_qss)
+
+        self.setWindowFlag(QtCore.Qt.FramelessWindowHint)  # 隐藏边框
+        self.setWindowOpacity(0.95)  # 设置窗口透明度
+        self.setAttribute(QtCore.Qt.WA_TranslucentBackground)  # 设置窗口背景透明
+
+    def retranslateUi(self, ApplyDialog):
+        _translate = QtCore.QCoreApplication.translate
+        ApplyDialog.setWindowTitle(_translate("ApplyDialog", "Dialog"))
+        self.titleLabel.setText(_translate("ApplyDialog", "添加好友"))
+        self.closeButton.setText(_translate("ApplyDialog", " "))
+        self.psLabel.setText(_translate("ApplyDialog", "需对方同意好友申请，才能成为好友"))
+
+
+class FriendApply(QMainWindow, Ui_ApplyDialog):
+
+    def __init__(self, server_conn):
+        """
+        发送好友请求的界面
+        :param
+        :return:
+        """
+        super(FriendApply, self).__init__()
+        self.setupUi(self)
+        self.retranslateUi(self)
+        self.server_conn = server_conn
+        self.buttonBox.accepted.connect(self.send)
+        self.buttonBox.rejected.connect(self.close)
+        self.closeButton.clicked.connect(self.close)
+        self.dialog = None
+
+    def send(self):
+        self.dialog = Dialog('UNDER CONSTRUCTION')
+        self.dialog.show()
+        self.close()
+
