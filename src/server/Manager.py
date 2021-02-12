@@ -155,7 +155,7 @@ class Manager(threading.Thread):
             send_id = pack['send_id']
             target_id = pack['target_id']
             key_name = send_id + '-' + target_id
-            text = pack['text']
+            text = pack['message']
             if key_name in config_dict:
                 # 重复发送好友请求
                 repeat_apply_package = {
@@ -187,7 +187,7 @@ class Manager(threading.Thread):
             config_dict = config.defaults()
             send_id = pack['send_id']
             target_id = pack['target_id']
-            result = pack['result']
+            result = pack['message']
             key_name = send_id + '-' + target_id
             if target_id in self._user2conn:
                 # 当前好友请求发送用户在线
