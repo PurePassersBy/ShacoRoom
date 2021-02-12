@@ -1,3 +1,4 @@
+import configparser
 import socket
 import struct
 import pickle
@@ -56,7 +57,6 @@ class Manager(threading.Thread):
         header = fetch_package(conn)
         user_id = header['user_id']
         user_name = header['user_name']
-        header['system_code'] = 'LOGIN PERMITTED'
         if user_id in self._user2conn:
             # 重复登录，发送下线请求给当前登录用户
             print('sending kickout')
@@ -66,7 +66,7 @@ class Manager(threading.Thread):
                 'time': get_localtime(),
                 'message': '该账号在其他客户端登录，您已被强制下线',
                 'system_code': 'KICK OUT'}
-            send_package(self._user2conn[user_id], kickout_package)   # 发送下线请求给已存在的用户
+            send_package(self._user2conn[user_id], kickout_package)  # 发送下线请求给已存在的用户
             self._user2conn[user_id].close()  # 确认强制下线客户端收到信息后，断开该用户id对应的conn连接
             del self._user2conn[user_id]
             kickout_package['message'] = '该账号已登录，您已将之前登录的人挤下线'
@@ -75,12 +75,14 @@ class Manager(threading.Thread):
         self._user2conn[user_id] = conn
         header['time'] = get_localtime()
         header['message'] = 'Enters ShacoRoom'
-        # send_package(conn, header)
+        # 检查是否有待处理的好友请求信息
+        self.check_apply(user_id)
         msg_queue.put(header)
         while True:
             try:
                 pack = fetch_package(conn)
                 if 'system_code' in pack:
+                    self.system_code(pack, conn)
                     continue
                 pack['time'] = get_localtime()
                 msg_queue.put(pack)
@@ -97,6 +99,113 @@ class Manager(threading.Thread):
                 msg_queue.put(pack)
                 break
 
+    def check_apply(self, user_id):
+        """
+        检查该用户是否有待处理的好友请求信息
+        查找用的是O(n)的算法，用户数量增加后登入进聊天室
+        的初始化过程可能会较长，需要增加动画效果
+        :param user_id: 当前用户id
+        :return:
+        """
+        config = configparser.ConfigParser()
+        file = config.read('add_friend.ini')
+        config_dict = config.defaults()
+        for key_name in config_dict:
+            split_key_name = key_name.split('-');
+            send_id = split_key_name[0]
+            target_id = split_key_name[1]
+            if target_id == user_id:
+                # 该用户id有待处理的好友请求信息
+                if config_dict[key_name][0] == 'APPLY':
+                    # 需处理好友请求
+                    friend_apply_package = {
+                        'send_id': send_id,
+                        'time': get_localtime(),
+                        'message': config_dict[key_name][1],
+                        'system_code': 'FRIEND APPLY'}
+                    send_package(self._user2conn[user_id], friend_apply_package)
+
+                else:
+                    # 需处理好友请求结果
+                    friend_reply_package = {
+                        'send_id': send_id,
+                        'time': get_localtime(),
+                        'message': config_dict[key_name][1],
+                        'system_code': 'FRIEND APPLY RESULT'}
+                    send_package(self._user2conn[user_id], friend_reply_package)
+
+                # 删除服务器待处理好友请求中该用户的记录
+                del config_dict[key_name]
+                # 用户上线后必须处理完好友请求，故不会出现send-target即是APPLY也是REPLY的情况
+                with open('add_friend.ini', 'w') as configfile:
+                    config.write(configfile)
+
+
+    def system_code(self, pack, conn):
+        """
+        处理该用户收到的的系统信息
+        :param pack:
+        :param conn: 该用户对应的socket接口
+        :return:
+        """
+        if pack['system_code'] == 'ADD FRIEND':
+            config = configparser.ConfigParser()
+            file = config.read('add_friend.ini')
+            config_dict = config.defaults()
+            send_id = pack['send_id']
+            target_id = pack['target_id']
+            key_name = send_id + '-' + target_id
+            text = pack['text']
+            if key_name in config_dict:
+                # 重复发送好友请求
+                repeat_apply_package = {
+                    'time': get_localtime(),
+                    'message': '您向此用户发送过好友请求，请耐心等待他予以回复',
+                    'system_code': 'REPEAT FRIEND APPLY'}
+                send_package(conn, repeat_apply_package)
+            else:
+                # 发送好友请求的正常情况
+                if target_id in self._user2conn:
+                    # 当前好友请求目标用户在线
+                    friend_apply_package = {
+                        'send_id': send_id,
+                        'time': get_localtime(),
+                        'message': text,
+                        'system_code': 'FRIEND APPLY'}
+                    send_package(self._user2conn[target_id], friend_apply_package)
+                else:
+                    # 当前好友请求目标用户不在线
+                    dict_value = {'APPLY': text}
+                    config_dict[key_name] = dict_value
+                    # 添加好友请求键值对：'发送-目标'--请求信息[类型：内容]
+                    with open('add_friend.ini', 'w') as configfile:
+                        config.write(configfile)
+
+        if pack['system_code'] == 'RESULT ADD FRIEND':
+            config = configparser.ConfigParser()
+            file = config.read('add_friend.ini')
+            config_dict = config.defaults()
+            send_id = pack['send_id']
+            target_id = pack['target_id']
+            result = pack['result']
+            key_name = send_id + '-' + target_id
+            if target_id in self._user2conn:
+                # 当前好友请求发送用户在线
+                result_package = {
+                    'send_id': send_id,
+                    'target_id': target_id,
+                    'time': get_localtime(),
+                    'result': result,
+                    'system_code': 'RESULT ADD FRIEND'}
+                send_package(self._user2conn[target_id], result_package)
+            else:
+                # 当前好友请求发送用户不在线
+                dict_value = {'REPLY': result}
+                config_dict[key_name] = dict_value
+                # 添加好友请求回复键值对：'发送-目标'--好友请求结果[请求类型：内容]
+                with open('add_friend.ini', 'w') as configfile:
+                    config.write(configfile)
+
     def run(self):
         print(f"{get_localtime()}  Manager starts...")
         dispatcher = threading.Thread(target=self.dispatch_message)
@@ -107,7 +216,6 @@ class Manager(threading.Thread):
             handler = threading.Thread(target=self.handle_connect, args=(conn,))
             handler.setDaemon(True)
             handler.start()
-
 
 # class Dispatcher(threading.Thread):
 #     def __init__(self):
