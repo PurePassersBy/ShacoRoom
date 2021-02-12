@@ -8,6 +8,7 @@ from PyQt5.QtGui import QPalette, QBrush, QPixmap, QPainter, QIcon
 from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton
 
 
+
 class Ui_Dialog(object):
     def setupUi(self, Dialog):
         Dialog.setObjectName("Dialog")
@@ -284,7 +285,7 @@ class Biography(QMainWindow, Ui_Biography):
     def addFriend(self):
         # self.addApply = Dialog('UNDER CONSTRUCTION')
         # self.addApply.show()
-        self.addApply = FriendApply(self.self_id, self.target_id, self.server_conn)
+        self.addApply = SendFriendApply(self.self_id, self.target_id, self.server_conn)
         self.addApply.show()
 
     def eventFilter(self, obj, event):
@@ -372,7 +373,7 @@ class Ui_ApplyDialog(object):
         self.psLabel.setText(_translate("ApplyDialog", "需对方同意好友申请，才能成为好友"))
 
 
-class FriendApply(QMainWindow, Ui_ApplyDialog):
+class SendFriendApply(QMainWindow, Ui_ApplyDialog):
 
     def __init__(self, self_id, target_id, server_conn):
         """
@@ -380,7 +381,7 @@ class FriendApply(QMainWindow, Ui_ApplyDialog):
         :param
         :return:
         """
-        super(FriendApply, self).__init__()
+        super(SendFriendApply, self).__init__()
         self.setupUi(self)
         self.retranslateUi(self)
         self.self_id = self_id
@@ -405,3 +406,202 @@ class FriendApply(QMainWindow, Ui_ApplyDialog):
         self.server_conn.send(pack_str)
         self.close()
 
+class Ui_ApplyDialog(object):
+    def setupUi(self, ApplyDialog):
+        ApplyDialog.setObjectName("ApplyDialog")
+        ApplyDialog.resize(400, 300)
+        ApplyDialog.setMinimumSize(QtCore.QSize(400, 300))
+        ApplyDialog.setMaximumSize(QtCore.QSize(400, 300))
+        self.portraitLabel = QtWidgets.QLabel(ApplyDialog)
+        self.portraitLabel.setGeometry(QtCore.QRect(0, 10, 100, 100))
+        self.portraitLabel.setText("")
+        self.portraitLabel.setPixmap(QtGui.QPixmap("resources/pic/助手3.jpg"))
+        self.portraitLabel.setScaledContents(True)
+        self.portraitLabel.setObjectName("portraitLabel")
+        self.acceptButton = QtWidgets.QPushButton(ApplyDialog)
+        self.acceptButton.setGeometry(QtCore.QRect(40, 260, 93, 28))
+        self.acceptButton.setObjectName("acceptButton")
+        self.rejectButton = QtWidgets.QPushButton(ApplyDialog)
+        self.rejectButton.setGeometry(QtCore.QRect(280, 260, 93, 28))
+        self.rejectButton.setObjectName("rejectButton")
+        self.textLabel = QtWidgets.QLabel(ApplyDialog)
+        self.textLabel.setGeometry(QtCore.QRect(40, 120, 321, 121))
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Preferred)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.textLabel.sizePolicy().hasHeightForWidth())
+        self.textLabel.setSizePolicy(sizePolicy)
+        font = QtGui.QFont()
+        font.setPointSize(10)
+        font.setUnderline(False)
+        self.textLabel.setFont(font)
+        self.textLabel.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignTop)
+        self.textLabel.setWordWrap(True)
+        self.textLabel.setObjectName("textLabel")
+        self.nameLabel = QtWidgets.QLabel(ApplyDialog)
+        self.nameLabel.setGeometry(QtCore.QRect(120, 30, 221, 21))
+        font = QtGui.QFont()
+        font.setPointSize(15)
+        self.nameLabel.setFont(font)
+        self.nameLabel.setObjectName("nameLabel")
+
+        self.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint)  # 置顶
+        # 设置背景
+        self.backgroundLabel = QtWidgets.QLabel(ApplyDialog)
+        self.backgroundLabel.setGeometry(QtCore.QRect(0, 0, 400, 300))
+        self.backgroundLabel.setPixmap(QtGui.QPixmap("resources/pic/whiteBackground.jpg"))
+        self.backgroundLabel.setScaledContents(True)
+        self.backgroundLabel.lower()
+
+        self.retranslateUi(ApplyDialog)
+        QtCore.QMetaObject.connectSlotsByName(ApplyDialog)
+    def setQSS(self):
+        self.acceptButton.setFixedSize(20, 20)  # 设置接受按钮的大小
+        self.rejectButton.setFixedSize(20, 20)  # 设置拒绝按钮的大小
+        self.acceptButton.setStyleSheet(
+            '''QPushButton{background:#F76677;border-radius:5px;}QPushButton:hover{background:green;}''')
+        self.rejectButton.setStyleSheet(
+            '''QPushButton{background:#F76677;border-radius:5px;}QPushButton:hover{background:green;}''')
+
+
+        self.setWindowFlag(QtCore.Qt.FramelessWindowHint)  # 隐藏边框
+        self.setWindowOpacity(0.98)  # 设置窗口透明度
+        self.setAttribute(QtCore.Qt.WA_TranslucentBackground)  # 设置窗口背景透明
+
+    def retranslateUi(self, ApplyDialog):
+        _translate = QtCore.QCoreApplication.translate
+        ApplyDialog.setWindowTitle(_translate("ApplyDialog", "Dialog"))
+        self.acceptButton.setText(_translate("ApplyDialog", "接受"))
+        self.rejectButton.setText(_translate("ApplyDialog", "拒绝"))
+        self.textLabel.setText(_translate("ApplyDialog", "TextLabel"))
+        self.nameLabel.setText(_translate("ApplyDialog", "TextLabel"))
+
+class FriendApply(QMainWindow, Ui_ApplyDialog):
+    def __init__(self, self_id, send_id, send_name, message, PORTRAIT_PATH, server_conn):
+        """
+        处理好友请求的窗口
+        """
+        super(FriendApply, self).__init__()
+        self.setupUi(self)
+        self.retranslateUi(self)
+        self.self_id = self_id
+        self.send_id = send_id
+        self.message = message
+        self.send_name = send_name
+        self.server_conn = server_conn
+        img = QPixmap(PORTRAIT_PATH % self.target_id).scaled(100, 100)
+        self.portraitLabel.setPixmap(img)
+        self.textLabel.setText(self.message)
+        self.nameLabel.setText(self.send_name)
+        self.acceptButton.clicked.connect(self.accept)
+        self.rejectButton.clicked.connect(self.reject)
+
+    def accept(self):
+        pack = {
+            'system_code': 'RESULT ADD FRIEND',
+            'send_id': self.self_id,
+            'target_id': self.send_id,
+            'message': 'ACCEPT'
+        }
+        pack_str = pickle.dumps(pack)
+        self.server_conn.send(struct.pack('i', len(pack_str)))
+        self.server_conn.send(pack_str)
+        self.close()
+
+    def reject(self):
+        pack = {
+            'system_code': 'RESULT ADD FRIEND',
+            'send_id': self.self_id,
+            'target_id': self.send_id,
+            'message': 'REJECT'
+        }
+        pack_str = pickle.dumps(pack)
+        self.server_conn.send(struct.pack('i', len(pack_str)))
+        self.server_conn.send(pack_str)
+        self.close()
+
+
+class Ui_ApplyResultDialog(object):
+    def setupUi(self, ApplyResultDialog):
+        ApplyResultDialog.setObjectName("ApplyResultDialog")
+        ApplyResultDialog.resize(400, 300)
+        ApplyResultDialog.setMinimumSize(QtCore.QSize(400, 300))
+        ApplyResultDialog.setMaximumSize(QtCore.QSize(400, 300))
+        self.portraitLabel = QtWidgets.QLabel(ApplyResultDialog)
+        self.portraitLabel.setGeometry(QtCore.QRect(0, 10, 100, 100))
+        self.portraitLabel.setText("")
+        self.portraitLabel.setPixmap(QtGui.QPixmap("resources/pic/助手3.jpg"))
+        self.portraitLabel.setScaledContents(True)
+        self.portraitLabel.setObjectName("portraitLabel")
+        self.confirmButton = QtWidgets.QPushButton(ApplyResultDialog)
+        self.confirmButton.setGeometry(QtCore.QRect(180, 260, 93, 28))
+        self.confirmButton.setObjectName("confirmButton")
+        self.textLabel = QtWidgets.QLabel(ApplyResultDialog)
+        self.textLabel.setGeometry(QtCore.QRect(40, 120, 321, 121))
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Preferred)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.textLabel.sizePolicy().hasHeightForWidth())
+        self.textLabel.setSizePolicy(sizePolicy)
+        font = QtGui.QFont()
+        font.setPointSize(10)
+        font.setUnderline(False)
+        self.textLabel.setFont(font)
+        self.textLabel.setAlignment(QtCore.Qt.AlignLeading | QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop)
+        self.textLabel.setWordWrap(True)
+        self.textLabel.setObjectName("textLabel")
+        self.nameLabel = QtWidgets.QLabel(ApplyResultDialog)
+        self.nameLabel.setGeometry(QtCore.QRect(120, 30, 221, 21))
+        font = QtGui.QFont()
+        font.setPointSize(15)
+        self.nameLabel.setFont(font)
+        self.nameLabel.setObjectName("nameLabel")
+
+        self.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint)  # 置顶
+        # 设置背景
+        self.backgroundLabel = QtWidgets.QLabel(ApplyResultDialog)
+        self.backgroundLabel.setGeometry(QtCore.QRect(0, 0, 400, 300))
+        self.backgroundLabel.setPixmap(QtGui.QPixmap("resources/pic/whiteBackground.jpg"))
+        self.backgroundLabel.setScaledContents(True)
+        self.backgroundLabel.lower()
+
+        self.retranslateUi(ApplyResultDialog)
+        QtCore.QMetaObject.connectSlotsByName(ApplyResultDialog)
+
+    def setQSS(self):
+        self.confirmButton.setFixedSize(30, 20)  # 设置接受按钮的大小
+        self.confirmButton.setStyleSheet(
+            '''QPushButton{background:#F76677;border-radius:5px;}QPushButton:hover{background:green;}''')
+
+        self.setWindowFlag(QtCore.Qt.FramelessWindowHint)  # 隐藏边框
+        self.setWindowOpacity(0.98)  # 设置窗口透明度
+        self.setAttribute(QtCore.Qt.WA_TranslucentBackground)  # 设置窗口背景透明
+
+    def retranslateUi(self, ApplyDialog):
+        _translate = QtCore.QCoreApplication.translate
+        ApplyDialog.setWindowTitle(_translate("ApplyDialog", "Dialog"))
+        self.confirmButton.setText(_translate("ApplyDialog", "确定"))
+        self.textLabel.setText(_translate("ApplyDialog", "TextLabel"))
+        self.nameLabel.setText(_translate("ApplyDialog", "TextLabel"))
+
+
+class ResultFriendApply(QMainWindow, Ui_ApplyDialog):
+    def __init__(self, self_id, send_id, send_name, message, PORTRAIT_PATH, server_conn):
+        """
+        处理好友请求的窗口
+        """
+        super(ResultFriendApply, self).__init__()
+        self.setupUi(self)
+        self.retranslateUi(self)
+        self.self_id = self_id
+        self.send_id = send_id
+        self.send_name = send_name
+        self.server_conn = server_conn
+        img = QPixmap(PORTRAIT_PATH % self.target_id).scaled(100, 100)
+        self.portraitLabel.setPixmap(img)
+        self.nameLabel.setText(self.send_name)
+        self.confirmButton.clicked.connect(self.close)
+        if message == 'ACCEPT':
+            self.textLabel.setText(f'{send_name}接受了您的好友请求')
+        else:
+            self.textLabel.setText(f'{send_name}拒绝了您的好友请求')
