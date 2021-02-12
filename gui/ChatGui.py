@@ -18,6 +18,8 @@ from gui.SettingsGui import SettingsGui
 from gui.EmojiWindow import EmojiWindow
 from authentication.dialogGUI import Dialog
 from authentication.dialogGUI import Biography
+from authentication.dialogGUI import FriendApply
+from authentication.dialogGUI import ResultFriendApply
 
 SERVER_IP = '39.106.169.58'
 SERVER_ADDRESS = ('39.106.169.58', 3976)
@@ -135,7 +137,10 @@ class ChatGUI(QWidget, Ui_Form):
         self.dialog = None
         # 初始化个人简介页面
         self.biography = None
-
+        # 初始化好友请求
+        self.apply_friend_window = None
+        # 初始化好友请求结果
+        self.result_apply_friend_window = None
         self.emoji_window = EmojiWindow()
         self.emoji_window.connect_slot(self.insert_emoji)
 
@@ -190,33 +195,44 @@ class ChatGUI(QWidget, Ui_Form):
         self.label_username.setText(self.userName)
         self.graphicsView.setStyleSheet(f"border-image: url({self.portrait});")
 
-    def show_biography(self, user_id, x, y):
-        print(f"{user_id} {x} {y}")
-        self.biography = Biography(user_id, x, y, PORTRAIT_PATH, self.db_conn, TABLE_NAME, self.chatter)
+    def show_biography(self, target_id, x, y):
+        print(f"{target_id} {x} {y}")
+        self.biography = Biography(self.id, target_id, x, y, PORTRAIT_PATH, self.db_conn, TABLE_NAME, self.chatter)
         self.biography.show()
 
     def insert_emoji(self, emo):
         self.textEdit.append(emo)
 
-    def system_information(self, system_code):
-        if system_code == 'KICK OUT':
+    def system_information(self, pack):
+        if pack['system_code'] == 'KICK OUT':
             # 将close 与kickout 信号连接
             self.dialog = Dialog('KICK OUT')
             self.dialog.close_signal.connect(self.close)
             # 弹出提示框
             self.dialog.show()
-        if system_code == 'LOGIN REPEAT':
+        if pack['system_code'] == 'LOGIN REPEAT':
             # 弹出提示框
             self.dialog = Dialog('LOGIN REPEAT')
             self.dialog.show()
-
+        if pack['system_code'] == 'FRIEND APPLY':
+            # 好友请求
+            result = self.db_conn.search(['id', pack['send_id']])
+            self.apply_friend_window = FriendApply(self.id, pack['send_id'],result[0][1],
+                                                   pack['message'], PORTRAIT_PATH, self.chatter)
+            self.apply_friend_window.show()
+        if pack['system_cod'] == 'REUSLT FRIEND APPLY':
+            # 好友请求的结果
+            result = self.db_conn.search(['id', pack['send_id']])
+            self.result_apply_friend_window = ResultFriendApply(self.id, pack['send_id'], result[0][1],
+                                                   pack['message'], PORTRAIT_PATH, self.chatter)
+            self.result_apply_friend_window.show()
     def show_message(self, msg_pack):
         """
         展示信息
         :return:
         """
         if 'system_code' in msg_pack:
-            self.system_information(msg_pack['system_code'])
+            self.system_information(msg_pack)
         time_ = msg_pack['time']
         user_id = msg_pack['user_id']
         user_name = msg_pack['user_name']
