@@ -1,12 +1,15 @@
 # -*- coding: utf-8 -*-
 import pickle
 import struct
+import sys
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import Qt, QEvent
 from PyQt5.QtGui import QPalette, QBrush, QPixmap, QPainter, QIcon
 from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton
 
+sys.path.append('..')
+from authentication.constantName import *
 
 
 class Ui_Dialog(object):
@@ -114,10 +117,10 @@ class Dialog(QMainWindow, Ui_Dialog):
         if self.type == 'EDIT SUCCESS':
             self.label.setText(_translate("Dialog", "密码修改成功！"))
             self.label_2.setText(_translate("Dialog", "注意保管好密码哦"))
-        if self.type == 'LOGIN REPEAT':
+        if self.type == SYSTEM_CODE_LOGIN_REPEAT:
             self.label.setText(_translate("Dialog", "该账户已登录"))
             self.label_2.setText(_translate("Dialog", "如非本人登录，请修改密码"))
-        if self.type == 'KICK OUT':
+        if self.type == SYSTEM_CODE_KICK_OUT:
             self.label.setText(_translate("Dialog", "该账户已在另一客户端登录,您将被愉悦送走"))
             self.label_2.setText(_translate("Dialog", "如非本人操作，请修改密码"))
         if self.type == 'UNDER CONSTRUCTION':
@@ -396,7 +399,7 @@ class SendFriendApply(QMainWindow, Ui_SendApplyDialog):
         # self.dialog = Dialog('UNDER CONSTRUCTION')
         # self.dialog.show()
         pack = {
-            'system_code': 'ADD FRIEND',
+            'system_code': SYSTEM_CODE_FRIEND_APPLY,
             'send_id': self.self_id,
             'target_id': self.target_id,
             'message': self.textEdit.toPlainText()
@@ -481,29 +484,24 @@ class FriendApply(QMainWindow, Ui_ApplyDialog):
         """
         处理好友请求的窗口
         """
-        print('enter')
         super(FriendApply, self).__init__()
         self.setupUi(self)
         self.retranslateUi(self)
-        print('xxx')
         self.self_id = self_id
         self.send_id = send_id
         self.message = message
         self.send_name = send_name
         self.server_conn = server_conn
-        print('gggggg')
         img = QPixmap(PORTRAIT_PATH % self.send_id).scaled(100, 100)
         self.portraitLabel.setPixmap(img)
         self.textLabel.setText(self.message)
         self.nameLabel.setText(self.send_name)
-        print('???')
         self.acceptButton.clicked.connect(self.accept)
         self.rejectButton.clicked.connect(self.reject)
-        print('-----')
 
     def accept(self):
         pack = {
-            'system_code': 'RESULT ADD FRIEND',
+            'system_code': SYSTEM_CODE_RESULT_FRIEND_APPLY,
             'send_id': self.self_id,
             'target_id': self.send_id,
             'message': 'ACCEPT'
@@ -515,7 +513,7 @@ class FriendApply(QMainWindow, Ui_ApplyDialog):
 
     def reject(self):
         pack = {
-            'system_code': 'RESULT ADD FRIEND',
+            'system_code': SYSTEM_CODE_RESULT_FRIEND_APPLY,
             'send_id': self.self_id,
             'target_id': self.send_id,
             'message': 'REJECT'
