@@ -393,8 +393,8 @@ class SendFriendApply(QMainWindow, Ui_ApplyDialog):
         self.dialog = None
 
     def send(self):
-        self.dialog = Dialog('UNDER CONSTRUCTION')
-        self.dialog.show()
+        # self.dialog = Dialog('UNDER CONSTRUCTION')
+        # self.dialog.show()
         pack = {
             'system_code': 'ADD FRIEND',
             'send_id': self.self_id,
