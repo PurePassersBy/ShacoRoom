@@ -36,14 +36,14 @@ message_lock = threading.Lock()
 
 def split_message(msg):
     msg_list = []
-    size = 0;
+    size = 0
     now = ''
     for char in msg:
         size += 1 if ord(char) < 128 else UNI2ASC
         now += char
         if size > LINE_LENGTH:
             msg_list.append(now)
-            size = 0;
+            size = 0
             now = ''
     if len(now) > 0:
         msg_list.append(now)
@@ -226,9 +226,11 @@ class ChatGUI(QWidget, Ui_Form):
             self.apply_friend_window.show()
         if pack['system_code'] == SYSTEM_CODE_RESULT_FRIEND_APPLY:
             # 好友请求的结果
+            print('...')
             result = self.db_conn.search(TABLE_NAME, ['id', pack['send_id']])
             self.result_apply_friend_window = ResultFriendApply(self.id, pack['send_id'], result[0][1],
                                                                 pack['message'], PORTRAIT_PATH)
+            print('>>')
             self.result_apply_friend_window.show()
 
         if pack['system_code'] == SYSTEM_CODE_REPEAT_FRIEND_APPLY:

@@ -14,7 +14,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_Form(object):
     def setupUi(self, Form):
         Form.setObjectName("Form")
-        Form.resize(647, 757)
+        Form.resize(671, 753)
         Form.setStyleSheet("")
         self.gridLayout = QtWidgets.QGridLayout(Form)
         self.gridLayout.setObjectName("gridLayout")
@@ -80,8 +80,8 @@ class Ui_Form(object):
         self.verticalLayout.setSizeConstraint(QtWidgets.QLayout.SetDefaultConstraint)
         self.verticalLayout.setObjectName("verticalLayout")
         self.graphicsView = QtWidgets.QGraphicsView(Form)
-        self.graphicsView.setMinimumSize(QtCore.QSize(0, 0))
-        self.graphicsView.setMaximumSize(QtCore.QSize(16777215, 16777215))
+        self.graphicsView.setMinimumSize(QtCore.QSize(152, 192))
+        self.graphicsView.setMaximumSize(QtCore.QSize(152, 192))
         self.graphicsView.setStyleSheet("")
         self.graphicsView.setObjectName("graphicsView")
         self.verticalLayout.addWidget(self.graphicsView)
@@ -96,6 +96,8 @@ class Ui_Form(object):
         self.label_username.setObjectName("label_username")
         self.verticalLayout.addWidget(self.label_username)
         self.listWidget = QtWidgets.QListWidget(Form)
+        self.listWidget.setMinimumSize(QtCore.QSize(152, 450))
+        self.listWidget.setMaximumSize(QtCore.QSize(152, 16777215))
         self.listWidget.setObjectName("listWidget")
         self.verticalLayout.addWidget(self.listWidget)
         self.verticalLayout.setStretch(0, 4)
@@ -103,7 +105,7 @@ class Ui_Form(object):
         self.verticalLayout.setStretch(2, 10)
         self.gridLayout.addLayout(self.verticalLayout, 0, 1, 1, 1)
         self.gridLayout.setColumnStretch(0, 6)
-        self.gridLayout.setColumnStretch(1, 2)
+        self.gridLayout.setColumnStretch(1, 1)
 
         self.retranslateUi(Form)
         self.pushButton_2.clicked.connect(Form.user_setting)
