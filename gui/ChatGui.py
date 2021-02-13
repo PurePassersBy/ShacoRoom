@@ -219,7 +219,7 @@ class ChatGUI(QWidget, Ui_Form):
             self.dialog.show()
         if pack['system_code'] == 'FRIEND APPLY':
             # 好友请求
-            result = self.db_conn.search(['id', pack['send_id']])
+            result = self.db_conn.search(TABLE_NAME, ['id', pack['send_id']])
             self.apply_friend_window = FriendApply(self.id, pack['send_id'],result[0][1],
                                                    pack['message'], PORTRAIT_PATH, self.chatter)
             self.apply_friend_window.show()
