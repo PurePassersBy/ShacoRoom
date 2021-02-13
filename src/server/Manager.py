@@ -7,7 +7,7 @@ from time import strftime, localtime, sleep
 import threading
 from queue import Queue
 
-sys.append('..')
+sys.path.append('..')
 from authentication.constantName import *
 
 msg_queue = Queue()
