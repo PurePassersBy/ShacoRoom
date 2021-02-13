@@ -88,6 +88,7 @@ class Manager(threading.Thread):
                 msg_queue.put(pack)
             except Exception as e:
                 print(f'{get_localtime()}  {user_name} dirty shutdown : {e}')
+                print(f'Wrong pack:{pack}')
                 if self._user2conn[user_id] == conn:
                     del self._user2conn[user_id]
                 pack = {
@@ -139,7 +140,6 @@ class Manager(threading.Thread):
                 # 用户上线后必须处理完好友请求，故不会出现send-target即是APPLY也是REPLY的情况
                 with open('add_friend.ini', 'w') as configfile:
                     config.write(configfile)
-
 
     def system_code(self, pack, conn):
         """
