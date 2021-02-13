@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>740</width>
-    <height>780</height>
+    <width>781</width>
+    <height>819</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -140,19 +140,18 @@
       </layout>
      </item>
      <item>
-      <widget class="QListWidget" name="msg_list">
-       <property name="minimumSize">
-        <size>
-         <width>0</width>
-         <height>0</height>
-        </size>
+      <widget class="QTabWidget" name="tabWidget">
+       <property name="styleSheet">
+        <string notr="true"/>
        </property>
-       <property name="maximumSize">
-        <size>
-         <width>16777215</width>
-         <height>16777215</height>
-        </size>
+       <property name="currentIndex">
+        <number>0</number>
        </property>
+       <widget class="QWidget" name="shaco_tab">
+        <attribute name="title">
+         <string>Tab 1</string>
+        </attribute>
+       </widget>
       </widget>
      </item>
     </layout>

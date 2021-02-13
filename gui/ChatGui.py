@@ -148,6 +148,24 @@ class ChatGUI(QWidget, Ui_Form):
         self.emoji_window = EmojiWindow()
         self.emoji_window.connect_slot(self.insert_emoji)
 
+        self.tabWidget.tabBar().hide()
+        self.cur_tab = self.create_tab(True)
+        self.user2tab = {}
+
+    def create_tab(self, first=False):
+        layout = QHBoxLayout()
+        layout.setContentsMargins(0,0,0,0)
+        list_widget = QListWidget()
+        layout.addWidget(list_widget)
+        if first is not None:
+            self.shaco_tab.setLayout(layout)
+        else:
+            widget = QWidget()
+            widget.setLayout(layout)
+            self.tabWidget.addTab(widget)
+        return list_widget
+
+
     def _fetch_others_portrait(self, user_id):
         query = {
             'type': 'fetch',
@@ -288,9 +306,9 @@ class ChatGUI(QWidget, Ui_Form):
             layout_main.addLayout(layout_msg)
         widget.setLayout(layout_main)
 
-        self.msg_list.addItem(item)
-        self.msg_list.setItemWidget(item, widget)
-        self.msg_list.scrollToBottom()
+        self.cur_tab.addItem(item)
+        self.cur_tab.setItemWidget(item, widget)
+        self.cur_tab.scrollToBottom()
 
     def send_message(self):
         """

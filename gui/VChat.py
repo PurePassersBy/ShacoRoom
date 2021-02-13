@@ -14,7 +14,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_Form(object):
     def setupUi(self, Form):
         Form.setObjectName("Form")
-        Form.resize(740, 780)
+        Form.resize(781, 819)
         Form.setStyleSheet("")
         self.gridLayout = QtWidgets.QGridLayout(Form)
         self.gridLayout.setObjectName("gridLayout")
@@ -66,11 +66,13 @@ class Ui_Form(object):
         self.verticalLayout_2.addItem(spacerItem3)
         self.horizontalLayout_2.addLayout(self.verticalLayout_2)
         self.verticalLayout_3.addLayout(self.horizontalLayout_2)
-        self.msg_list = QtWidgets.QListWidget(Form)
-        self.msg_list.setMinimumSize(QtCore.QSize(0, 0))
-        self.msg_list.setMaximumSize(QtCore.QSize(16777215, 16777215))
-        self.msg_list.setObjectName("msg_list")
-        self.verticalLayout_3.addWidget(self.msg_list)
+        self.tabWidget = QtWidgets.QTabWidget(Form)
+        self.tabWidget.setStyleSheet("")
+        self.tabWidget.setObjectName("tabWidget")
+        self.shaco_tab = QtWidgets.QWidget()
+        self.shaco_tab.setObjectName("shaco_tab")
+        self.tabWidget.addTab(self.shaco_tab, "")
+        self.verticalLayout_3.addWidget(self.tabWidget)
         self.verticalLayout_3.setStretch(0, 1)
         self.verticalLayout_3.setStretch(1, 4)
         self.verticalLayout_3.setStretch(2, 1)
@@ -108,6 +110,7 @@ class Ui_Form(object):
         self.gridLayout.setColumnStretch(1, 1)
 
         self.retranslateUi(Form)
+        self.tabWidget.setCurrentIndex(0)
         self.pushButton_2.clicked.connect(Form.user_setting)
         self.emoji_button.clicked.connect(Form.send_emoji)
         self.pushButton.clicked.connect(Form.send_message)
@@ -120,5 +123,6 @@ class Ui_Form(object):
         Form.setWindowTitle(_translate("Form", "ShacoRoom"))
         self.pushButton_2.setText(_translate("Form", "设置"))
         self.pushButton.setText(_translate("Form", "发送"))
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.shaco_tab), _translate("Form", "Tab 1"))
         self.label_username.setText(_translate("Form", "TextLabel"))
 import resources_rc
