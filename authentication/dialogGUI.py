@@ -303,39 +303,39 @@ class Biography(QMainWindow, Ui_Biography):
         self.close()
 
 
-class Ui_ApplyDialog(object):
-    def setupUi(self, ApplyDialog):
-        ApplyDialog.setObjectName("ApplyDialog")
-        ApplyDialog.resize(400, 300)
-        self.buttonBox = QtWidgets.QDialogButtonBox(ApplyDialog)
+class Ui_SendApplyDialog(object):
+    def setupUi(self, SendApplyDialog):
+        SendApplyDialog.setObjectName("SendApplyDialog")
+        SendApplyDialog.resize(400, 300)
+        self.buttonBox = QtWidgets.QDialogButtonBox(SendApplyDialog)
         self.buttonBox.setGeometry(QtCore.QRect(200, 250, 191, 32))
         self.buttonBox.setOrientation(QtCore.Qt.Horizontal)
         self.buttonBox.setStandardButtons(QtWidgets.QDialogButtonBox.Cancel|QtWidgets.QDialogButtonBox.Ok)
         self.buttonBox.setObjectName("buttonBox")
-        self.titleLabel = QtWidgets.QLabel(ApplyDialog)
+        self.titleLabel = QtWidgets.QLabel(SendApplyDialog)
         self.titleLabel.setGeometry(QtCore.QRect(10, 10, 72, 15))
         self.titleLabel.setObjectName("titleLabel")
-        self.closeButton = QtWidgets.QPushButton(ApplyDialog)
+        self.closeButton = QtWidgets.QPushButton(SendApplyDialog)
         self.closeButton.setGeometry(QtCore.QRect(370, 0, 93, 28))
         self.closeButton.setObjectName("closeButton")
-        self.psLabel = QtWidgets.QLabel(ApplyDialog)
+        self.psLabel = QtWidgets.QLabel(SendApplyDialog)
         self.psLabel.setGeometry(QtCore.QRect(40, 230, 301, 16))
         self.psLabel.setObjectName("psLabel")
-        self.textEdit = QtWidgets.QTextEdit(ApplyDialog)
+        self.textEdit = QtWidgets.QTextEdit(SendApplyDialog)
         self.textEdit.setGeometry(QtCore.QRect(20, 70, 361, 151))
         self.textEdit.setObjectName("textEdit")
 
         self.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint)  # 置顶
         # 设置背景
-        self.backgroundLabel = QtWidgets.QLabel(ApplyDialog)
+        self.backgroundLabel = QtWidgets.QLabel(SendApplyDialog)
         self.backgroundLabel.setGeometry(QtCore.QRect(0, 0, 400, 300))
         self.backgroundLabel.setPixmap(QtGui.QPixmap("resources/pic/whiteBackground.jpg"))
         self.backgroundLabel.setScaledContents(True)
         self.backgroundLabel.lower()
 
         self.setQSS()
-        self.retranslateUi(ApplyDialog)
-        QtCore.QMetaObject.connectSlotsByName(ApplyDialog)
+        self.retranslateUi(SendApplyDialog)
+        QtCore.QMetaObject.connectSlotsByName(SendApplyDialog)
 
     def setQSS(self):
         self.closeButton.setFixedSize(20, 20)  # 设置关闭按钮的大小
@@ -365,15 +365,15 @@ class Ui_ApplyDialog(object):
         self.setWindowOpacity(0.95)  # 设置窗口透明度
         self.setAttribute(QtCore.Qt.WA_TranslucentBackground)  # 设置窗口背景透明
 
-    def retranslateUi(self, ApplyDialog):
+    def retranslateUi(self, SendApplyDialog):
         _translate = QtCore.QCoreApplication.translate
-        ApplyDialog.setWindowTitle(_translate("ApplyDialog", "Dialog"))
+        SendApplyDialog.setWindowTitle(_translate("ApplyDialog", "Dialog"))
         self.titleLabel.setText(_translate("ApplyDialog", "添加好友"))
         self.closeButton.setText(_translate("ApplyDialog", " "))
         self.psLabel.setText(_translate("ApplyDialog", "需对方同意好友申请，才能成为好友"))
 
 
-class SendFriendApply(QMainWindow, Ui_ApplyDialog):
+class SendFriendApply(QMainWindow, Ui_SendApplyDialog):
 
     def __init__(self, self_id, target_id, server_conn):
         """
