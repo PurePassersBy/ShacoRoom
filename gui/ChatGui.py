@@ -16,6 +16,7 @@ sys.path.append('..')
 from gui.VChat import Ui_Form
 from gui.SettingsGui import SettingsGui
 from gui.EmojiWindow import EmojiWindow
+from authentication.constantName import *
 from authentication.dialogGUI import Dialog
 from authentication.dialogGUI import Biography
 from authentication.dialogGUI import FriendApply
@@ -205,34 +206,30 @@ class ChatGUI(QWidget, Ui_Form):
         self.textEdit.insertPlainText(emo)
 
     def system_information(self, pack):
-        print('system_information')
-        if pack['system_code'] == 'KICK OUT':
+        if pack['system_code'] == SYSTEM_CODE_KICK_OUT:
             # 将close 与kickout 信号连接
-            self.dialog = Dialog('KICK OUT')
-            print('Kick out')
+            self.dialog = Dialog(SYSTEM_CODE_KICK_OUT)
             self.dialog.close_signal.connect(self.close)
             # 弹出提示框
             self.dialog.show()
-        if pack['system_code'] == 'LOGIN REPEAT':
+        if pack['system_code'] == SYSTEM_CODE_LOGIN_REPEAT:
             # 弹出提示框
-            self.dialog = Dialog('LOGIN REPEAT')
-            print('Login Repeat')
+            self.dialog = Dialog(SYSTEM_CODE_LOGIN_REPEAT)
             self.dialog.show()
-        if pack['system_code'] == 'FRIEND APPLY':
+        if pack['system_code'] == SYSTEM_CODE_FRIEND_APPLY:
             # 好友请求
             result = self.db_conn.search(TABLE_NAME, ['id', pack['send_id']])
-            print(type(self.id), type(pack['send_id']), self.id, pack['send_id'], result[0][1], pack['message'])
             self.apply_friend_window = FriendApply(self.id, pack['send_id'],result[0][1],
                                                    pack['message'], PORTRAIT_PATH, self.chatter)
-            print('--show')
             self.apply_friend_window.show()
-            print('xxxshow')
-        if pack['system_code'] == 'REUSLT FRIEND APPLY':
+        if pack['system_code'] == SYSTEM_CODE_RESULT_FRIEND_APPLY:
             # 好友请求的结果
             result = self.db_conn.search(TABLE_NAME, ['id', pack['send_id']])
             self.result_apply_friend_window = ResultFriendApply(self.id, pack['send_id'], result[0][1],
                                                    pack['message'], PORTRAIT_PATH, self.chatter)
             self.result_apply_friend_window.show()
+
+
 
     def show_message(self, msg_pack):
         """

@@ -2,9 +2,13 @@ import configparser
 import socket
 import struct
 import pickle
+import sys
 from time import strftime, localtime, sleep
 import threading
 from queue import Queue
+
+sys.append('..')
+from authentication.constantName import *
 
 msg_queue = Queue()
 SERVER_ADDRESS = ('0.0.0.0', 3976)
@@ -65,12 +69,12 @@ class Manager(threading.Thread):
                 'user_name': user_name,
                 'time': get_localtime(),
                 'message': '该账号在其他客户端登录，您已被强制下线',
-                'system_code': 'KICK OUT'}
+                'system_code': SYSTEM_CODE_KICK_OUT}
             send_package(self._user2conn[user_id], kickout_package)  # 发送下线请求给已存在的用户
             self._user2conn[user_id].close()  # 确认强制下线客户端收到信息后，断开该用户id对应的conn连接
             del self._user2conn[user_id]
             kickout_package['message'] = '该账号已登录，您已将之前登录的人挤下线'
-            kickout_package['system_code'] = 'LOGIN REPEAT'
+            kickout_package['system_code'] = SYSTEM_CODE_LOGIN_REPEAT
             send_package(conn, kickout_package)
         self._user2conn[user_id] = conn
         header['time'] = get_localtime()
@@ -126,7 +130,7 @@ class Manager(threading.Thread):
                         'send_id': send_id,
                         'time': get_localtime(),
                         'message': config_dict[key_name][1],
-                        'system_code': 'FRIEND APPLY'}
+                        'system_code': SYSTEM_CODE_FRIEND_APPLY}
                     send_package(self._user2conn[int(user_id)], friend_apply_package)
 
                 else:
@@ -136,7 +140,7 @@ class Manager(threading.Thread):
                         'send_id': send_id,
                         'time': get_localtime(),
                         'message': config_dict[key_name][1],
-                        'system_code': 'FRIEND APPLY RESULT'}
+                        'system_code': SYSTEM_CODE_RESULT_FRIEND_APPLY}
                     send_package(self._user2conn[int(user_id)], friend_reply_package)
 
                 # 删除服务器待处理好友请求中该用户的记录
@@ -153,7 +157,7 @@ class Manager(threading.Thread):
         :return:
         """
         print('Processing system code...')
-        if pack['system_code'] == 'ADD FRIEND':
+        if pack['system_code'] == SYSTEM_CODE_FRIEND_APPLY:
             config = configparser.ConfigParser()
             file = config.read('add_friend.ini')
             config_dict = config.defaults()
@@ -167,7 +171,7 @@ class Manager(threading.Thread):
                 repeat_apply_package = {
                     'time': get_localtime(),
                     'message': '您向此用户发送过好友请求，请耐心等待他予以回复',
-                    'system_code': 'REPEAT FRIEND APPLY'}
+                    'system_code': SYSTEM_CODE_REPEAT_FRIEND_APPLY}
                 send_package(conn, repeat_apply_package)
             else:
                 # 发送好友请求的正常情况
@@ -178,7 +182,7 @@ class Manager(threading.Thread):
                         'send_id': send_id,
                         'time': get_localtime(),
                         'message': text,
-                        'system_code': 'FRIEND APPLY'}
+                        'system_code': SYSTEM_CODE_FRIEND_APPLY}
                     send_package(self._user2conn[int(target_id)], friend_apply_package)
                 else:
                     # 当前好友请求目标用户不在线
@@ -189,7 +193,7 @@ class Manager(threading.Thread):
                     with open('add_friend.ini', 'w') as configfile:
                         config.write(configfile)
 
-        if pack['system_code'] == 'RESULT ADD FRIEND':
+        if pack['system_code'] == SYSTEM_CODE_RESULT_FRIEND_APPLY:
             config = configparser.ConfigParser()
             file = config.read('add_friend.ini')
             config_dict = config.defaults()
@@ -205,7 +209,7 @@ class Manager(threading.Thread):
                     'target_id': target_id,
                     'time': get_localtime(),
                     'result': result,
-                    'system_code': 'RESULT ADD FRIEND'}
+                    'system_code': SYSTEM_CODE_RESULT_FRIEND_APPLY}
                 send_package(self._user2conn[int(target_id)], result_package)
             else:
                 # 当前好友请求发送用户不在线
