@@ -149,8 +149,33 @@ class ChatGUI(QWidget, Ui_Form):
         self.emoji_window.connect_slot(self.insert_emoji)
 
         self.tabWidget.tabBar().hide()
-        self.cur_tab = self.create_tab(True)
+        self.create_tab(True)
         self.user2tab = {}
+        self.load_friends()
+
+    def load_friends(self):
+        # TODO
+        # 从数据库中加载已有的好友关系
+        pass
+
+    def add_friend(self, friend_id, friend_name):
+        print('add friend', friend_id, friend_name)
+        item = QListWidgetItem()
+        widget = QWidget()
+        layout = QHBoxLayout()
+        portrait_path = PORTRAIT_PATH % friend_id
+        img = QPixmap(portrait_path).scaled(30,30)
+        portrait = Portrait(friend_id)
+        portrait.connect_customized_slot(self._fetch_others_portrait)
+        portrait.connect_pos_slot(self.show_biography)
+        portrait.setPixmap(img)
+        layout.addWidget(portrait)
+        layout.addWidget(QLabel(friend_name))
+        layout.setStretch(3,7)
+        widget.setLayout(layout)
+        item.setSizeHint(QSize(150,55))
+        self.frineds_list.addItem(item)
+        self.frineds_list.setItemWidget(item, widget)
 
     def create_tab(self, first=False):
         layout = QHBoxLayout()
@@ -163,7 +188,7 @@ class ChatGUI(QWidget, Ui_Form):
             widget = QWidget()
             widget.setLayout(layout)
             self.tabWidget.addTab(widget)
-        return list_widget
+        self.cur_tab =  list_widget
 
 
     def _fetch_others_portrait(self, user_id):
@@ -244,12 +269,11 @@ class ChatGUI(QWidget, Ui_Form):
             self.apply_friend_window.show()
         if pack['system_code'] == SYSTEM_CODE_RESULT_FRIEND_APPLY:
             # 好友请求的结果
-            print('...')
             result = self.db_conn.search(TABLE_NAME, ['id', pack['send_id']])
             self.result_apply_friend_window = ResultFriendApply(self.id, pack['send_id'], result[0][1],
                                                                 pack['message'], PORTRAIT_PATH)
-            print('>>')
             self.result_apply_friend_window.show()
+            self.add_friend(pack['send_id'], result[0][1])
 
         if pack['system_code'] == SYSTEM_CODE_REPEAT_FRIEND_APPLY:
             result = self.db_conn.search(TABLE_NAME, ['id', pack['send_id']])
