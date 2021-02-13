@@ -591,7 +591,7 @@ class Ui_ApplyResultDialog(object):
 
 
 class ResultFriendApply(QMainWindow, Ui_ApplyDialog):
-    def __init__(self, self_id, send_id, send_name, message, PORTRAIT_PATH, server_conn):
+    def __init__(self, self_id, send_id, send_name, message, PORTRAIT_PATH):
         """
         处理好友请求的窗口
         """
@@ -601,7 +601,6 @@ class ResultFriendApply(QMainWindow, Ui_ApplyDialog):
         self.self_id = self_id
         self.send_id = send_id
         self.send_name = send_name
-        self.server_conn = server_conn
         img = QPixmap(PORTRAIT_PATH % self.send_id).scaled(100, 100)
         self.portraitLabel.setPixmap(img)
         self.nameLabel.setText(self.send_name)

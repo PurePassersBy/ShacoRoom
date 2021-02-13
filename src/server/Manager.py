@@ -170,6 +170,7 @@ class Manager(threading.Thread):
                 print(f'send repeat friend apply information to sender:{send_id}')
                 repeat_apply_package = {
                     'time': get_localtime(),
+                    'send_id': send_id,
                     'message': '您向此用户发送过好友请求，请耐心等待他予以回复',
                     'system_code': SYSTEM_CODE_REPEAT_FRIEND_APPLY}
                 send_package(conn, repeat_apply_package)

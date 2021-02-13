@@ -36,13 +36,15 @@ message_lock = threading.Lock()
 
 def split_message(msg):
     msg_list = []
-    size = 0; now = ''
+    size = 0;
+    now = ''
     for char in msg:
-        size += 1 if ord(char)<128 else UNI2ASC
+        size += 1 if ord(char) < 128 else UNI2ASC
         now += char
         if size > LINE_LENGTH:
             msg_list.append(now)
-            size = 0; now = ''
+            size = 0;
+            now = ''
     if len(now) > 0:
         msg_list.append(now)
     return msg_list
@@ -115,7 +117,7 @@ class ChatGUI(QWidget, Ui_Form):
         icon.addPixmap(QPixmap("../gui/resource/shaco_logo.jpg"), QIcon.Normal, QIcon.Off)
         self.setWindowIcon(icon)
         self.emoji_button.setIcon(QIcon("../gui/resource/button/emoji_button.png"))
-        self.emoji_button.setIconSize(QSize(39,28))
+        self.emoji_button.setIconSize(QSize(39, 28))
         self.image_button.setIcon(QIcon("../gui/resource/button/image_button.png"))
         self.image_button.setIconSize(QSize(39, 28))
         self.file_button.setIcon(QIcon("../gui/resource/button/file_button.png"))
@@ -219,17 +221,21 @@ class ChatGUI(QWidget, Ui_Form):
         if pack['system_code'] == SYSTEM_CODE_FRIEND_APPLY:
             # 好友请求
             result = self.db_conn.search(TABLE_NAME, ['id', pack['send_id']])
-            self.apply_friend_window = FriendApply(self.id, pack['send_id'],result[0][1],
+            self.apply_friend_window = FriendApply(self.id, pack['send_id'], result[0][1],
                                                    pack['message'], PORTRAIT_PATH, self.chatter)
             self.apply_friend_window.show()
         if pack['system_code'] == SYSTEM_CODE_RESULT_FRIEND_APPLY:
             # 好友请求的结果
             result = self.db_conn.search(TABLE_NAME, ['id', pack['send_id']])
             self.result_apply_friend_window = ResultFriendApply(self.id, pack['send_id'], result[0][1],
-                                                   pack['message'], PORTRAIT_PATH, self.chatter)
+                                                                pack['message'], PORTRAIT_PATH)
             self.result_apply_friend_window.show()
 
-
+        if pack['system_code'] == SYSTEM_CODE_REPEAT_FRIEND_APPLY:
+            result = self.db_conn.search(TABLE_NAME, ['id', pack['send_id']])
+            self.result_apply_friend_window = ResultFriendApply(self.id, pack['send_id'], result[0][1],
+                                                                pack['message'], PORTRAIT_PATH)
+            self.result_apply_friend_window.show()
 
     def show_message(self, msg_pack):
         """
@@ -260,9 +266,9 @@ class ChatGUI(QWidget, Ui_Form):
             shape = msg_pack['shape']
             image_np = np.frombuffer(msg_pack['image'], dtype='uint8').reshape(shape)
             image = Image.fromarray(image_np).convert('RGB')
-            pixmap = image.toqpixmap().scaled(200,200)
+            pixmap = image.toqpixmap().scaled(200, 200)
             image_label = QLabel()
-            image_label.setFixedSize(400,200)
+            image_label.setFixedSize(400, 200)
             image_label.setPixmap(pixmap)
             layout_msg.addWidget(image_label)
             item.setSizeHint(QSize(400, 250))
@@ -279,7 +285,6 @@ class ChatGUI(QWidget, Ui_Form):
             layout_main.addWidget(portrait)
             layout_main.addLayout(layout_msg)
         widget.setLayout(layout_main)
-
 
         self.msg_list.addItem(item)
         self.msg_list.setItemWidget(item, widget)
@@ -365,7 +370,7 @@ class ChatGUI(QWidget, Ui_Form):
 
     def send_emoji(self):
         pos = self.emoji_button.mapToGlobal(self.emoji_button.pos())
-        self.emoji_window.move(pos.x(), pos.y()-200)
+        self.emoji_window.move(pos.x(), pos.y() - 200)
         self.emoji_window.show()
 
     def send_image(self):
@@ -384,7 +389,6 @@ class ChatGUI(QWidget, Ui_Form):
         message_lock.acquire()
         send_package(self.chatter, pack)
         message_lock.release()
-
 
     def send_file(self):
         self.send_emoji()
