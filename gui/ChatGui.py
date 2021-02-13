@@ -221,10 +221,12 @@ class ChatGUI(QWidget, Ui_Form):
         if pack['system_code'] == 'FRIEND APPLY':
             # 好友请求
             result = self.db_conn.search(TABLE_NAME, ['id', pack['send_id']])
-            print(self.id, pack['send_id'], result[0][1], pack['message'])
+            print(type(self.id), type(pack['send_id']), self.id, pack['send_id'], result[0][1], pack['message'])
             self.apply_friend_window = FriendApply(self.id, pack['send_id'],result[0][1],
                                                    pack['message'], PORTRAIT_PATH, self.chatter)
+            print('--show')
             self.apply_friend_window.show()
+            print('xxxshow')
         if pack['system_code'] == 'REUSLT FRIEND APPLY':
             # 好友请求的结果
             result = self.db_conn.search(TABLE_NAME, ['id', pack['send_id']])
@@ -239,6 +241,7 @@ class ChatGUI(QWidget, Ui_Form):
         """
         if 'system_code' in msg_pack:
             self.system_information(msg_pack)
+            return
         time_ = msg_pack['time']
         user_id = msg_pack['user_id']
         user_name = msg_pack['user_name']

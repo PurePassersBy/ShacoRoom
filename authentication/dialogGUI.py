@@ -481,20 +481,25 @@ class FriendApply(QMainWindow, Ui_ApplyDialog):
         """
         处理好友请求的窗口
         """
+        print('enter')
         super(FriendApply, self).__init__()
         self.setupUi(self)
         self.retranslateUi(self)
+        print('xxx')
         self.self_id = self_id
         self.send_id = send_id
         self.message = message
         self.send_name = send_name
         self.server_conn = server_conn
+        print('gggggg')
         img = QPixmap(PORTRAIT_PATH % self.send_id).scaled(100, 100)
         self.portraitLabel.setPixmap(img)
         self.textLabel.setText(self.message)
         self.nameLabel.setText(self.send_name)
+        print('???')
         self.acceptButton.clicked.connect(self.accept)
         self.rejectButton.clicked.connect(self.reject)
+        print('-----')
 
     def accept(self):
         pack = {
