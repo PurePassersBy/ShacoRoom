@@ -580,15 +580,15 @@ class Ui_ApplyResultDialog(object):
         self.setWindowOpacity(0.98)  # 设置窗口透明度
         self.setAttribute(QtCore.Qt.WA_TranslucentBackground)  # 设置窗口背景透明
 
-    def retranslateUi(self, ApplyDialog):
+    def retranslateUi(self, ApplyResultDialog):
         _translate = QtCore.QCoreApplication.translate
-        ApplyDialog.setWindowTitle(_translate("ApplyDialog", "Dialog"))
+        ApplyResultDialog.setWindowTitle(_translate("ApplyDialog", "Dialog"))
         self.confirmButton.setText(_translate("ApplyDialog", "确定"))
         self.textLabel.setText(_translate("ApplyDialog", "TextLabel"))
         self.nameLabel.setText(_translate("ApplyDialog", "TextLabel"))
 
 
-class ResultFriendApply(QMainWindow, Ui_ApplyDialog):
+class ResultFriendApply(QMainWindow, Ui_ApplyResultDialog):
     def __init__(self, self_id, send_id, send_name, message, PORTRAIT_PATH):
         """
         处理好友请求的窗口
