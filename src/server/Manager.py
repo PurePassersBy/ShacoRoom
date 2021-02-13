@@ -88,6 +88,7 @@ class Manager(threading.Thread):
                 msg_queue.put(pack)
             except Exception as e:
                 print(f'{get_localtime()}  {user_name} dirty shutdown : {e}')
+                print(f'Wrong pack:{pack}')
                 if self._user2conn[user_id] == conn:
                     del self._user2conn[user_id]
                 pack = {
@@ -110,7 +111,9 @@ class Manager(threading.Thread):
         config = configparser.ConfigParser()
         file = config.read('add_friend.ini')
         config_dict = config.defaults()
+        print('Checking apply to do...')
         for key_name in config_dict:
+            print('Spot friend apply ')
             split_key_name = key_name.split('-');
             send_id = split_key_name[0]
             target_id = split_key_name[1]
@@ -118,6 +121,7 @@ class Manager(threading.Thread):
                 # 该用户id有待处理的好友请求信息
                 if config_dict[key_name][0] == 'APPLY':
                     # 需处理好友请求
+                    print(f'Sending friend apply to {user_id}')
                     friend_apply_package = {
                         'send_id': send_id,
                         'time': get_localtime(),
@@ -127,6 +131,7 @@ class Manager(threading.Thread):
 
                 else:
                     # 需处理好友请求结果
+                    print(f'Sending result of friend apply to {user_id}')
                     friend_reply_package = {
                         'send_id': send_id,
                         'time': get_localtime(),
@@ -140,7 +145,6 @@ class Manager(threading.Thread):
                 with open('add_friend.ini', 'w') as configfile:
                     config.write(configfile)
 
-
     def system_code(self, pack, conn):
         """
         处理该用户收到的的系统信息
@@ -148,6 +152,7 @@ class Manager(threading.Thread):
         :param conn: 该用户对应的socket接口
         :return:
         """
+        print('Processing system code...')
         if pack['system_code'] == 'ADD FRIEND':
             config = configparser.ConfigParser()
             file = config.read('add_friend.ini')
@@ -158,6 +163,7 @@ class Manager(threading.Thread):
             text = pack['message']
             if key_name in config_dict:
                 # 重复发送好友请求
+                print(f'send repeat friend apply information to sender:{send_id}')
                 repeat_apply_package = {
                     'time': get_localtime(),
                     'message': '您向此用户发送过好友请求，请耐心等待他予以回复',
@@ -167,6 +173,7 @@ class Manager(threading.Thread):
                 # 发送好友请求的正常情况
                 if target_id in self._user2conn:
                     # 当前好友请求目标用户在线
+                    print(f'send  friend apply information to target:{target_id}')
                     friend_apply_package = {
                         'send_id': send_id,
                         'time': get_localtime(),
@@ -175,6 +182,7 @@ class Manager(threading.Thread):
                     send_package(self._user2conn[target_id], friend_apply_package)
                 else:
                     # 当前好友请求目标用户不在线
+                    print(f'write {send_id}-{target_id}:[APPLY]{text} into add_friend.ini')
                     dict_value = {'APPLY': text}
                     config_dict[key_name] = dict_value
                     # 添加好友请求键值对：'发送-目标'--请求信息[类型：内容]
@@ -191,6 +199,7 @@ class Manager(threading.Thread):
             key_name = send_id + '-' + target_id
             if target_id in self._user2conn:
                 # 当前好友请求发送用户在线
+                print(f'send result of friend apply information to target:{target_id}')
                 result_package = {
                     'send_id': send_id,
                     'target_id': target_id,
@@ -200,6 +209,7 @@ class Manager(threading.Thread):
                 send_package(self._user2conn[target_id], result_package)
             else:
                 # 当前好友请求发送用户不在线
+                print(f'write {send_id}-{target_id}:[REPLY]{result} into add_friend.ini')
                 dict_value = {'REPLY': result}
                 config_dict[key_name] = dict_value
                 # 添加好友请求回复键值对：'发送-目标'--好友请求结果[请求类型：内容]
