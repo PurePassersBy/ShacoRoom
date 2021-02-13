@@ -96,6 +96,7 @@ class ReceiveMessageThread(QThread):
         while True:
             try:
                 pack = fetch_package(self.chatter)
+                print(pack)
                 self.msg_pack.emit(pack)
                 sleep(0.1)
             except Exception as e:
@@ -220,12 +221,13 @@ class ChatGUI(QWidget, Ui_Form):
         if pack['system_code'] == 'FRIEND APPLY':
             # 好友请求
             result = self.db_conn.search(TABLE_NAME, ['id', pack['send_id']])
+            print(self.id, pack['send_id'], result[0][1], pack['message'])
             self.apply_friend_window = FriendApply(self.id, pack['send_id'],result[0][1],
                                                    pack['message'], PORTRAIT_PATH, self.chatter)
             self.apply_friend_window.show()
         if pack['system_code'] == 'REUSLT FRIEND APPLY':
             # 好友请求的结果
-            result = self.db_conn.search(['id', pack['send_id']])
+            result = self.db_conn.search(TABLE_NAME, ['id', pack['send_id']])
             self.result_apply_friend_window = ResultFriendApply(self.id, pack['send_id'], result[0][1],
                                                    pack['message'], PORTRAIT_PATH, self.chatter)
             self.result_apply_friend_window.show()
