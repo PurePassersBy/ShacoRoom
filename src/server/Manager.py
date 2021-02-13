@@ -200,7 +200,7 @@ class Manager(threading.Thread):
             config_dict = config.defaults()
             send_id = pack['send_id']
             target_id = pack['target_id']
-            result = pack['message']
+            message = pack['message']
             key_name = str(send_id) + '-' + str(target_id)
             if target_id in self._user2conn:
                 # 当前好友请求发送用户在线
@@ -209,13 +209,13 @@ class Manager(threading.Thread):
                     'send_id': send_id,
                     'target_id': target_id,
                     'time': get_localtime(),
-                    'result': result,
+                    'message': message,
                     'system_code': SYSTEM_CODE_RESULT_FRIEND_APPLY}
                 send_package(self._user2conn[int(target_id)], result_package)
             else:
                 # 当前好友请求发送用户不在线
-                print(f'write {send_id}-{target_id}:[REPLY]{result} into add_friend.ini')
-                dict_value = {'REPLY': result}
+                print(f'write {send_id}-{target_id}:[REPLY]{message} into add_friend.ini')
+                dict_value = {'REPLY': message}
                 config_dict[key_name] = dict_value
                 # 添加好友请求回复键值对：'发送-目标'--好友请求结果[请求类型：内容]
                 with open('add_friend.ini', 'w') as configfile:
