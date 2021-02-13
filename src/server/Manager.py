@@ -127,7 +127,7 @@ class Manager(threading.Thread):
                         'time': get_localtime(),
                         'message': config_dict[key_name][1],
                         'system_code': 'FRIEND APPLY'}
-                    send_package(self._user2conn[user_id], friend_apply_package)
+                    send_package(self._user2conn[int(user_id)], friend_apply_package)
 
                 else:
                     # 需处理好友请求结果
@@ -137,7 +137,7 @@ class Manager(threading.Thread):
                         'time': get_localtime(),
                         'message': config_dict[key_name][1],
                         'system_code': 'FRIEND APPLY RESULT'}
-                    send_package(self._user2conn[user_id], friend_reply_package)
+                    send_package(self._user2conn[int(user_id)], friend_reply_package)
 
                 # 删除服务器待处理好友请求中该用户的记录
                 del config_dict[key_name]
@@ -159,7 +159,7 @@ class Manager(threading.Thread):
             config_dict = config.defaults()
             send_id = pack['send_id']
             target_id = pack['target_id']
-            key_name = send_id + '-' + target_id
+            key_name = str(send_id) + '-' + str(target_id)
             text = pack['message']
             if key_name in config_dict:
                 # 重复发送好友请求
@@ -171,7 +171,7 @@ class Manager(threading.Thread):
                 send_package(conn, repeat_apply_package)
             else:
                 # 发送好友请求的正常情况
-                if target_id in self._user2conn:
+                if int(target_id) in self._user2conn:
                     # 当前好友请求目标用户在线
                     print(f'send  friend apply information to target:{target_id}')
                     friend_apply_package = {
@@ -179,7 +179,7 @@ class Manager(threading.Thread):
                         'time': get_localtime(),
                         'message': text,
                         'system_code': 'FRIEND APPLY'}
-                    send_package(self._user2conn[target_id], friend_apply_package)
+                    send_package(self._user2conn[int(target_id)], friend_apply_package)
                 else:
                     # 当前好友请求目标用户不在线
                     print(f'write {send_id}-{target_id}:[APPLY]{text} into add_friend.ini')
@@ -196,7 +196,7 @@ class Manager(threading.Thread):
             send_id = pack['send_id']
             target_id = pack['target_id']
             result = pack['message']
-            key_name = send_id + '-' + target_id
+            key_name = str(send_id) + '-' + str(target_id)
             if target_id in self._user2conn:
                 # 当前好友请求发送用户在线
                 print(f'send result of friend apply information to target:{target_id}')
@@ -206,7 +206,7 @@ class Manager(threading.Thread):
                     'time': get_localtime(),
                     'result': result,
                     'system_code': 'RESULT ADD FRIEND'}
-                send_package(self._user2conn[target_id], result_package)
+                send_package(self._user2conn[int(target_id)], result_package)
             else:
                 # 当前好友请求发送用户不在线
                 print(f'write {send_id}-{target_id}:[REPLY]{result} into add_friend.ini')
