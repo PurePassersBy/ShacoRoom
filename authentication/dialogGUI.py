@@ -370,7 +370,7 @@ class Ui_SendApplyDialog(object):
 
     def retranslateUi(self, SendApplyDialog):
         _translate = QtCore.QCoreApplication.translate
-        SendApplyDialog.setWindowTitle(_translate("ApplyDialog", "Dialog"))
+        SendApplyDialog.setWindowTitle(_translate("ApplyDialog", "添加好友"))
         self.titleLabel.setText(_translate("ApplyDialog", "添加好友"))
         self.closeButton.setText(_translate("ApplyDialog", " "))
         self.psLabel.setText(_translate("ApplyDialog", "需对方同意好友申请，才能成为好友"))
@@ -415,6 +415,9 @@ class Ui_ApplyDialog(object):
         ApplyDialog.resize(400, 300)
         ApplyDialog.setMinimumSize(QtCore.QSize(400, 300))
         ApplyDialog.setMaximumSize(QtCore.QSize(400, 300))
+        icon = QIcon()
+        icon.addPixmap(QPixmap("../gui/resource/shaco_logo.jpg"), QIcon.Normal, QIcon.Off)
+        self.setWindowIcon(icon)
         self.portraitLabel = QtWidgets.QLabel(ApplyDialog)
         self.portraitLabel.setGeometry(QtCore.QRect(0, 10, 100, 100))
         self.portraitLabel.setText("")
@@ -473,7 +476,7 @@ class Ui_ApplyDialog(object):
 
     def retranslateUi(self, ApplyDialog):
         _translate = QtCore.QCoreApplication.translate
-        ApplyDialog.setWindowTitle(_translate("ApplyDialog", "Dialog"))
+        ApplyDialog.setWindowTitle(_translate("ApplyDialog", "好友申请"))
         self.acceptButton.setText(_translate("ApplyDialog", "接受"))
         self.rejectButton.setText(_translate("ApplyDialog", "拒绝"))
         self.textLabel.setText(_translate("ApplyDialog", "TextLabel"))
@@ -530,6 +533,9 @@ class Ui_ApplyResultDialog(object):
         ApplyResultDialog.resize(400, 300)
         ApplyResultDialog.setMinimumSize(QtCore.QSize(400, 300))
         ApplyResultDialog.setMaximumSize(QtCore.QSize(400, 300))
+        icon = QIcon()
+        icon.addPixmap(QPixmap("../gui/resource/shaco_logo.jpg"), QIcon.Normal, QIcon.Off)
+        self.setWindowIcon(icon)
         self.portraitLabel = QtWidgets.QLabel(ApplyResultDialog)
         self.portraitLabel.setGeometry(QtCore.QRect(0, 10, 100, 100))
         self.portraitLabel.setText("")
@@ -582,7 +588,7 @@ class Ui_ApplyResultDialog(object):
 
     def retranslateUi(self, ApplyResultDialog):
         _translate = QtCore.QCoreApplication.translate
-        ApplyResultDialog.setWindowTitle(_translate("ApplyDialog", "Dialog"))
+        ApplyResultDialog.setWindowTitle(_translate("ApplyDialog", "好友申请结果"))
         self.confirmButton.setText(_translate("ApplyDialog", "确定"))
         self.textLabel.setText(_translate("ApplyDialog", "TextLabel"))
         self.nameLabel.setText(_translate("ApplyDialog", "TextLabel"))
