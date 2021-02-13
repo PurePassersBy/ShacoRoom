@@ -399,7 +399,7 @@ class SendFriendApply(QMainWindow, Ui_ApplyDialog):
             'system_code': 'ADD FRIEND',
             'send_id': self.self_id,
             'target_id': self.target_id,
-            'text': self.textEdit.toPlainText()
+            'message': self.textEdit.toPlainText()
         }
         pack_str = pickle.dumps(pack)
         self.server_conn.send(struct.pack('i', len(pack_str)))
