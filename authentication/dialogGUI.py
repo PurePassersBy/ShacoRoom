@@ -148,12 +148,13 @@ class Ui_Biography(object):
         Biography.setAnimated(True)
         Biography.setDocumentMode(False)
         Biography.setTabShape(QtWidgets.QTabWidget.Rounded)
-        # 设置成无边框
-        self.setWindowFlags(Qt.FramelessWindowHint)
         self.centralwidget = QtWidgets.QWidget(Biography)
         self.centralwidget.setObjectName("centralwidget")
+        self.deleteButton = QtWidgets.QPushButton(self.centralwidget)
+        self.deleteButton.setGeometry(QtCore.QRect(230, 160, 70, 28))
+        self.deleteButton.setObjectName("deleteButton")
         self.addButton = QtWidgets.QPushButton(self.centralwidget)
-        self.addButton.setGeometry(QtCore.QRect(270, 160, 93, 28))
+        self.addButton.setGeometry(QtCore.QRect(320, 160, 70, 25))
         self.addButton.setObjectName("addButton")
         self.portraitLabel = QtWidgets.QLabel(self.centralwidget)
         self.portraitLabel.setGeometry(QtCore.QRect(240, 10, 141, 141))
@@ -215,13 +216,54 @@ class Ui_Biography(object):
         self.line_5.setFrameShadow(QtWidgets.QFrame.Sunken)
         self.line_5.setObjectName("line_5")
 
+        self.setQSS()
         self.retranslateUi(Biography)
         QtCore.QMetaObject.connectSlotsByName(Biography)
+
+    def setQSS(self):
+        button_qss = '''     QPushButton{
+                                     border:2px solid #F3F3F5;
+                                     color:green;
+                                     font-size:12px;
+                                     height:40px;
+                                     padding-left:5px;
+                                     padding-right:10px;
+                                     background:LightGray;
+                                     }
+                                               QPushButton:hover{
+                                     color:cyan;
+                                     border:2px solid #F3F3F5;
+                                     border-radius:10px;
+                                     background:Gray;
+                                     } '''
+        deletebutton_qss = '''     QPushButton{
+                                     border:2px solid #F3F3F5;
+                                     color:red;
+                                     font-size:12px;
+                                     height:40px;
+                                     padding-left:5px;
+                                     padding-right:10px;
+                                     background:LightGray;
+                                     }
+                                               QPushButton:hover{
+                                     color:orange;
+                                     border:2px solid #F3F3F5;
+                                     border-radius:10px;
+                                     background:Gray;
+                                     } '''
+        self.addButton.setStyleSheet(button_qss)
+        self.deleteButton.setStyleSheet(button_qss)
+        self.deleteButton.setStyleSheet(deletebutton_qss)
+
+        self.setWindowFlag(QtCore.Qt.FramelessWindowHint)  # 隐藏边框
+        self.setWindowOpacity(0.95)  # 设置窗口透明度
+        self.setAttribute(QtCore.Qt.WA_TranslucentBackground)  # 设置窗口背景透明
 
     def retranslateUi(self, Biography):
         _translate = QtCore.QCoreApplication.translate
         Biography.setWindowTitle(_translate("Biography", "MainWindow"))
         self.addButton.setText(_translate("Biography", "添加好友"))
+        self.deleteButton.setText(_translate("Biography", "删除好友"))
         self.nameLabel.setText(_translate("Biography", "用户名："))
         self.animeLabel.setText(_translate("Biography", "喜欢的动漫："))
         self.bioLabel.setText(_translate("Biography", "个人介绍："))
@@ -234,7 +276,8 @@ class Ui_Biography(object):
 class Biography(QMainWindow, Ui_Biography):
     # pyqtSignal 要定义为一个类而不是属性，不能放到__init__里
     close_signal = QtCore.pyqtSignal()
-    def __init__(self, self_id, target_id, x, y, PORTRAIT_PATH, db_conn, table_name, server_conn, private_chat):
+
+    def __init__(self, self_id, self_name, target_id, x, y, db_conn, server_conn, private_chat):
         """
         注意close_signal 要在类成员函数外定义
         初始化CloseDialog类，将 确定 和 取消 按钮连接到self._close函数
@@ -246,17 +289,20 @@ class Biography(QMainWindow, Ui_Biography):
         self.retranslateUi(self)
         self.setGeometry(x, y, 400, 400)
         self.self_id = self_id
+        self.self_name = self_name
         self.target_id = target_id
         self.db_conn = db_conn
         self.server_conn = server_conn
         self.private_chat_func = private_chat
-        res = self.db_conn.search(table_name, ['id', self.target_id])
+        res = self.db_conn.search(TABLE_NAME_USERINFO, ['id', self.target_id])
         self.userinfo = res[0]
         self.friend_list = self.db_conn.search(TABLE_NAME_FRIENDINFO, ['id', self.self_id])
+        self.deleteButton.setVisible(False)
         # 判断是否为自己或已添加的好友
         self.flag = True
         if self.self_id == self.target_id:
             self.addButton.setVisible(False)
+
         else:
             for i in self.friend_list:
                 if i == self.target_id:
@@ -265,8 +311,10 @@ class Biography(QMainWindow, Ui_Biography):
             if self.flag is False:
                 self.addButton.setText('私聊')
                 self.addButton.clicked.connect(self.private_chat)
+                self.deleteButton.setVisible(True)
+                self.deleteButton.clicked.connect(self.delete_friend)
             if self.flag is True:
-                self.addButton.clicked.connect(self.addFriend)
+                self.addButton.clicked.connect(self.add_friend)
 
         self.portraitLabel.setText("")
         img = QPixmap(PORTRAIT_PATH % self.target_id).scaled(141, 141)
@@ -303,7 +351,19 @@ class Biography(QMainWindow, Ui_Biography):
     def private_chat(self):
         self.private_chat_func(self.target_id)
 
-    def addFriend(self):
+    def delete_friend(self):
+        pack = {
+            'send_id': self.self_id,
+            'send_name': self.self_name,
+            'target_id': self.target_id,
+            'message': f'您已被用户{self.self_name} 删除好友关系',
+            'system_code': SYSTEM_CODE_DELETE_FRIEND
+        }
+        pack_str = pickle.dumps(pack)
+        self.server_conn.send(struct.pack('i', len(pack_str)))
+        self.server_conn.send(pack_str)
+
+    def add_friend(self):
         # self.addApply = Dialog('UNDER CONSTRUCTION')
         # self.addApply.show()
         self.addApply = SendFriendApply(self.self_id, self.target_id, self.server_conn)
@@ -331,7 +391,7 @@ class Ui_SendApplyDialog(object):
         self.buttonBox = QtWidgets.QDialogButtonBox(SendApplyDialog)
         self.buttonBox.setGeometry(QtCore.QRect(200, 250, 191, 32))
         self.buttonBox.setOrientation(QtCore.Qt.Horizontal)
-        self.buttonBox.setStandardButtons(QtWidgets.QDialogButtonBox.Cancel|QtWidgets.QDialogButtonBox.Ok)
+        self.buttonBox.setStandardButtons(QtWidgets.QDialogButtonBox.Cancel | QtWidgets.QDialogButtonBox.Ok)
         self.buttonBox.setObjectName("buttonBox")
         self.titleLabel = QtWidgets.QLabel(SendApplyDialog)
         self.titleLabel.setGeometry(QtCore.QRect(10, 10, 72, 15))
@@ -427,6 +487,7 @@ class SendFriendApply(QMainWindow, Ui_SendApplyDialog):
         self.server_conn.send(pack_str)
         self.close()
 
+
 class Ui_ApplyDialog(object):
     def setupUi(self, ApplyDialog):
         ApplyDialog.setObjectName("ApplyDialog")
@@ -459,7 +520,7 @@ class Ui_ApplyDialog(object):
         font.setPointSize(10)
         font.setUnderline(False)
         self.textLabel.setFont(font)
-        self.textLabel.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignTop)
+        self.textLabel.setAlignment(QtCore.Qt.AlignLeading | QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop)
         self.textLabel.setWordWrap(True)
         self.textLabel.setObjectName("textLabel")
         self.nameLabel = QtWidgets.QLabel(ApplyDialog)
@@ -479,6 +540,7 @@ class Ui_ApplyDialog(object):
 
         self.retranslateUi(ApplyDialog)
         QtCore.QMetaObject.connectSlotsByName(ApplyDialog)
+
     def setQSS(self):
         self.acceptButton.setFixedSize(20, 20)  # 设置接受按钮的大小
         self.rejectButton.setFixedSize(20, 20)  # 设置拒绝按钮的大小
@@ -486,7 +548,6 @@ class Ui_ApplyDialog(object):
             '''QPushButton{background:#F76677;border-radius:5px;}QPushButton:hover{background:green;}''')
         self.rejectButton.setStyleSheet(
             '''QPushButton{background:#F76677;border-radius:5px;}QPushButton:hover{background:green;}''')
-
 
         self.setWindowFlag(QtCore.Qt.FramelessWindowHint)  # 隐藏边框
         self.setWindowOpacity(0.98)  # 设置窗口透明度
@@ -500,8 +561,10 @@ class Ui_ApplyDialog(object):
         self.textLabel.setText(_translate("ApplyDialog", "TextLabel"))
         self.nameLabel.setText(_translate("ApplyDialog", "TextLabel"))
 
+
 class FriendApply(QMainWindow, Ui_ApplyDialog):
     accept_signal = QtCore.pyqtSignal(int, str)
+
     def __init__(self, self_id, send_id, send_name, message, PORTRAIT_PATH, server_conn):
         """
         处理好友请求的窗口
@@ -631,5 +694,7 @@ class ResultFriendApply(QMainWindow, Ui_ApplyResultDialog):
         self.confirmButton.clicked.connect(self.close)
         if message == 'ACCEPT':
             self.textLabel.setText(f'{send_name}接受了您的好友请求')
-        else:
+        elif message == 'REJECT':
             self.textLabel.setText(f'{send_name}拒绝了您的好友请求')
+        else:
+            self.textLabel.setText(f'{send_name}解除了与您的好友关系')
