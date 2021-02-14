@@ -4,3 +4,4 @@ opencv-python==4.4.0.46
 PyAudio==0.2.11
 PyMySQL==1.0.2
 emoji==1.2.0
+numpy==1.14.5
