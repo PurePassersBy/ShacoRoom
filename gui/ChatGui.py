@@ -202,12 +202,16 @@ class ChatGUI(QWidget, Ui_Form):
         self.frineds_list.setItemWidget(item, widget)
 
     def switch_tab(self, user_id=None):
+        print('swith', user_id)
         if user_id is None:
             self.cur_tab = self.shaco_tab
+            self.tabWidget.setCurrentIndex(0)
         elif user_id not in self.user2tab:
             self.cur_tab = self.create_tab(user_id)
+            self.tabWidget.setCurrentIndex(self.user2tab[user_id][1])
         else:
-            self.cur_tab = self.user2tab[user_id]
+            self.cur_tab = self.user2tab[user_id][0]
+            self.tabWidget.setCurrentIndex(self.user2tab[user_id][1])
         self.cur_id = user_id
 
     def create_tab(self, user_id=None):
@@ -218,10 +222,13 @@ class ChatGUI(QWidget, Ui_Form):
         if user_id is None:
             self.shaco_tab.setLayout(layout)
         else:
+            print('enter create')
             widget = QWidget()
             widget.setLayout(layout)
-            self.tabWidget.addTab(widget)
-            self.user2tab[user_id] = list_widget
+            self.tabWidget.addTab(widget, '')
+            print(self.tabWidget.count())
+            self.user2tab[user_id] = (list_widget, self.tabWidget.count()-1)
+            print('create done', user_id)
         return list_widget
 
 
