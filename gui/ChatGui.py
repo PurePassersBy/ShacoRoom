@@ -69,45 +69,38 @@ def fetch_package(conn):
 
 
 class BiographyWidget(QWidget):
-    clicked_signal = pyqtSignal(int)
+    clicked_fetch_signal = pyqtSignal(int)
     clicked_pos_signal = pyqtSignal(int, int, int)
 
-    def __init__(self, user_id, parent=None):
+    def __init__(self, user_id, fetch_func, dialog_func, parent=None):
         super().__init__(parent)
         self.user_id = user_id
+        if self.user_id is not None:
+            self.clicked_fetch_signal.connect(fetch_func)
+            self.clicked_pos_signal.connect(dialog_func)
 
     def mousePressEvent(self, QMouseEvent):
         if self.user_id is None:
             return
-        self.clicked_signal.emit(self.user_id)
+        self.clicked_fetch_signal.emit(self.user_id)
         self.clicked_pos_signal.emit(self.user_id,
                                      QMouseEvent.globalPos().x(), QMouseEvent.globalPos().y())
-
-    def connect_pos_slot(self, func):
-        self.clicked_pos_signal.connect(func)
-
-    def connect_customized_slot(self, func):
-        self.clicked_signal.connect(func)
 
 
 class BiographyLabel(QLabel):
-    clicked_signal = pyqtSignal(int)
+    clicked_fetch_signal = pyqtSignal(int)
     clicked_pos_signal = pyqtSignal(int, int, int)
 
-    def __init__(self, user_id, parent=None):
+    def __init__(self, user_id, fetch_func, dialog_func, parent=None):
         super().__init__(parent)
         self.user_id = user_id
+        self.clicked_fetch_signal.connect(fetch_func)
+        self.clicked_pos_signal.connect(dialog_func)
 
     def mousePressEvent(self, QMouseEvent):
-        self.clicked_signal.emit(self.user_id)
+        self.clicked_fetch_signal.emit(self.user_id)
         self.clicked_pos_signal.emit(self.user_id,
                                      QMouseEvent.globalPos().x(), QMouseEvent.globalPos().y())
-
-    def connect_pos_slot(self, func):
-        self.clicked_pos_signal.connect(func)
-
-    def connect_customized_slot(self, func):
-        self.clicked_signal.connect(func)
 
 
 class ReceiveMessageThread(QThread):
@@ -186,14 +179,12 @@ class ChatGUI(QWidget, Ui_Form):
     def add_friend(self, friend_id=None, friend_name=None):
         print('add friend', friend_id, friend_name)
         item = QListWidgetItem()
-        widget = BiographyWidget(friend_id)
+        widget = BiographyWidget(friend_id, self._fetch_others_portrait, self.show_biography)
         layout = QHBoxLayout()
         if friend_id is None:
             friend_name = "ShacoRoom"
             img = QPixmap('resources/pic/shaco.jpg').scaled(30, 30)
         else:
-            widget.connect_customized_slot(self._fetch_others_portrait)
-            widget.connect_pos_slot(self.show_biography)
             portrait_path = PORTRAIT_PATH % friend_id
             img = QPixmap(portrait_path).scaled(30, 30)
         portrait = QLabel()
@@ -343,9 +334,7 @@ class ChatGUI(QWidget, Ui_Form):
         widget = QWidget()
         layout_main = QHBoxLayout()
         layout_msg = QVBoxLayout()
-        portrait = BiographyLabel(int(user_id))
-        portrait.connect_customized_slot(self._fetch_others_portrait)
-        portrait.connect_pos_slot(self.show_biography)
+        portrait = BiographyLabel(int(user_id), self._fetch_others_portrait, self.show_biography)
         portrait.setFixedSize(50, 50)
         img = QPixmap(PORTRAIT_PATH % user_id).scaled(50, 50)
         portrait.setPixmap(img)
