@@ -92,7 +92,6 @@ class Manager(threading.Thread):
                 msg_queue.put(pack)
             except Exception as e:
                 print(f'{get_localtime()}  {user_name} dirty shutdown : {e}')
-                print(f'Wrong pack:{pack}')
                 if self._user2conn[user_id] == conn:
                     del self._user2conn[user_id]
                 pack = {
