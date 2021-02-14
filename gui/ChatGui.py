@@ -178,6 +178,15 @@ class ChatGUI(QWidget, Ui_Form):
             friend_name = self.db_conn.search(TABLE_NAME_USERINFO, ['id', friend_id])[0][1]
             self.add_friend(friend_id, friend_name, new=False)
 
+    def delete_friend(self, friend_id):
+        for index in range(self.frineds_list.count()):
+            item = self.frineds_list.item(index)
+            widget = self.frineds_list.itemWidget(item)
+            if widget.user_id == friend_id:
+                self.frineds_list.takeItem(index)
+                del item
+                break
+
     def add_friend(self, friend_id=None, friend_name=None, new=True):
         print('add friend', friend_id, friend_name)
         if friend_id is not None and new is True:
@@ -284,7 +293,7 @@ class ChatGUI(QWidget, Ui_Form):
     def show_biography(self, target_id, x, y):
         print(f"{target_id} {x} {y}")
         self.biography = Biography(self.id, self.userName, target_id, x, y,
-                                   self.db_conn,  self.chatter, self.switch_tab)
+                                   self.db_conn,  self.chatter, self.switch_tab, self.delete_friend)
         self.biography.show()
 
     def insert_emoji(self, emo):
@@ -330,6 +339,7 @@ class ChatGUI(QWidget, Ui_Form):
                                                                 pack['message'], PORTRAIT_PATH)
             self.db_conn.delete(TABLE_NAME_FRIENDINFO, [pack['send_id'], self.id])
             self.db_conn.delete(TABLE_NAME_FRIENDINFO, [self.id, pack['send_id']])
+            self.delete_friend(pack['send_id'])
             self.result_apply_friend_window.show()
 
     def show_message(self, msg_pack):

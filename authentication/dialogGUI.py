@@ -277,7 +277,7 @@ class Biography(QMainWindow, Ui_Biography):
     # pyqtSignal 要定义为一个类而不是属性，不能放到__init__里
     close_signal = QtCore.pyqtSignal()
 
-    def __init__(self, self_id, self_name, target_id, x, y, db_conn, server_conn, private_chat):
+    def __init__(self, self_id, self_name, target_id, x, y, db_conn, server_conn, private_chat, delete_friend):
         """
         注意close_signal 要在类成员函数外定义
         初始化CloseDialog类，将 确定 和 取消 按钮连接到self._close函数
@@ -294,6 +294,7 @@ class Biography(QMainWindow, Ui_Biography):
         self.db_conn = db_conn
         self.server_conn = server_conn
         self.private_chat_func = private_chat
+        self.delete_friend_func = delete_friend
         res = self.db_conn.search(TABLE_NAME_USERINFO, ['id', self.target_id])
         self.userinfo = res[0]
         self.friend_list = self.db_conn.search(TABLE_NAME_FRIENDINFO, ['id', self.self_id])
@@ -356,12 +357,13 @@ class Biography(QMainWindow, Ui_Biography):
             'send_id': self.self_id,
             'send_name': self.self_name,
             'target_id': self.target_id,
-            'message': f'您已被用户{self.self_name} 删除好友关系',
+            'message': f'您已被用户 {self.self_name} 删除好友关系',
             'system_code': SYSTEM_CODE_DELETE_FRIEND
         }
         pack_str = pickle.dumps(pack)
         self.server_conn.send(struct.pack('i', len(pack_str)))
         self.server_conn.send(pack_str)
+        self.delete_friend_func(self.target_id)
 
     def add_friend(self):
         # self.addApply = Dialog('UNDER CONSTRUCTION')
