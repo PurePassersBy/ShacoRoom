@@ -172,6 +172,8 @@ class ChatGUI(QWidget, Ui_Form):
 
     def load_friends(self):
         friends = self.db_conn.search(TABLE_NAME_FRIENDINFO, ['id', self.id])
+        if friends is None:
+            return
         for friend_id in friends:
             friend_name = self.db_conn.search(TABLE_NAME_USERINFO, ['id', friend_id])[0][1]
             self.add_friend(friend_id, friend_name, new=False)
