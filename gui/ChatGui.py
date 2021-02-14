@@ -177,7 +177,8 @@ class ChatGUI(QWidget, Ui_Form):
 
     def add_friend(self, friend_id=None, friend_name=None):
         print('add friend', friend_id, friend_name)
-        self.db_conn.insert(TABLE_NAME_FRIENDINFO, [self.id, friend_id])
+        if friend_id is not None:
+            self.db_conn.insert(TABLE_NAME_FRIENDINFO, [self.id, friend_id])
         item = QListWidgetItem()
         widget = BiographyWidget(friend_id, self._fetch_others_portrait, self.show_biography)
         layout = QHBoxLayout()
