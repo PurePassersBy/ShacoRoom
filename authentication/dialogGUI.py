@@ -234,8 +234,7 @@ class Ui_Biography(object):
 class Biography(QMainWindow, Ui_Biography):
     # pyqtSignal 要定义为一个类而不是属性，不能放到__init__里
     close_signal = QtCore.pyqtSignal()
-
-    def __init__(self, self_id, target_id, x, y, PORTRAIT_PATH, db_conn, table_name, server_conn):
+    def __init__(self, self_id, target_id, x, y, PORTRAIT_PATH, db_conn, table_name, server_conn, private_chat):
         """
         注意close_signal 要在类成员函数外定义
         初始化CloseDialog类，将 确定 和 取消 按钮连接到self._close函数
@@ -250,21 +249,25 @@ class Biography(QMainWindow, Ui_Biography):
         self.target_id = target_id
         self.db_conn = db_conn
         self.server_conn = server_conn
+        self.private_chat_func = private_chat
         res = self.db_conn.search(table_name, ['id', self.target_id])
         self.userinfo = res[0]
         self.friend_list = self.db_conn.search(TABLE_NAME_FRIENDINFO, ['id', self.self_id])
         # 判断是否为自己或已添加的好友
         self.flag = True
         if self.self_id == self.target_id:
-            self.flag = False
+            self.addButton.setVisible(False)
         else:
             for i in self.friend_list:
                 if i == self.target_id:
                     self.flag = False
                     break
-        if self.flag is False:
-            self.addButton.setVisible(False)
-        self.addButton.clicked.connect(self.addFriend)
+            if self.flag is False:
+                self.addButton.setText('私聊')
+                self.addButton.clicked.connect(self.private_chat)
+            if self.flag is True:
+                self.addButton.clicked.connect(self.addFriend)
+
         self.portraitLabel.setText("")
         img = QPixmap(PORTRAIT_PATH % self.target_id).scaled(141, 141)
         self.portraitLabel.setPixmap(img)
@@ -296,6 +299,9 @@ class Biography(QMainWindow, Ui_Biography):
 
         # 设置用户头像
         pass
+
+    def private_chat(self):
+        self.private_chat_func(self.target_id)
 
     def addFriend(self):
         # self.addApply = Dialog('UNDER CONSTRUCTION')

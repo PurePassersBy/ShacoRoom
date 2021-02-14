@@ -276,7 +276,8 @@ class ChatGUI(QWidget, Ui_Form):
 
     def show_biography(self, target_id, x, y):
         print(f"{target_id} {x} {y}")
-        self.biography = Biography(self.id, target_id, x, y, PORTRAIT_PATH, self.db_conn, TABLE_NAME_USERINFO, self.chatter)
+        self.biography = Biography(self.id, target_id, x, y, PORTRAIT_PATH,
+                                   self.db_conn, TABLE_NAME_USERINFO, self.chatter, self.switch_tab)
         self.biography.show()
 
     def insert_emoji(self, emo):
