@@ -129,9 +129,9 @@ class Manager(threading.Thread):
             if target_id == user_id:
                 # 该用户id有待处理的好友请求信息
                 dict_temp = eval(config_dict[key_name])
-                cmd = dict_temp.keys()[0]
-                message = dict_temp.values[0]
-                print(dict_temp, cmd, message)
+                cmd = list(dict_temp.keys())[0]
+                message = list(dict_temp.values)[0]
+                print(dict_temp, cmd, message, type(dict_temp.keys()))
                 if cmd == 'APPLY':
                     # 需处理好友请求
                     print(f'Sending friend apply to {user_id}')
