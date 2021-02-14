@@ -483,6 +483,7 @@ class Ui_ApplyDialog(object):
         self.nameLabel.setText(_translate("ApplyDialog", "TextLabel"))
 
 class FriendApply(QMainWindow, Ui_ApplyDialog):
+    accept_signal = QtCore.pyqtSignal(int, str)
     def __init__(self, self_id, send_id, send_name, message, PORTRAIT_PATH, server_conn):
         """
         处理好友请求的窗口
@@ -512,6 +513,7 @@ class FriendApply(QMainWindow, Ui_ApplyDialog):
         pack_str = pickle.dumps(pack)
         self.server_conn.send(struct.pack('i', len(pack_str)))
         self.server_conn.send(pack_str)
+        self.accept_signal.emit(self.send_id, self.send_name)
         self.close()
 
     def reject(self):

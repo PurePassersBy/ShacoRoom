@@ -266,14 +266,23 @@ class ChatGUI(QWidget, Ui_Form):
             result = self.db_conn.search(TABLE_NAME, ['id', pack['send_id']])
             self.apply_friend_window = FriendApply(self.id, pack['send_id'], result[0][1],
                                                    pack['message'], PORTRAIT_PATH, self.chatter)
+            self.apple_friend_window.accept_signal.connect(self.add_friend)
+            # 被请求用户点击同意后，将对方加入到好友列表
+            # TODO
+            # 更新好友数据库
             self.apply_friend_window.show()
         if pack['system_code'] == SYSTEM_CODE_RESULT_FRIEND_APPLY:
             # 好友请求的结果
             result = self.db_conn.search(TABLE_NAME, ['id', pack['send_id']])
             self.result_apply_friend_window = ResultFriendApply(self.id, pack['send_id'], result[0][1],
                                                                 pack['message'], PORTRAIT_PATH)
+            if pack['message'] == 'ACCEPT':
+                # 目标用户同意好友请求
+                # TODO
+                # 更新好友数据库
+                self.add_friend(pack['send_id'], result[0][1])
             self.result_apply_friend_window.show()
-            self.add_friend(pack['send_id'], result[0][1])
+
 
         if pack['system_code'] == SYSTEM_CODE_REPEAT_FRIEND_APPLY:
             result = self.db_conn.search(TABLE_NAME, ['id', pack['send_id']])
