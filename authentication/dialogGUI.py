@@ -513,7 +513,7 @@ class FriendApply(QMainWindow, Ui_ApplyDialog):
         pack_str = pickle.dumps(pack)
         self.server_conn.send(struct.pack('i', len(pack_str)))
         self.server_conn.send(pack_str)
-        self.accept_signal.emit(self.send_id, self.send_name)
+        self.accept_signal.emit(int(self.send_id), str(self.send_name))
         self.close()
 
     def reject(self):

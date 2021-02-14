@@ -292,7 +292,7 @@ class ChatGUI(QWidget, Ui_Form):
             result = self.db_conn.search(TABLE_NAME, ['id', pack['send_id']])
             self.apply_friend_window = FriendApply(self.id, pack['send_id'], result[0][1],
                                                    pack['message'], PORTRAIT_PATH, self.chatter)
-            self.apple_friend_window.accept_signal.connect(self.add_friend)
+            self.apply_friend_window.accept_signal.connect(self.add_friend)
             # 被请求用户点击同意后，将对方加入到好友列表
             # TODO
             # 更新好友数据库
