@@ -177,6 +177,7 @@ class ChatGUI(QWidget, Ui_Form):
 
     def add_friend(self, friend_id=None, friend_name=None):
         print('add friend', friend_id, friend_name)
+        self.db_conn.insert(TABLE_NAME_FRIENDINFO, [self.id, friend_id])
         item = QListWidgetItem()
         widget = BiographyWidget(friend_id, self._fetch_others_portrait, self.show_biography)
         layout = QHBoxLayout()
@@ -296,7 +297,6 @@ class ChatGUI(QWidget, Ui_Form):
             self.apply_friend_window = FriendApply(self.id, pack['send_id'], result[0][1],
                                                    pack['message'], PORTRAIT_PATH, self.chatter)
             self.apply_friend_window.accept_signal.connect(self.add_friend)
-            self.db_conn.insert(TABLE_NAME_FRIENDINFO, [self.id, pack['send_id']])
             self.apply_friend_window.show()
         if pack['system_code'] == SYSTEM_CODE_RESULT_FRIEND_APPLY:
             # 好友请求的结果
@@ -304,7 +304,6 @@ class ChatGUI(QWidget, Ui_Form):
             self.result_apply_friend_window = ResultFriendApply(self.id, pack['send_id'], result[0][1],
                                                                 pack['message'], PORTRAIT_PATH)
             if pack['message'] == 'ACCEPT':
-                self.db_conn.insert(TABLE_NAME_FRIENDINFO, [self.id, pack['send_id']])
                 self.add_friend(pack['send_id'], result[0][1])
             self.result_apply_friend_window.show()
 
