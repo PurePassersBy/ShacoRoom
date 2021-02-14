@@ -1,3 +1,4 @@
+PORTRAIT_PATH = '../gui/resource/portrait/%s.jpg'
 TABLE_NAME_USERINFO = 'userinfo'
 TABLE_NAME_FRIENDINFO = 'friendinfo'
 SYSTEM_CODE_LOGIN_REPEAT = 'LOGIN REPEAT'
