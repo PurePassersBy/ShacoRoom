@@ -252,6 +252,18 @@ class Biography(QMainWindow, Ui_Biography):
         self.server_conn = server_conn
         res = self.db_conn.search(table_name, ['id', self.target_id])
         self.userinfo = res[0]
+        self.friend_list = self.db_conn.search(TABLE_NAME_FRIENDINFO, ['id', self.self_id])
+        # 判断是否为自己或已添加的好友
+        self.flag = True
+        if self.self_id == self.target_id:
+            self.flag = False
+        else:
+            for i in self.friend_list:
+                if i == self.target_id:
+                    self.flag = False
+                    break
+        if self.flag is False:
+            self.addButton.setVisible(False)
         self.addButton.clicked.connect(self.addFriend)
         self.portraitLabel.setText("")
         img = QPixmap(PORTRAIT_PATH % self.target_id).scaled(141, 141)
