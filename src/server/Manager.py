@@ -130,7 +130,7 @@ class Manager(threading.Thread):
                 # 该用户id有待处理的好友请求信息
                 dict_temp = eval(config_dict[key_name])
                 cmd = list(dict_temp.keys())[0]
-                message = list(dict_temp.values)[0]
+                message = list(dict_temp.values())[0]
                 print(dict_temp, cmd, message, type(dict_temp.keys()))
                 if cmd == 'APPLY':
                     # 需处理好友请求
