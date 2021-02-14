@@ -149,7 +149,9 @@ class ChatGUI(QWidget, Ui_Form):
         self.emoji_window.connect_slot(self.insert_emoji)
 
         self.tabWidget.tabBar().hide()
-        self.create_tab(True)
+        self.cur_tab = None
+        self.cur_user = None
+        self.create_tab()
         self.user2tab = {}
         self.load_friends()
 
@@ -177,18 +179,19 @@ class ChatGUI(QWidget, Ui_Form):
         self.frineds_list.addItem(item)
         self.frineds_list.setItemWidget(item, widget)
 
-    def create_tab(self, first=False):
+    def create_tab(self, user_id=None, user_name=None):
         layout = QHBoxLayout()
         layout.setContentsMargins(0,0,0,0)
         list_widget = QListWidget()
         layout.addWidget(list_widget)
-        if first is not None:
+        if user_id is not None:
             self.shaco_tab.setLayout(layout)
         else:
             widget = QWidget()
             widget.setLayout(layout)
             self.tabWidget.addTab(widget)
         self.cur_tab =  list_widget
+        self.cur_user = (user_id, user_name)
 
 
     def _fetch_others_portrait(self, user_id):
