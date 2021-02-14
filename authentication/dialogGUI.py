@@ -305,10 +305,11 @@ class Biography(QMainWindow, Ui_Biography):
             self.addButton.setVisible(False)
 
         else:
-            for i in self.friend_list:
-                if i == self.target_id:
-                    self.flag = False
-                    break
+            if self.friend_list is not None:
+                for i in self.friend_list:
+                    if i == self.target_id:
+                        self.flag = False
+                        break
             if self.flag is False:
                 self.addButton.setText('私聊')
                 self.addButton.clicked.connect(self.private_chat)
