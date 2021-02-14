@@ -119,6 +119,7 @@ class Manager(threading.Thread):
         file = config.read('add_friend.ini')
         config_dict = config.defaults()
         print('Checking apply to do...')
+        key_name_to_delete = None
         for key_name in config_dict:
             print('Spot friend apply ')
             split_key_name = key_name.split('-');
@@ -147,10 +148,13 @@ class Manager(threading.Thread):
                     send_package(self._user2conn[int(user_id)], friend_reply_package)
 
                 # 删除服务器待处理好友请求中该用户的记录
-                del config_dict[key_name]
-                # 用户上线后必须处理完好友请求，故不会出现send-target即是APPLY也是REPLY的情况
-                with open('add_friend.ini', 'w') as configfile:
-                    config.write(configfile)
+                key_name_to_delete = key_name
+                break
+        if key_name_to_delete is not None:
+            del config_dict[key_name_to_delete]
+            # 用户上线后必须处理完好友请求，故不会出现send-target即是APPLY也是REPLY的情况
+            with open('add_friend.ini', 'w') as configfile:
+                config.write(configfile)
 
 
 
