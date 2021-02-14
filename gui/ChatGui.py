@@ -186,7 +186,8 @@ class ChatGUI(QWidget, Ui_Form):
                 self.frineds_list.takeItem(index)
                 del item
                 break
-        del self.user2tab[friend_id]
+        if friend_id in self.user2tab:
+            del self.user2tab[friend_id]
         if self.cur_user_id == friend_id:
             self.switch_tab()
 
