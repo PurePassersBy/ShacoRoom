@@ -68,33 +68,40 @@ def fetch_package(conn):
     return pack
 
 
-class Portrait(QLabel):
-    clicked_signal = pyqtSignal(int)
+class BiographyWidget(QWidget):
+    clicked_fetch_signal = pyqtSignal(int)
     clicked_pos_signal = pyqtSignal(int, int, int)
 
-    def __init__(self, user_id, parent=None):
+    def __init__(self, user_id, fetch_func, dialog_func, parent=None):
         super().__init__(parent)
         self.user_id = user_id
+        if self.user_id is not None:
+            self.clicked_fetch_signal.connect(fetch_func)
+            self.clicked_pos_signal.connect(dialog_func)
 
     def mousePressEvent(self, QMouseEvent):
-        self.clicked_signal.emit(self.user_id)
+        if self.user_id is None:
+            return
+        self.clicked_fetch_signal.emit(self.user_id)
         self.clicked_pos_signal.emit(self.user_id,
                                      QMouseEvent.globalPos().x(), QMouseEvent.globalPos().y())
 
-    def connect_pos_slot(self, func):
-        self.clicked_pos_signal.connect(func)
 
-    def connect_customized_slot(self, func):
-        self.clicked_signal.connect(func)
+class BiographyLabel(QLabel):
+    clicked_fetch_signal = pyqtSignal(int)
+    clicked_pos_signal = pyqtSignal(int, int, int)
 
-
-class ShacoRoomLabel(QLabel):
-    def __init__(self, func, parent=None):
+    def __init__(self, user_id, fetch_func, dialog_func, parent=None):
         super().__init__(parent)
-        self.switch_room = func
+        self.user_id = user_id
+        self.clicked_fetch_signal.connect(fetch_func)
+        self.clicked_pos_signal.connect(dialog_func)
 
     def mousePressEvent(self, QMouseEvent):
-        self.switch_room()
+        self.clicked_fetch_signal.emit(self.user_id)
+        self.clicked_pos_signal.emit(self.user_id,
+                                     QMouseEvent.globalPos().x(), QMouseEvent.globalPos().y())
+
 
 class ReceiveMessageThread(QThread):
     msg_pack = pyqtSignal(dict)
@@ -172,18 +179,15 @@ class ChatGUI(QWidget, Ui_Form):
     def add_friend(self, friend_id=None, friend_name=None):
         print('add friend', friend_id, friend_name)
         item = QListWidgetItem()
-        widget = QWidget()
+        widget = BiographyWidget(friend_id, self._fetch_others_portrait, self.show_biography)
         layout = QHBoxLayout()
         if friend_id is None:
             friend_name = "ShacoRoom"
-            portrait = ShacoRoomLabel(self.switch_tab)
             img = QPixmap('resources/pic/shaco.jpg').scaled(30, 30)
         else:
             portrait_path = PORTRAIT_PATH % friend_id
             img = QPixmap(portrait_path).scaled(30, 30)
-            portrait = Portrait(friend_id)
-            portrait.connect_customized_slot(self._fetch_others_portrait)
-            portrait.connect_pos_slot(self.show_biography)
+        portrait = QLabel()
         portrait.setPixmap(img)
         layout.addWidget(portrait)
         layout.addWidget(QLabel(friend_name))
@@ -330,9 +334,7 @@ class ChatGUI(QWidget, Ui_Form):
         widget = QWidget()
         layout_main = QHBoxLayout()
         layout_msg = QVBoxLayout()
-        portrait = Portrait(int(user_id))
-        portrait.connect_customized_slot(self._fetch_others_portrait)
-        portrait.connect_pos_slot(self.show_biography)
+        portrait = BiographyLabel(int(user_id), self._fetch_others_portrait, self.show_biography)
         portrait.setFixedSize(50, 50)
         img = QPixmap(PORTRAIT_PATH % user_id).scaled(50, 50)
         portrait.setPixmap(img)
