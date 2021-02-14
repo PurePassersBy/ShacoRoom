@@ -165,9 +165,8 @@ class ChatGUI(QWidget, Ui_Form):
         self.emoji_window.connect_slot(self.insert_emoji)
 
         self.tabWidget.tabBar().hide()
-        self.cur_tab = self.create_tab()
-        self.shaco_tab = self.cur_tab
-        self.cur_user = None
+        self.create_tab()
+        self.cur_user_id = None
         self.add_friend()
         self.user2tab = {}
         self.load_friends()
@@ -209,15 +208,13 @@ class ChatGUI(QWidget, Ui_Form):
     def switch_tab(self, user_id=None):
         print('swith', user_id)
         if user_id is None:
-            self.cur_tab = self.shaco_tab
             self.tabWidget.setCurrentIndex(0)
         elif user_id not in self.user2tab:
-            self.cur_tab = self.create_tab(user_id)
+            self.create_tab(user_id)
             self.tabWidget.setCurrentIndex(self.user2tab[user_id][1])
         else:
-            self.cur_tab = self.user2tab[user_id][0]
             self.tabWidget.setCurrentIndex(self.user2tab[user_id][1])
-        self.cur_id = user_id
+        self.cur_user_id = user_id
 
     def create_tab(self, user_id=None):
         layout = QHBoxLayout()
@@ -226,12 +223,12 @@ class ChatGUI(QWidget, Ui_Form):
         layout.addWidget(list_widget)
         if user_id is None:
             self.shaco_tab.setLayout(layout)
+            self.shaco_tab = list_widget
         else:
             widget = QWidget()
             widget.setLayout(layout)
             self.tabWidget.addTab(widget, '')
             self.user2tab[user_id] = (list_widget, self.tabWidget.count()-1)
-        return list_widget
 
 
     def _fetch_others_portrait(self, user_id):
@@ -375,9 +372,17 @@ class ChatGUI(QWidget, Ui_Form):
             layout_main.addLayout(layout_msg)
         widget.setLayout(layout_main)
 
-        self.cur_tab.addItem(item)
-        self.cur_tab.setItemWidget(item, widget)
-        self.cur_tab.scrollToBottom()
+        if 'to_id' in msg_pack:
+            other_id = user_id if user_id != self.id else msg_pack['to_id']
+            if other_id not in self.user2tab:
+                self.create_tab(other_id)
+            self.user2tab[other_id][0].addItem(item)
+            self.user2tab[other_id][0].setItemWidget(item, widget)
+            self.user2tab[other_id][0].scrollToBottom()
+        else:
+            self.shaco_tab.addItem(item)
+            self.shaco_tab.setItemWidget(item, widget)
+            self.shaco_tab.scrollToBottom()
 
     def send_message(self):
         """
@@ -395,6 +400,8 @@ class ChatGUI(QWidget, Ui_Form):
             'user_name': self.userName,
             'message': msg
         }
+        if self.cur_user_id is not None:
+            pack['to_id'] = self.cur_user_id
         message_lock.acquire()
         send_package(self.chatter, pack)
         message_lock.release()
