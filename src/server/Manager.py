@@ -231,6 +231,7 @@ class Manager(threading.Thread):
             file = config.read('delete_friend.ini')
             config_dict = config.defaults()
             send_id = pack['send_id']
+            send_name = pack['send_name']
             target_id = pack['target_id']
             message = pack['message']
             key_name = str(send_id) + '-' + str(target_id)
@@ -240,6 +241,7 @@ class Manager(threading.Thread):
                 result_package = {
                     'send_id': send_id,
                     'target_id': target_id,
+                    'send_name': send_name,
                     'time': get_localtime(),
                     'message': message,
                     'system_code': SYSTEM_CODE_RESULT_DELETE_FRIEND}
