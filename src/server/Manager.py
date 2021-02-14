@@ -120,6 +120,7 @@ class Manager(threading.Thread):
         config_dict = config.defaults()
         print('Checking apply to do...')
         key_name_to_delete = None
+        print(config_dict)
         for key_name in config_dict:
             print('Spot friend apply ')
             split_key_name = key_name.split('-');
@@ -127,13 +128,17 @@ class Manager(threading.Thread):
             target_id = int(split_key_name[1])
             if target_id == user_id:
                 # 该用户id有待处理的好友请求信息
-                if config_dict[key_name][0] == 'APPLY':
+                dict_temp = eval(config_dict[key_name])
+                cmd = dict_temp.keys()[0]
+                message = dict_temp.values[0]
+                print(dict_temp, cmd, message)
+                if cmd == 'APPLY':
                     # 需处理好友请求
                     print(f'Sending friend apply to {user_id}')
                     friend_apply_package = {
                         'send_id': send_id,
                         'time': get_localtime(),
-                        'message': config_dict[key_name][1],
+                        'message': message,
                         'system_code': SYSTEM_CODE_FRIEND_APPLY}
                     send_package(self._user2conn[int(user_id)], friend_apply_package)
 
@@ -143,7 +148,7 @@ class Manager(threading.Thread):
                     friend_reply_package = {
                         'send_id': send_id,
                         'time': get_localtime(),
-                        'message': config_dict[key_name][1],
+                        'message': message,
                         'system_code': SYSTEM_CODE_RESULT_FRIEND_APPLY}
                     send_package(self._user2conn[int(user_id)], friend_reply_package)
 
