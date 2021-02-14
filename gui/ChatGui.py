@@ -27,7 +27,6 @@ SERVER_ADDRESS = ('39.106.169.58', 3976)
 VIDEO_SERVER_ADDRESS = ('39.106.169.58', 3977)
 AUDIO_SERVER_ADDRESS = ('39.106.169.58', 3978)
 RESOURCE_SERVER_ADDRESS = ('39.106.169.58', 3979)
-PORTRAIT_PATH = '../gui/resource/portrait/%s.jpg'
 LINE_LENGTH = 39
 UNI2ASC = 40 / 24
 message_lock = threading.Lock()
@@ -284,8 +283,8 @@ class ChatGUI(QWidget, Ui_Form):
 
     def show_biography(self, target_id, x, y):
         print(f"{target_id} {x} {y}")
-        self.biography = Biography(self.id, target_id, x, y, PORTRAIT_PATH,
-                                   self.db_conn, TABLE_NAME_USERINFO, self.chatter, self.switch_tab)
+        self.biography = Biography(self.id, self.userName, target_id, x, y,
+                                   self.db_conn,  self.chatter, self.switch_tab)
         self.biography.show()
 
     def insert_emoji(self, emo):
