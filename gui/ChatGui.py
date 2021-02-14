@@ -71,16 +71,18 @@ class BiographyWidget(QWidget):
     clicked_fetch_signal = pyqtSignal(int)
     clicked_pos_signal = pyqtSignal(int, int, int)
 
-    def __init__(self, user_id, fetch_func, dialog_func, parent=None):
+    def __init__(self, user_id, fetch_func=None, dialog_func=None, parent=None):
         super().__init__(parent)
         self.user_id = user_id
         if self.user_id is not None:
             self.clicked_fetch_signal.connect(fetch_func)
             self.clicked_pos_signal.connect(dialog_func)
+        else:
+            self.switch_shaco_room = fetch_func
 
     def mousePressEvent(self, QMouseEvent):
         if self.user_id is None:
-            return
+            self.switch_shaco_room()
         self.clicked_fetch_signal.emit(self.user_id)
         self.clicked_pos_signal.emit(self.user_id,
                                      QMouseEvent.globalPos().x(), QMouseEvent.globalPos().y())
@@ -183,7 +185,10 @@ class ChatGUI(QWidget, Ui_Form):
         if friend_id is not None and new is True:
             self.db_conn.insert(TABLE_NAME_FRIENDINFO, [self.id, friend_id])
         item = QListWidgetItem()
-        widget = BiographyWidget(friend_id, self._fetch_others_portrait, self.show_biography)
+        if friend_id is None:
+            widget = BiographyWidget(friend_id, self.switch_tab)
+        else:
+            widget = BiographyWidget(friend_id, self._fetch_others_portrait, self.show_biography)
         layout = QHBoxLayout()
         if friend_id is None:
             friend_name = "ShacoRoom"
@@ -222,13 +227,10 @@ class ChatGUI(QWidget, Ui_Form):
         if user_id is None:
             self.shaco_tab.setLayout(layout)
         else:
-            print('enter create')
             widget = QWidget()
             widget.setLayout(layout)
             self.tabWidget.addTab(widget, '')
-            print(self.tabWidget.count())
             self.user2tab[user_id] = (list_widget, self.tabWidget.count()-1)
-            print('create done', user_id)
         return list_widget
 
 
