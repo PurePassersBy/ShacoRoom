@@ -122,8 +122,8 @@ class Manager(threading.Thread):
         for key_name in config_dict:
             print('Spot friend apply ')
             split_key_name = key_name.split('-');
-            send_id = split_key_name[0]
-            target_id = split_key_name[1]
+            send_id = int(split_key_name[0])
+            target_id = int(split_key_name[1])
             if target_id == user_id:
                 # 该用户id有待处理的好友请求信息
                 if config_dict[key_name][0] == 'APPLY':
