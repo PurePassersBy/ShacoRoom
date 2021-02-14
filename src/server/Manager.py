@@ -167,7 +167,7 @@ class Manager(threading.Thread):
         for i in key_name_to_delete:
             del config_dict[i]
             # 用户上线后必须处理完好友请求，故不会出现send-target即是APPLY也是REPLY的情况
-            with open(f'{user_id}todo.ini', 'a') as configfile:
+            with open(f'{user_id}todo.ini', 'w') as configfile:
                 config.write(configfile)
 
 
@@ -216,7 +216,7 @@ class Manager(threading.Thread):
                     dict_value = f'APPLY~{str(get_localtime())}~{str(message)}'
                     config_dict[key_name] = dict_value
                     # 添加好友请求键值对：'发送-目标'--请求信息[类型：内容]
-                    with open(f'{str(target_id)}todo.ini', 'a') as configfile:
+                    with open(f'{str(target_id)}todo.ini', 'w') as configfile:
                         config.write(configfile)
 
         if pack['system_code'] == SYSTEM_CODE_RESULT_FRIEND_APPLY:
@@ -244,7 +244,7 @@ class Manager(threading.Thread):
                 dict_value = f'REPLY~{str(get_localtime())}~{str(message)}'
                 config_dict[key_name] = dict_value
                 # 添加好友请求回复键值对：'发送-目标'--好友请求结果[请求类型：内容]
-                with open(f'{str(target_id)}todo.ini', 'a') as configfile:
+                with open(f'{str(target_id)}todo.ini', 'w') as configfile:
                     config.write(configfile)
 
         if pack['system_code'] == SYSTEM_CODE_DELETE_FRIEND:
@@ -273,7 +273,7 @@ class Manager(threading.Thread):
                 dict_value = f'DELETE~{str(get_localtime())}~{str(message)}'
                 config_dict[key_name] = dict_value
                 # 添加好友请求回复键值对：'发送-目标'--好友请求结果[请求类型：内容]
-                with open(f'{str(target_id)}todo.ini', 'a') as configfile:
+                with open(f'{str(target_id)}todo.ini', 'w') as configfile:
                     config.write(configfile)
 
     def run(self):
