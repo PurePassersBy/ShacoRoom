@@ -28,7 +28,6 @@ VIDEO_SERVER_ADDRESS = ('39.106.169.58', 3977)
 AUDIO_SERVER_ADDRESS = ('39.106.169.58', 3978)
 RESOURCE_SERVER_ADDRESS = ('39.106.169.58', 3979)
 PORTRAIT_PATH = '../gui/resource/portrait/%s.jpg'
-TABLE_NAME = 'userinfo'
 LINE_LENGTH = 39
 UNI2ASC = 40 / 24
 message_lock = threading.Lock()
@@ -274,7 +273,7 @@ class ChatGUI(QWidget, Ui_Form):
 
     def show_biography(self, target_id, x, y):
         print(f"{target_id} {x} {y}")
-        self.biography = Biography(self.id, target_id, x, y, PORTRAIT_PATH, self.db_conn, TABLE_NAME, self.chatter)
+        self.biography = Biography(self.id, target_id, x, y, PORTRAIT_PATH, self.db_conn, TABLE_NAME_USERINFO, self.chatter)
         self.biography.show()
 
     def insert_emoji(self, emo):
@@ -293,29 +292,25 @@ class ChatGUI(QWidget, Ui_Form):
             self.dialog.show()
         if pack['system_code'] == SYSTEM_CODE_FRIEND_APPLY:
             # 好友请求
-            result = self.db_conn.search(TABLE_NAME, ['id', pack['send_id']])
+            result = self.db_conn.search(TABLE_NAME_USERINFO, ['id', pack['send_id']])
             self.apply_friend_window = FriendApply(self.id, pack['send_id'], result[0][1],
                                                    pack['message'], PORTRAIT_PATH, self.chatter)
             self.apply_friend_window.accept_signal.connect(self.add_friend)
-            # 被请求用户点击同意后，将对方加入到好友列表
-            # TODO
-            # 更新好友数据库
+            self.db_conn.insert(TABLE_NAME_FRIENDINFO, [self.id, pack['send_id']])
             self.apply_friend_window.show()
         if pack['system_code'] == SYSTEM_CODE_RESULT_FRIEND_APPLY:
             # 好友请求的结果
-            result = self.db_conn.search(TABLE_NAME, ['id', pack['send_id']])
+            result = self.db_conn.search(TABLE_NAME_USERINFO, ['id', pack['send_id']])
             self.result_apply_friend_window = ResultFriendApply(self.id, pack['send_id'], result[0][1],
                                                                 pack['message'], PORTRAIT_PATH)
             if pack['message'] == 'ACCEPT':
-                # 目标用户同意好友请求
-                # TODO
-                # 更新好友数据库
+                self.db_conn.insert(TABLE_NAME_FRIENDINFO, [self.id, pack['send_id']])
                 self.add_friend(pack['send_id'], result[0][1])
             self.result_apply_friend_window.show()
 
 
         if pack['system_code'] == SYSTEM_CODE_REPEAT_FRIEND_APPLY:
-            result = self.db_conn.search(TABLE_NAME, ['id', pack['send_id']])
+            result = self.db_conn.search(TABLE_NAME_USERINFO, ['id', pack['send_id']])
             self.result_apply_friend_window = ResultFriendApply(self.id, pack['send_id'], result[0][1],
                                                                 pack['message'], PORTRAIT_PATH)
             self.result_apply_friend_window.show()
@@ -443,9 +438,9 @@ class ChatGUI(QWidget, Ui_Form):
         self.userName = params['user_name']
         self.favComic = params['fav_comic']
         self.profile = params['profile']
-        self.db_conn.edit(TABLE_NAME, [self.id, 'name', self.userName])
-        self.db_conn.edit(TABLE_NAME, [self.id, 'anime', self.favComic])
-        self.db_conn.edit(TABLE_NAME, [self.id, 'profile', self.profile])
+        self.db_conn.edit(TABLE_NAME_USERINFO, [self.id, 'name', self.userName])
+        self.db_conn.edit(TABLE_NAME_USERINFO, [self.id, 'anime', self.favComic])
+        self.db_conn.edit(TABLE_NAME_USERINFO, [self.id, 'profile', self.profile])
         self._flush()
         threading.Thread(target=self._send_portrait).start()
 
