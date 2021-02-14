@@ -88,6 +88,14 @@ class Portrait(QLabel):
         self.clicked_signal.connect(func)
 
 
+class ShacoRoomLabel(QLabel):
+    def __init__(self, func, parent=None):
+        super().__init__(parent)
+        self.switch_room = func
+
+    def mousePressEvent(self, QMouseEvent):
+        self.switch_room()
+
 class ReceiveMessageThread(QThread):
     msg_pack = pyqtSignal(dict)
 
@@ -149,7 +157,10 @@ class ChatGUI(QWidget, Ui_Form):
         self.emoji_window.connect_slot(self.insert_emoji)
 
         self.tabWidget.tabBar().hide()
-        self.create_tab(True)
+        self.cur_tab = self.create_tab()
+        self.shaco_tab = self.cur_tab
+        self.cur_user = None
+        self.add_friend()
         self.user2tab = {}
         self.load_friends()
 
@@ -158,16 +169,21 @@ class ChatGUI(QWidget, Ui_Form):
         # 从数据库中加载已有的好友关系
         pass
 
-    def add_friend(self, friend_id, friend_name):
+    def add_friend(self, friend_id=None, friend_name=None):
         print('add friend', friend_id, friend_name)
         item = QListWidgetItem()
         widget = QWidget()
         layout = QHBoxLayout()
-        portrait_path = PORTRAIT_PATH % friend_id
-        img = QPixmap(portrait_path).scaled(30,30)
-        portrait = Portrait(friend_id)
-        portrait.connect_customized_slot(self._fetch_others_portrait)
-        portrait.connect_pos_slot(self.show_biography)
+        if friend_id is None:
+            friend_name = "ShacoRoom"
+            portrait = ShacoRoomLabel(self.switch_tab)
+            img = QPixmap('resources/pic/shaco.jpg').scaled(30, 30)
+        else:
+            portrait_path = PORTRAIT_PATH % friend_id
+            img = QPixmap(portrait_path).scaled(30, 30)
+            portrait = Portrait(friend_id)
+            portrait.connect_customized_slot(self._fetch_others_portrait)
+            portrait.connect_pos_slot(self.show_biography)
         portrait.setPixmap(img)
         layout.addWidget(portrait)
         layout.addWidget(QLabel(friend_name))
@@ -177,18 +193,28 @@ class ChatGUI(QWidget, Ui_Form):
         self.frineds_list.addItem(item)
         self.frineds_list.setItemWidget(item, widget)
 
-    def create_tab(self, first=False):
+    def switch_tab(self, user_id=None):
+        if user_id is None:
+            self.cur_tab = self.shaco_tab
+        elif user_id not in self.user2tab:
+            self.cur_tab = self.create_tab(user_id)
+        else:
+            self.cur_tab = self.user2tab[user_id]
+        self.cur_id = user_id
+
+    def create_tab(self, user_id=None):
         layout = QHBoxLayout()
         layout.setContentsMargins(0,0,0,0)
         list_widget = QListWidget()
         layout.addWidget(list_widget)
-        if first is not None:
+        if user_id is None:
             self.shaco_tab.setLayout(layout)
         else:
             widget = QWidget()
             widget.setLayout(layout)
             self.tabWidget.addTab(widget)
-        self.cur_tab =  list_widget
+            self.user2tab[user_id] = list_widget
+        return list_widget
 
 
     def _fetch_others_portrait(self, user_id):
