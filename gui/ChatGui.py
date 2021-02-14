@@ -158,6 +158,7 @@ class ChatGUI(QWidget, Ui_Form):
 
         self.tabWidget.tabBar().hide()
         self.cur_tab = self.create_tab()
+        self.shaco_tab = self.cur_tab
         self.cur_user = None
         self.add_friend()
         self.user2tab = {}
