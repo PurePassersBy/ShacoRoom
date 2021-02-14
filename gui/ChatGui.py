@@ -171,13 +171,14 @@ class ChatGUI(QWidget, Ui_Form):
         self.load_friends()
 
     def load_friends(self):
-        # TODO
-        # 从数据库中加载已有的好友关系
-        pass
+        friends = self.db_conn.search(TABLE_NAME_FRIENDINFO, ['id', self.id])
+        for friend_id in friends:
+            friend_name = self.db_conn.search(TABLE_NAME_USERINFO, ['id', self.id])[0][1]
+            self.add_friend(friend_id, friend_name, new=False)
 
-    def add_friend(self, friend_id=None, friend_name=None):
+    def add_friend(self, friend_id=None, friend_name=None, new=True):
         print('add friend', friend_id, friend_name)
-        if friend_id is not None:
+        if friend_id is not None and new is True:
             self.db_conn.insert(TABLE_NAME_FRIENDINFO, [self.id, friend_id])
         item = QListWidgetItem()
         widget = BiographyWidget(friend_id, self._fetch_others_portrait, self.show_biography)
