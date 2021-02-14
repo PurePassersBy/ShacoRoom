@@ -52,8 +52,12 @@ class Manager(threading.Thread):
         while True:
             if not msg_queue.empty():
                 msg = msg_queue.get()
-                for conn in self._user2conn.values():
-                    send_package(conn, msg)
+                if 'to_id' in msg:
+                    send_package(self._user2conn[msg['to_id']], msg)
+                    send_package(self._user2conn[msg['user_id']], msg)
+                else:
+                    for conn in self._user2conn.values():
+                        send_package(conn, msg)
 
             sleep(0.1)
 
