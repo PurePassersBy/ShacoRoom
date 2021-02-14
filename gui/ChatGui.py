@@ -339,7 +339,8 @@ class ChatGUI(QWidget, Ui_Form):
 
         if pack['system_code'] == SYSTEM_CODE_RESULT_DELETE_FRIEND:
             # 删除好友
-            self.result_apply_friend_window = ResultFriendApply(self.id, pack['send_id'], pack['send_name'],
+            result = self.db_conn.search(TABLE_NAME_USERINFO, ['id', pack['send_id']])
+            self.result_apply_friend_window = ResultFriendApply(self.id, pack['send_id'], result[0][1],
                                                                 pack['message'], PORTRAIT_PATH)
             self.db_conn.delete(TABLE_NAME_FRIENDINFO, [pack['send_id'], self.id])
             self.db_conn.delete(TABLE_NAME_FRIENDINFO, [self.id, pack['send_id']])
