@@ -129,6 +129,7 @@ class Manager(threading.Thread):
             if target_id == user_id:
                 # 该用户id有待处理的好友请求信息
                 split_value = config_dict[key_name].split('~', 2)
+                print(split_value)
                 type = split_value[0]
                 time = split_value[1]
                 message = split_value[2]
@@ -252,7 +253,7 @@ class Manager(threading.Thread):
             send_name = pack['send_name']
             target_id = pack['target_id']
             message = pack['message']
-            key_name = str(send_id) + '-' + str(target_id)
+            key_name = str(send_id) + '~' + str(target_id)
             config = configparser.ConfigParser()
             file = config.read(f'{str(target_id)}todo.ini')
             config_dict = config.defaults()
