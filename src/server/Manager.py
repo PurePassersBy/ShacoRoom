@@ -152,6 +152,8 @@ class Manager(threading.Thread):
                 with open('add_friend.ini', 'w') as configfile:
                     config.write(configfile)
 
+
+
     def system_code(self, pack, conn):
         """
         处理该用户收到的的系统信息
@@ -222,6 +224,32 @@ class Manager(threading.Thread):
                 config_dict[key_name] = dict_value
                 # 添加好友请求回复键值对：'发送-目标'--好友请求结果[请求类型：内容]
                 with open('add_friend.ini', 'w') as configfile:
+                    config.write(configfile)
+
+        if pack['system_code'] == SYSTEM_CODE_DELETE_FRIEND:
+            config = configparser.ConfigParser()
+            file = config.read('delete_friend.ini')
+            config_dict = config.defaults()
+            send_id = pack['send_id']
+            target_id = pack['target_id']
+            message = pack['message']
+            key_name = str(send_id) + '-' + str(target_id)
+            if target_id in self._user2conn:
+                # 当前好友请求发送用户在线
+                print(f'send result of delete friend information to target:{target_id}')
+                result_package = {
+                    'send_id': send_id,
+                    'target_id': target_id,
+                    'time': get_localtime(),
+                    'message': message,
+                    'system_code': SYSTEM_CODE_RESULT_DELETE_FRIEND}
+                send_package(self._user2conn[int(target_id)], result_package)
+            else:
+                # 当前好友请求发送用户不在线
+                print(f'write {send_id}-{target_id}:{message} into delete_friend.ini')
+                config_dict[key_name] = message
+                # 添加好友请求回复键值对：'发送-目标'--好友请求结果[请求类型：内容]
+                with open('delete_friend.ini', 'w') as configfile:
                     config.write(configfile)
 
     def run(self):
