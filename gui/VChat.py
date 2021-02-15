@@ -147,5 +147,5 @@ class Ui_Form(object):
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.shaco_tab), _translate("Form", "Tab 1"))
         self.label_username.setText(_translate("Form", "TextLabel"))
         self.friend_label.setText(_translate("Form", "好友列表"))
-from NoticeLabel import NoticeLabel
+from ChatGui import NoticeLabel
 import resources_rc
