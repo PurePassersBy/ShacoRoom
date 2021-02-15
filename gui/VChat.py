@@ -107,7 +107,7 @@ class Ui_Form(object):
         self.friend_label.setAlignment(QtCore.Qt.AlignCenter)
         self.friend_label.setObjectName("friend_label")
         self.horizontalLayout_5.addWidget(self.friend_label)
-        self.notice_label = QtWidgets.QLabel(Form)
+        self.notice_label = NoticeLabel(Form)
         self.notice_label.setMinimumSize(QtCore.QSize(42, 38))
         self.notice_label.setMaximumSize(QtCore.QSize(42, 38))
         self.notice_label.setText("")
@@ -147,4 +147,5 @@ class Ui_Form(object):
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.shaco_tab), _translate("Form", "Tab 1"))
         self.label_username.setText(_translate("Form", "TextLabel"))
         self.friend_label.setText(_translate("Form", "好友列表"))
+from NoticeLabel import NoticeLabel
 import resources_rc

@@ -100,6 +100,15 @@ class BiographyLabel(QLabel):
                                      QMouseEvent.globalPos().x(), QMouseEvent.globalPos().y())
 
 
+class NoticeLabel(QLabel):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+
+    def mousePressEvent(self, QMouseEvent):
+        # TODO
+        pass
+
+
 class ReceiveMessageThread(QThread):
     msg_pack = pyqtSignal(dict)
 

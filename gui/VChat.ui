@@ -241,7 +241,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QLabel" name="notice_label">
+        <widget class="NoticeLabel" name="notice_label">
          <property name="minimumSize">
           <size>
            <width>42</width>
@@ -281,6 +281,13 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>NoticeLabel</class>
+   <extends>QLabel</extends>
+   <header location="global">NoticeLabel</header>
+  </customwidget>
+ </customwidgets>
  <resources>
   <include location="resources.qrc"/>
  </resources>
