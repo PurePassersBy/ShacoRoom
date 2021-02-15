@@ -374,16 +374,16 @@ class ChatGUI(QWidget, Ui_Form):
             image = Image.fromarray(image_np).convert('RGB')
             pixmap = image.toqpixmap().scaled(200, 200)
             image_label = QLabel()
-            image_label.setFixedSize(400, 200)
+            image_label.setFixedSize(500, 200)
             image_label.setPixmap(pixmap)
             layout_msg.addWidget(image_label)
-            item.setSizeHint(QSize(400, 250))
+            item.setSizeHint(QSize(500, 250))
         else:
             msg = msg_pack['message']
             msg_list = split_message(msg)
             for msg_splited in msg_list:
                 layout_msg.addWidget(QLabel(msg_splited))
-            item.setSizeHint(QSize(200, 70 + (len(msg_list) - 1) * 35))
+            item.setSizeHint(QSize(500, 70 + (len(msg_list) - 1) * 35))
         if self.id == user_id:
             layout_main.addLayout(layout_msg)
             layout_main.addWidget(portrait)
