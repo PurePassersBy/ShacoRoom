@@ -361,6 +361,7 @@ class Biography(QMainWindow, Ui_Biography):
                                                 delete_warning, self.server_conn)
         self.delete_friend_window.acceptButton.setText('取消')
         self.delete_friend_window.rejectButton.setText('爆杀！')
+        self.delete_friend_window.applyLabel.setVisible(False)
         self.delete_friend_window.acceptButton.clicked.disconnect(self.delete_friend_window.accept)
         self.delete_friend_window.rejectButton.clicked.disconnect(self.delete_friend_window.reject)
         self.delete_friend_window.acceptButton.clicked.connect(self.delete_friend_window.close)
@@ -542,15 +543,23 @@ class Ui_ApplyDialog(object):
         font.setPointSize(10)
         font.setUnderline(False)
         self.textLabel.setFont(font)
-        self.textLabel.setAlignment(QtCore.Qt.AlignLeading | QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop)
+        self.textLabel.setAlignment(QtCore.Qt.AlignLeading | QtCore.Qt.AlignCenter | QtCore.Qt.AlignTop)
         self.textLabel.setWordWrap(True)
         self.textLabel.setObjectName("textLabel")
         self.nameLabel = QtWidgets.QLabel(ApplyDialog)
-        self.nameLabel.setGeometry(QtCore.QRect(120, 30, 221, 21))
+        self.nameLabel.setGeometry(QtCore.QRect(110, 20, 220, 40))
         font = QtGui.QFont()
         font.setPointSize(15)
+        font.setBold(True)
         self.nameLabel.setFont(font)
         self.nameLabel.setObjectName("nameLabel")
+
+        self.applyLabel = QtWidgets.QLabel(ApplyDialog)
+        self.applyLabel.setGeometry(QtCore.QRect(320, 70, 80, 20))
+        font = QtGui.QFont()
+        font.setPointSize(10)
+        self.applyLabel.setFont(font)
+        self.applyLabel.setObjectName("applyLabel")
 
         self.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint)  # 置顶
         # 设置背景
@@ -618,7 +627,7 @@ class Ui_ApplyDialog(object):
         self.rejectButton.setText(_translate("ApplyDialog", "拒绝"))
         self.textLabel.setText(_translate("ApplyDialog", "TextLabel"))
         self.nameLabel.setText(_translate("ApplyDialog", "TextLabel"))
-
+        self.applyLabel.setText(_translate("ApplyDialog", "好友申请"))
 
 class FriendApply(QMainWindow, Ui_ApplyDialog):
     accept_signal = QtCore.pyqtSignal(int, str)
