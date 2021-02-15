@@ -322,8 +322,10 @@ class Biography(QMainWindow, Ui_Biography):
         img = QPixmap(PORTRAIT_PATH % self.target_id).scaled(141, 141)
         self.portraitLabel.setPixmap(img)
         self._set()
-        # 初始化添加朋友窗口
+        # 初始化添加好友窗口
         self.addApply = None
+        # 初始化删除好友警告窗口
+        self.delete_friend_window = None
         # 点击个人简介外的地方则关闭个人简介
         # 激活窗口，这样在点击母窗口的时候，eventFilter里会捕获到WindowDeactivate事件，从而关闭窗口
         self.activateWindow()
@@ -354,6 +356,19 @@ class Biography(QMainWindow, Ui_Biography):
         self.private_chat_func(self.target_id)
 
     def delete_friend(self):
+        delete_warning = '确定要删除该好友吗？（对方会收到被删通知）'
+        self.delete_friend_window = FriendApply(self.self_id, self.target_id, self.userinfo[1],
+                                                delete_warning, self.server_conn)
+        self.delete_friend_window.acceptButton.setText('取消')
+        self.delete_friend_window.rejectButton.setText('爆杀！')
+        self.delete_friend_window.acceptButton.clicked.disconnect(self.delete_friend_window.accept)
+        self.delete_friend_window.rejectButton.clicked.disconnect(self.delete_friend_window.reject)
+        self.delete_friend_window.acceptButton.clicked.connect(self.delete_friend_window.close)
+        self.delete_friend_window.rejectButton.clicked.connect(self.confirm_delete)
+        self.delete_friend_window.rejectButton.clicked.connect(self.delete_friend_window.close)
+        self.delete_friend_window.show()
+
+    def confirm_delete(self):
         pack = {
             'send_id': self.self_id,
             'send_name': self.self_name,
@@ -365,6 +380,8 @@ class Biography(QMainWindow, Ui_Biography):
         self.server_conn.send(struct.pack('i', len(pack_str)))
         self.server_conn.send(pack_str)
         self.delete_friend_func(self.target_id)
+        self.close()
+        print("?")
 
     def add_friend(self):
         # self.addApply = Dialog('UNDER CONSTRUCTION')
@@ -540,17 +557,53 @@ class Ui_ApplyDialog(object):
         self.backgroundLabel.setPixmap(QtGui.QPixmap("resources/pic/whiteBackground.jpg"))
         self.backgroundLabel.setScaledContents(True)
         self.backgroundLabel.lower()
-
+        self.setQSS()
         self.retranslateUi(ApplyDialog)
         QtCore.QMetaObject.connectSlotsByName(ApplyDialog)
 
     def setQSS(self):
-        self.acceptButton.setFixedSize(20, 20)  # 设置接受按钮的大小
-        self.rejectButton.setFixedSize(20, 20)  # 设置拒绝按钮的大小
-        self.acceptButton.setStyleSheet(
-            '''QPushButton{background:#F76677;border-radius:5px;}QPushButton:hover{background:green;}''')
-        self.rejectButton.setStyleSheet(
-            '''QPushButton{background:#F76677;border-radius:5px;}QPushButton:hover{background:green;}''')
+        self.acceptButton.setFixedSize(80, 40)  # 设置接受按钮的大小
+        self.rejectButton.setFixedSize(80, 40)  # 设置拒绝按钮的大小
+        accept_button_qss = '''     QPushButton{
+                 border:none;         
+                 color:black;         
+                 font-size:15px;         
+                 height:40px;         
+                 padding-left:5px;         
+                 padding-right:10px;  
+                 background:LightGreen;       
+                 }     
+                            QPushButton:hover{         
+                 color:LightGray;         
+                 border:1px solid #F3F3F5;         
+                 border-radius:10px;
+                                  font-size:15px;         
+                 height:40px;         
+                 padding-left:5px;         
+                 padding-right:10px;           
+                 background:green;  
+                 } '''
+        rejept_button_qss = '''     QPushButton{
+                 border:none;         
+                 color:black;         
+                 font-size:15px;         
+                 height:40px;         
+                 padding-left:5px;         
+                 padding-right:10px;  
+                 background:orange;       
+                 }     
+                            QPushButton:hover{         
+                 color:LightGray;         
+                 border:1px solid #F3F3F5;         
+                 border-radius:10px;
+                                  font-size:15px;         
+                 height:40px;         
+                 padding-left:5px;         
+                 padding-right:10px;           
+                 background:red;     
+                 } '''
+        self.acceptButton.setStyleSheet(accept_button_qss)
+        self.rejectButton.setStyleSheet(rejept_button_qss)
 
         self.setWindowFlag(QtCore.Qt.FramelessWindowHint)  # 隐藏边框
         self.setWindowOpacity(0.98)  # 设置窗口透明度
@@ -568,7 +621,7 @@ class Ui_ApplyDialog(object):
 class FriendApply(QMainWindow, Ui_ApplyDialog):
     accept_signal = QtCore.pyqtSignal(int, str)
 
-    def __init__(self, self_id, send_id, send_name, message, PORTRAIT_PATH, server_conn):
+    def __init__(self, self_id, send_id, send_name, message, server_conn):
         """
         处理好友请求的窗口
         """
