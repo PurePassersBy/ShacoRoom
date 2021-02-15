@@ -101,7 +101,6 @@ class ChatGUI(QWidget, Ui_Form):
         self.notice_label.setPixmap(QPixmap('../gui/resource/label/friend_list.png'))
         self.notice_label.setScaledContents(True)
         self.notice_label.clicked_signal.connect(self.show_process)
-
         self.id = user_id
         self.userName = user_name
         self.portrait = f'../gui/resource/portrait/{self.id}.jpg'
@@ -130,8 +129,8 @@ class ChatGUI(QWidget, Ui_Form):
         self.to_do_list = []
         # 立即处理的system_code
         self.system_code_instant = [SYSTEM_CODE_KICK_OUT,
-                                   SYSTEM_CODE_LOGIN_REPEAT,
-                                   SYSTEM_CODE_REPEAT_FRIEND_APPLY]
+                                    SYSTEM_CODE_LOGIN_REPEAT,
+                                    SYSTEM_CODE_REPEAT_FRIEND_APPLY]
 
         self.emoji_window = EmojiWindow()
         self.emoji_window.connect_slot(self.insert_emoji)
@@ -184,9 +183,9 @@ class ChatGUI(QWidget, Ui_Form):
         portrait.setPixmap(img)
         layout.addWidget(portrait)
         layout.addWidget(QLabel(friend_name))
-        layout.setStretch(3,7)
+        layout.setStretch(3, 7)
         widget.setLayout(layout)
-        item.setSizeHint(QSize(150,55))
+        item.setSizeHint(QSize(150, 55))
         self.frineds_list.addItem(item)
         self.frineds_list.setItemWidget(item, widget)
 
@@ -203,7 +202,7 @@ class ChatGUI(QWidget, Ui_Form):
 
     def create_tab(self, user_id=None):
         layout = QHBoxLayout()
-        layout.setContentsMargins(0,0,0,0)
+        layout.setContentsMargins(0, 0, 0, 0)
         list_widget = QListWidget()
         layout.addWidget(list_widget)
         if user_id is None:
@@ -213,7 +212,7 @@ class ChatGUI(QWidget, Ui_Form):
             widget = QWidget()
             widget.setLayout(layout)
             self.tabWidget.addTab(widget, '')
-            self.user2tab[user_id] = (list_widget, self.tabWidget.count()-1)
+            self.user2tab[user_id] = (list_widget, self.tabWidget.count() - 1)
 
     def _fetch_others_portrait(self, user_id):
         query = {
@@ -269,12 +268,21 @@ class ChatGUI(QWidget, Ui_Form):
     def show_biography(self, target_id, x, y):
         print(f"{target_id} {x} {y}")
         self.biography = Biography(self.id, self.userName, target_id, x, y,
-                                   self.db_conn,  self.chatter, self.switch_tab, self.delete_friend)
+                                   self.db_conn, self.chatter, self.switch_tab, self.delete_friend)
         self.biography.show()
 
     def show_process(self):
-        self.friend_process_window = FriendProcess(self.to_do_list, self.system_information)
+        print(self.to_do_list)
+        self.friend_process_window = FriendProcess(self.to_do_list, self.system_information,
+                                                   self.delete_todolist)
         self.friend_process_window.show()
+
+    def delete_todolist(self, target_index):
+        del self.to_do_list[target_index]
+        print(self.to_do_list)
+        if not self.to_do_list:
+            self.notice_label.setPixmap(QPixmap('../gui/resource/label/friend_list.png'))
+
 
     def insert_emoji(self, emo):
         self.textEdit.insertPlainText(emo)
@@ -317,18 +325,17 @@ class ChatGUI(QWidget, Ui_Form):
 
     def add_to_do_list(self, pack):
         result = self.db_conn.search(TABLE_NAME_USERINFO, ['id', pack['send_id']])
-        dict_to_add = {'self_id': self.id, 'send_id': pack['send_id'], 'send_name':result[0][1],
+        dict_to_add = {'self_id': self.id, 'send_id': pack['send_id'], 'send_name': result[0][1],
                        'message': pack['message'], 'system_code': pack['system_code']}
+        print(dict_to_add)
         if dict_to_add['system_code'] in self.system_code_instant:
             # 重复登陆或强制下线立即执行而不是加入到to_do_list
             self.system_information(dict_to_add)
         else:
             self.to_do_list.append(dict_to_add)
-            self.friend_process_window.update_to_do_list(self.to_do_list)
             # 更改通知图标为带红点的
             self.notice_label.setPixmap(QPixmap('../gui/resource/label/friend_list_red.png'))
             self.notice_label.setScaledContents(True)
-
 
     def show_message(self, msg_pack):
         """
