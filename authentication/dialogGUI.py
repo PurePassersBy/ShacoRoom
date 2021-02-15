@@ -632,6 +632,7 @@ class Ui_ApplyDialog(object):
         self.nameLabel.setText(_translate("ApplyDialog", "TextLabel"))
         self.applyLabel.setText(_translate("ApplyDialog", "好友申请"))
 
+
 class FriendApply(QMainWindow, Ui_ApplyDialog):
     accept_signal = QtCore.pyqtSignal(int, str)
 
@@ -814,15 +815,15 @@ class Ui_friendProcess(object):
 
         self.retranslateUi(friendProcess)
         QtCore.QMetaObject.connectSlotsByName(friendProcess)
+
     def setQSS(self):
         self.hideButton.setFixedSize(20, 20)  # 设置关闭按钮的大小
         self.hideButton.setStyleSheet(
             '''QPushButton{background:#F76677;border-radius:5px;}QPushButton:hover{background:red;}''')
 
-
         self.setWindowFlag(QtCore.Qt.FramelessWindowHint)  # 隐藏边框
         self.setWindowOpacity(0.95)  # 设置窗口透明度
-        self.setAttribute(QtCore.Qt.WA_TranslucentBackground) # 设置窗口背景透明
+        self.setAttribute(QtCore.Qt.WA_TranslucentBackground)  # 设置窗口背景透明
 
     def retranslateUi(self, friendProcess):
         _translate = QtCore.QCoreApplication.translate
@@ -830,10 +831,12 @@ class Ui_friendProcess(object):
         self.titleLabel.setText(_translate("friendProcess", "好友处理"))
         self.hideButton.setText(_translate("friendProcess", "关闭"))
 
+
 class MYWidget(QWidget):
     clicked_deal_signal = pyqtSignal(int)
     clicked_show_signal = pyqtSignal(dict)
-    def __init__(self, user_dict, parent = None):
+
+    def __init__(self, user_dict, parent=None):
         super().__init__(parent)
         self.user_dict = user_dict
         self.user_id = user_dict['send_id']
@@ -843,7 +846,7 @@ class MYWidget(QWidget):
         self.clicked_show_signal.emit(self.user_dict)
 
 
-class FriendProcess(QMainWindow, Ui_friendProcess)
+class FriendProcess(QMainWindow, Ui_friendProcess):
     def __init__(self, to_do_list, system_code_func):
         """
         处理好友请求的窗口
@@ -852,13 +855,12 @@ class FriendProcess(QMainWindow, Ui_friendProcess)
         self.hideButton.clicked.connect(lambda: self.setVisible(False))
         self.system_code_func = system_code_func
         self.system_code2chinese = {SYSTEM_CODE_FRIEND_APPLY: '好友申请',
-                                   SYSTEM_CODE_RESULT_FRIEND_APPLY: '好友申请结果',
-                                   SYSTEM_CODE_RESULT_DELETE_FRIEND: '解除好友关系',
-                                   }
-
+                                    SYSTEM_CODE_RESULT_FRIEND_APPLY: '好友申请结果',
+                                    SYSTEM_CODE_RESULT_DELETE_FRIEND: '解除好友关系',
+                                    }
+        # 加载待处理信息
         for i in to_do_list:
             self.add_deal(i)
-
 
     def add_deal(self, user_dict):
         item = QListWidgetItem()
@@ -887,6 +889,3 @@ class FriendProcess(QMainWindow, Ui_friendProcess)
                 self.todoList.takeItem(index)
                 del item
                 break
-
-
-
