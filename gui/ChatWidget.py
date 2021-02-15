@@ -15,6 +15,12 @@ class BiographyWidget(QWidget):
         else:
             self.switch_shaco_room = fetch_func
 
+    def hide_notice(self):
+        self.setStyleSheet("")
+
+    def show_notice(self):
+        self.setStyleSheet("QLabel{background-color: red;}")
+
     def mousePressEvent(self, QMouseEvent):
         if self.user_id is None:
             self.switch_shaco_room()

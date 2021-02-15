@@ -198,6 +198,13 @@ class ChatGUI(QWidget, Ui_Form):
             self.tabWidget.setCurrentIndex(self.user2tab[user_id][1])
         else:
             self.tabWidget.setCurrentIndex(self.user2tab[user_id][1])
+        if self.cur_user_id != user_id:
+            for index in range(self.frineds_list.count()):
+                item = self.frineds_list.item(index)
+                widget = self.frineds_list.itemWidget(item)
+                if widget.user_id == user_id:
+                    widget.hide_notice()
+                    break
         self.cur_user_id = user_id
 
     def create_tab(self, user_id=None):
@@ -383,7 +390,7 @@ class ChatGUI(QWidget, Ui_Form):
             layout_main.addWidget(portrait)
             layout_main.addLayout(layout_msg)
         widget.setLayout(layout_main)
-
+        other_id = None
         if 'to_id' in msg_pack:
             other_id = user_id if user_id != self.id else msg_pack['to_id']
             if other_id not in self.user2tab:
@@ -395,6 +402,13 @@ class ChatGUI(QWidget, Ui_Form):
             self.shaco_tab.addItem(item)
             self.shaco_tab.setItemWidget(item, widget)
             self.shaco_tab.scrollToBottom()
+        if self.cur_user_id != other_id:
+            for index in range(self.frineds_list.count()):
+                item = self.frineds_list.item(index)
+                widget = self.frineds_list.itemWidget(item)
+                if widget.user_id == other_id:
+                    widget.show_notice()
+                    break
 
     def send_message(self):
         """
