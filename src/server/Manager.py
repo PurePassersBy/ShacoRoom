@@ -1,4 +1,4 @@
-import configparser
+import json
 import socket
 import struct
 import pickle
@@ -14,7 +14,7 @@ msg_queue = Queue()
 SERVER_ADDRESS = ('0.0.0.0', 3976)
 MAX_CONNECTIONS = 200
 CHUNK = 2048
-TODO_PATH = 'offline_request/%s_todo.ini'
+TODO_PATH = 'offline_request/%s_todo.json'
 
 
 def get_localtime():
@@ -58,13 +58,9 @@ class Manager(threading.Thread):
                     if msg['to_id'] in self._user2conn:
                         send_package(self._user2conn[msg['to_id']], msg)
                     else:
-                        config = configparser.ConfigParser()
-                        config.read(TODO_PATH % msg['to_id'])
-                        config_dict = config.defaults()
-                        value = f'MESSAGE~{msg["time"]}~{msg["message"]}'
-                        config_dict[f'{msg["user_id"]}~{msg["to_id"]}'] = value
-                        with open(TODO_PATH % msg['to_id'], 'a') as configfile:
-                            config.write(configfile)
+                        msg['type'] = 'MESSAGE'
+                        with open(TODO_PATH % msg['to_id'], 'a') as f:
+                            f.write(json.dumps(msg))
                 else:
                     for conn in self._user2conn.values():
                         send_package(conn, msg)
@@ -94,13 +90,13 @@ class Manager(threading.Thread):
         header['time'] = get_localtime()
         header['message'] = 'Enters ShacoRoom'
         # 检查是否有待处理的好友请求信息
-        self.check_apply(user_id)
+        self.check_apply(conn, user_id)
         msg_queue.put(header)
         while True:
             try:
                 pack = fetch_package(conn)
                 if 'system_code' in pack:
-                    self.system_code(pack, conn)
+                    self.system_code(pack)
                     continue
                 pack['time'] = get_localtime()
                 msg_queue.put(pack)
@@ -117,7 +113,7 @@ class Manager(threading.Thread):
                 msg_queue.put(pack)
                 break
 
-    def check_apply(self, user_id):
+    def check_apply(self, conn, user_id):
         """
         检查该用户是否有待处理的好友请求信息
         查找用的是O(n)的算法，用户数量增加后登入进聊天室
@@ -125,64 +121,15 @@ class Manager(threading.Thread):
         :param user_id: 当前用户id
         :return:
         """
-        config = configparser.ConfigParser()
-        file = config.read(TODO_PATH % str(user_id))
-        config_dict = config.defaults()
         print('Checking apply to do...')
-        key_name_to_delete = []
-        print(config_dict)
-        for key_name in config_dict:
+        with open(TODO_PATH % user_id, 'r+') as f:
+            todo_list = json.load(f)
+            f.seek(0); f.truncate() # 清空文件
+        for package in todo_list:
             print('Spot friend apply ')
-            split_key_name = key_name.split('~')
-            send_id = int(split_key_name[0])
-            target_id = int(split_key_name[1])
-            # 该用户id有待处理的好友请求信息
-            split_value = config_dict[key_name].split('~', 2)
-            print(split_value)
-            type_ = split_value[0]
-            time_ = split_value[1]
-            message = split_value[2]
-            if type_ == 'MESSAGE':
-                print(f'Sending friend apply to {user_id}')
-                message_package = {
-                    'user_id': send_id,
-                    'time': time_,
-                    'to_id': int(user_id),
-                    'message': message
-                }
-                send_package(self._user2conn[int(user_id)], message_package)
+            send_package(conn, package)
 
-            if type_ == 'APPLY':
-                # 需处理好友请求
-                print(f'Sending friend apply to {user_id}')
-                friend_apply_package = {
-                    'send_id': send_id,
-                    'time': time_,
-                    'message': message,
-                    'system_code': SYSTEM_CODE_FRIEND_APPLY}
-                send_package(self._user2conn[int(user_id)], friend_apply_package)
-
-            if type_ == 'REPLY':
-                # 需处理好友请求结果
-                print(f'Sending result of friend apply to {user_id}')
-                friend_reply_package = {
-                    'send_id': send_id,
-                    'time': time_,
-                    'message': message,
-                    'system_code': SYSTEM_CODE_RESULT_FRIEND_APPLY}
-                send_package(self._user2conn[int(user_id)], friend_reply_package)
-
-            if type_ == 'DELETE':
-                # 需解除好友关系结果
-                print(f'Sending result of delete friend to {user_id}')
-                package = {
-                    'send_id': send_id,
-                    'time': time_,
-                    'message': message,
-                    'system_code': SYSTEM_CODE_RESULT_DELETE_FRIEND}
-                send_package(self._user2conn[int(user_id)], package)
-
-    def system_code(self, pack, conn):
+    def system_code(self, pack):
         """
         处理该用户收到的的系统信息
         :param pack:
@@ -190,100 +137,16 @@ class Manager(threading.Thread):
         :return:
         """
         print('Processing system code...')
-        if pack['system_code'] == SYSTEM_CODE_FRIEND_APPLY:
-            send_id = pack['send_id']
-            target_id = pack['target_id']
-            key_name = str(send_id) + '~' + str(target_id)
-            message = pack['message']
-            config = configparser.ConfigParser()
-            file = config.read(TODO_PATH % target_id)
-            config_dict = config.defaults()
-            if key_name in config_dict:
-                # 重复发送好友请求
-                # 没成为好友就不会有离线私聊信息，故可以直接判断
-                print(f'send repeat friend apply information to sender:{send_id}')
-                repeat_apply_package = {
-                    'time': get_localtime(),
-                    'send_id': send_id,
-                    'message': '您向此用户发送过好友请求，请耐心等待他予以回复',
-                    'system_code': SYSTEM_CODE_REPEAT_FRIEND_APPLY}
-                send_package(conn, repeat_apply_package)
-            else:
-                # 发送好友请求的正常情况
-                if int(target_id) in self._user2conn:
-                    # 当前好友请求目标用户在线
-                    print(f'send  friend apply information to target:{target_id}')
-                    friend_apply_package = {
-                        'send_id': send_id,
-                        'time': get_localtime(),
-                        'message': message,
-                        'system_code': SYSTEM_CODE_FRIEND_APPLY}
-                    send_package(self._user2conn[int(target_id)], friend_apply_package)
-                else:
-                    # 当前好友请求目标用户不在线
-                    print(f'write {send_id}~{target_id}:APPLY~{str(get_localtime())}~{str(message)}'
-                          f' into {str(target_id)}todo.ini')
-                    dict_value = f'APPLY~{str(get_localtime())}~{str(message)}'
-                    config_dict[key_name] = dict_value
-                    # 添加好友请求键值对：'发送-目标'--请求信息[类型：内容]
-                    with open(TODO_PATH % target_id, 'w') as configfile:
-                        config.write(configfile)
-
-        if pack['system_code'] == SYSTEM_CODE_RESULT_FRIEND_APPLY:
-            send_id = pack['send_id']
-            target_id = pack['target_id']
-            message = pack['message']
-            key_name = str(send_id) + '~' + str(target_id)
-            config = configparser.ConfigParser()
-            file = config.read(TODO_PATH % target_id)
-            config_dict = config.defaults()
-            if target_id in self._user2conn:
-                # 当前好友请求发送用户在线
-                print(f'send result of friend apply information to target:{target_id}')
-                result_package = {
-                    'send_id': send_id,
-                    'target_id': target_id,
-                    'time': get_localtime(),
-                    'message': message,
-                    'system_code': SYSTEM_CODE_RESULT_FRIEND_APPLY}
-                send_package(self._user2conn[int(target_id)], result_package)
-            else:
-                # 当前好友请求发送用户不在线
-                print(f'write {send_id}~{target_id}:REPLY~{str(get_localtime())}~{str(message)} '
-                      f'into {str(target_id)}todo.ini')
-                dict_value = f'REPLY~{str(get_localtime())}~{str(message)}'
-                config_dict[key_name] = dict_value
-                # 添加好友请求回复键值对：'发送-目标'--好友请求结果[请求类型：内容]
-                with open(TODO_PATH % target_id, 'w') as configfile:
-                    config.write(configfile)
-
+        target_id = pack['target_id']
         if pack['system_code'] == SYSTEM_CODE_DELETE_FRIEND:
-            send_id = pack['send_id']
-            send_name = pack['send_name']
-            target_id = pack['target_id']
-            message = pack['message']
-            key_name = str(send_id) + '~' + str(target_id)
-            config = configparser.ConfigParser()
-            file = config.read(TODO_PATH % target_id)
-            config_dict = config.defaults()
-            if target_id in self._user2conn:
-                # 当前解除好友结果目标用户在线
-                print(f'send result of delete friend information to target:{target_id}')
-                result_package = {
-                    'send_id': send_id,
-                    'target_id': target_id,
-                    'time': get_localtime(),
-                    'message': message,
-                    'system_code': SYSTEM_CODE_RESULT_DELETE_FRIEND}
-                send_package(self._user2conn[int(target_id)], result_package)
-            else:
-                # 当前解除好友结果目标用户不在线
-                print(f'write {send_id}~{target_id}:{message} into {str(target_id)}todo.ini')
-                dict_value = f'DELETE~{str(get_localtime())}~{str(message)}'
-                config_dict[key_name] = dict_value
-                # 添加好友请求回复键值对：'发送-目标'--好友请求结果[请求类型：内容]
-                with open(TODO_PATH % target_id, 'w') as configfile:
-                    config.write(configfile)
+            pack['system_code'] = SYSTEM_CODE_RESULT_DELETE_FRIEND
+        if int(target_id) in self._user2conn:
+            # 当前好友请求目标用户在线
+            send_package(self._user2conn[int(target_id)], pack)
+        else:
+            # 当前好友请求目标用户不在线
+            with open(TODO_PATH % target_id, 'a') as f:
+                f.write(json.dumps(pack))
 
     def run(self):
         print(f"{get_localtime()}  Manager starts...")
