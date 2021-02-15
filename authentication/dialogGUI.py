@@ -6,7 +6,10 @@ import sys
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import Qt, QEvent
 from PyQt5.QtGui import QPalette, QBrush, QPixmap, QPainter, QIcon
-from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton
+from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton, QListWidgetItem, QLabel, QHBoxLayout
+from PyQt5.QtCore import *
+from PyQt5.QtWidgets import *
+from PyQt5.QtGui import *
 
 sys.path.append('..')
 from authentication.constantName import *
@@ -765,3 +768,125 @@ class ResultFriendApply(QMainWindow, Ui_ApplyResultDialog):
             self.textLabel.setText(f'{send_name}拒绝了您的好友请求')
         else:
             self.textLabel.setText(f'{send_name}解除了与您的好友关系')
+
+
+class Ui_friendProcess(object):
+    def setupUi(self, friendProcess):
+        friendProcess.setObjectName("friendProcess")
+        friendProcess.resize(300, 500)
+        friendProcess.setMinimumSize(QtCore.QSize(300, 500))
+        friendProcess.setMaximumSize(QtCore.QSize(300, 500))
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        friendProcess.setFont(font)
+        self.centralwidget = QtWidgets.QWidget(friendProcess)
+        self.centralwidget.setObjectName("centralwidget")
+        self.titleLabel = QtWidgets.QLabel(self.centralwidget)
+        self.titleLabel.setGeometry(QtCore.QRect(10, 10, 81, 16))
+        font = QtGui.QFont()
+        font.setPointSize(11)
+        font.setBold(True)
+        font.setUnderline(False)
+        font.setWeight(75)
+        self.titleLabel.setFont(font)
+        self.titleLabel.setObjectName("titleLabel")
+        self.todoList = QtWidgets.QListWidget(self.centralwidget)
+        self.todoList.setGeometry(QtCore.QRect(0, 30, 300, 430))
+        self.todoList.setFrameShape(QtWidgets.QFrame.StyledPanel)
+        self.todoList.setObjectName("todoList")
+        self.hideButton = QtWidgets.QPushButton(self.centralwidget)
+        self.hideButton.setGeometry(QtCore.QRect(222, 0, 71, 28))
+        self.hideButton.setObjectName("hideButton")
+        friendProcess.setCentralWidget(self.centralwidget)
+        self.menubar = QtWidgets.QMenuBar(friendProcess)
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 300, 26))
+        self.menubar.setObjectName("menubar")
+        friendProcess.setMenuBar(self.menubar)
+        self.statusbar = QtWidgets.QStatusBar(friendProcess)
+        self.statusbar.setObjectName("statusbar")
+        friendProcess.setStatusBar(self.statusbar)
+        # 设置背景
+        self.backgroundLabel = QtWidgets.QLabel(friendProcess)
+        self.backgroundLabel.setGeometry(QtCore.QRect(0, 0, 300, 500))
+        self.backgroundLabel.setPixmap(QtGui.QPixmap("resources/pic/whiteBackground.jpg"))
+        self.backgroundLabel.setScaledContents(True)
+        self.backgroundLabel.lower()
+
+        self.retranslateUi(friendProcess)
+        QtCore.QMetaObject.connectSlotsByName(friendProcess)
+    def setQSS(self):
+        self.hideButton.setFixedSize(20, 20)  # 设置关闭按钮的大小
+        self.hideButton.setStyleSheet(
+            '''QPushButton{background:#F76677;border-radius:5px;}QPushButton:hover{background:red;}''')
+
+
+        self.setWindowFlag(QtCore.Qt.FramelessWindowHint)  # 隐藏边框
+        self.setWindowOpacity(0.95)  # 设置窗口透明度
+        self.setAttribute(QtCore.Qt.WA_TranslucentBackground) # 设置窗口背景透明
+
+    def retranslateUi(self, friendProcess):
+        _translate = QtCore.QCoreApplication.translate
+        friendProcess.setWindowTitle(_translate("friendProcess", "MainWindow"))
+        self.titleLabel.setText(_translate("friendProcess", "好友处理"))
+        self.hideButton.setText(_translate("friendProcess", "关闭"))
+
+class MYWidget(QWidget):
+    clicked_deal_signal = pyqtSignal(int)
+    clicked_show_signal = pyqtSignal(dict)
+    def __init__(self, user_dict, parent = None):
+        super().__init__(parent)
+        self.user_dict = user_dict
+        self.user_id = user_dict['send_id']
+
+    def mousePressEvent(self, QMouseEvent):
+        self.clicked_deal_signal.emit(self.user_id)
+        self.clicked_show_signal.emit(self.user_dict)
+
+
+class FriendProcess(QMainWindow, Ui_friendProcess)
+    def __init__(self, to_do_list, system_code_func):
+        """
+        处理好友请求的窗口
+        """
+        super(FriendProcess, self).__init__()
+        self.hideButton.clicked.connect(lambda: self.setVisible(False))
+        self.system_code_func = system_code_func
+        self.system_code2chinese = {SYSTEM_CODE_FRIEND_APPLY: '好友申请',
+                                   SYSTEM_CODE_RESULT_FRIEND_APPLY: '好友申请结果',
+                                   SYSTEM_CODE_RESULT_DELETE_FRIEND: '解除好友关系',
+                                   }
+
+        for i in to_do_list:
+            self.add_deal(i)
+
+
+    def add_deal(self, user_dict):
+        item = QListWidgetItem()
+        widget = MYWidget(user_dict)
+        widget.clicked_deal_signal.connect(self.delete_deal)
+        widget.clicked_show_signal.connect(self.system_code_func)
+        layout = QHBoxLayout()
+        portrait_path = PORTRAIT_PATH % user_dict['send_id']
+        img = QPixmap(portrait_path).scaled(30, 30)
+        portrait = QLabel()
+        portrait.setPixmap(img)
+        layout.addWidget(portrait)
+        layout.addWidget(QLabel(user_dict['send_name']))
+        layout.addWidget(QLabel(self.system_code2chinese[user_dict['system_code']]))
+        layout.setStretch(3, 5, 3)
+        widget.setLayout(layout)
+        item.setSizeHint(QSize(300, 60))
+        self.todoList.addItem(item)
+        self.todoList.setItemWidget(item, widget)
+
+    def delete_deal(self, user_id):
+        for index in range(self.todoList.count()):
+            item = self.to_do_list.item(index)
+            widget = self.todoList.itemWidget(item)
+            if widget.user_id == user_id:
+                self.todoList.takeItem(index)
+                del item
+                break
+
+
+
