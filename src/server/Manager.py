@@ -15,7 +15,7 @@ msg_queue = Queue()
 SERVER_ADDRESS = ('0.0.0.0', 3976)
 MAX_CONNECTIONS = 200
 CHUNK = 2048
-TODO_PATH = 'offline_request/%s_todo.json'
+TODO_PATH = 'offline_request/%s.todo'
 
 
 def get_localtime():
