@@ -128,7 +128,7 @@ class Manager(threading.Thread):
                 pass # 创建
         try:
             with open(TODO_PATH % user_id, 'r+') as f:
-                todo_list = json.load(f)
+                todo_list = [json.loads(line) for line in f.readlines()]
                 f.seek(0); f.truncate() # 清空文件
         except json.decoder.JSONDecodeError:
             return
