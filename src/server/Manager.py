@@ -54,7 +54,14 @@ class Manager(threading.Thread):
             if not msg_queue.empty():
                 msg = msg_queue.get()
                 if 'to_id' in msg:
-                    send_package(self._user2conn[msg['to_id']], msg)
+                    if msg['to_id'] in self._user2conn:
+                        send_package(self._user2conn[msg['to_id']], msg)
+                    else:
+                        config = configparser.ConfigParser()
+                        value = f'MESSAGE~{msg["time"]}~{msg["message"]}'
+                        config[f'{msg["user_id"]}~{msg["to_id"]}'] = value
+                        with open(TODO_PATH % msg['to_id'], 'a') as configfile:
+                            config.write(configfile)
                     send_package(self._user2conn[msg['user_id']], msg)
                 else:
                     for conn in self._user2conn.values():
@@ -142,6 +149,7 @@ class Manager(threading.Thread):
                     'message': message
                 }
                 send_package(self._user2conn[int(user_id)], message_package)
+
             if type_ == 'APPLY':
                 # 需处理好友请求
                 print(f'Sending friend apply to {user_id}')
@@ -171,16 +179,6 @@ class Manager(threading.Thread):
                     'message': message,
                     'system_code': SYSTEM_CODE_RESULT_DELETE_FRIEND}
                 send_package(self._user2conn[int(user_id)], package)
-            # 删除服务器待处理好友请求中该用户的记录
-            key_name_to_delete.append(key_name)
-
-        for i in key_name_to_delete:
-            del config_dict[i]
-            # 用户上线后必须处理完好友请求，故不会出现send-target即是APPLY也是REPLY的情况
-            with open(TODO_PATH % str(user_id), 'w') as configfile:
-                config.write(configfile)
-
-
 
     def system_code(self, pack, conn):
         """
