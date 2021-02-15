@@ -17,10 +17,7 @@ from gui.VChat import Ui_Form
 from gui.SettingsGui import SettingsGui
 from gui.EmojiWindow import EmojiWindow
 from authentication.constantName import *
-from authentication.dialogGUI import Dialog
-from authentication.dialogGUI import Biography
-from authentication.dialogGUI import FriendApply
-from authentication.dialogGUI import ResultFriendApply
+from authentication.dialogGUI import *
 
 SERVER_IP = '39.106.169.58'
 SERVER_ADDRESS = ('39.106.169.58', 3976)
@@ -162,6 +159,16 @@ class ChatGUI(QWidget, Ui_Form):
         self.apply_friend_window = None
         # 初始化好友请求结果
         self.result_apply_friend_window = None
+        # 初始化好友处理界面
+        self.friend_process_window = FriendProcess(self.to_do_list, self.system_information)
+        self.friend_process_window.setVisible(False)
+        # 待办事项
+        self.to_do_list = []
+        # 立即处理的system_code
+        self.system_code_instant = [SYSTEM_CODE_KICK_OUT,
+                                   SYSTEM_CODE_LOGIN_REPEAT,
+                                   SYSTEM_CODE_REPEAT_FRIEND_APPLY]
+
         self.emoji_window = EmojiWindow()
         self.emoji_window.connect_slot(self.insert_emoji)
 
@@ -244,7 +251,6 @@ class ChatGUI(QWidget, Ui_Form):
             self.tabWidget.addTab(widget, '')
             self.user2tab[user_id] = (list_widget, self.tabWidget.count()-1)
 
-
     def _fetch_others_portrait(self, user_id):
         query = {
             'type': 'fetch',
@@ -317,35 +323,44 @@ class ChatGUI(QWidget, Ui_Form):
             self.dialog = Dialog(SYSTEM_CODE_LOGIN_REPEAT)
             self.dialog.show()
         if pack['system_code'] == SYSTEM_CODE_FRIEND_APPLY:
-            # 好友请求
-            result = self.db_conn.search(TABLE_NAME_USERINFO, ['id', pack['send_id']])
-            self.apply_friend_window = FriendApply(self.id, pack['send_id'], result[0][1],
+            self.apply_friend_window = FriendApply(self.id, pack['send_id'], pack['send_name'],
                                                    pack['message'], self.chatter)
             self.apply_friend_window.accept_signal.connect(self.add_friend)
             self.apply_friend_window.show()
         if pack['system_code'] == SYSTEM_CODE_RESULT_FRIEND_APPLY:
             # 好友请求的结果
-            result = self.db_conn.search(TABLE_NAME_USERINFO, ['id', pack['send_id']])
-            self.result_apply_friend_window = ResultFriendApply(self.id, pack['send_id'], result[0][1],
+            self.result_apply_friend_window = ResultFriendApply(self.id, pack['send_id'], pack['send_name'],
                                                                 pack['message'], PORTRAIT_PATH)
             if pack['message'] == 'ACCEPT':
-                self.add_friend(pack['send_id'], result[0][1])
+                self.add_friend(pack['send_id'], pack['send_name'])
             self.result_apply_friend_window.show()
 
-
         if pack['system_code'] == SYSTEM_CODE_REPEAT_FRIEND_APPLY:
-            result = self.db_conn.search(TABLE_NAME_USERINFO, ['id', pack['send_id']])
-            self.result_apply_friend_window = ResultFriendApply(self.id, pack['send_id'], result[0][1],
+            self.result_apply_friend_window = ResultFriendApply(self.id, pack['send_id'], pack['send_name'],
                                                                 pack['message'], PORTRAIT_PATH)
             self.result_apply_friend_window.show()
 
         if pack['system_code'] == SYSTEM_CODE_RESULT_DELETE_FRIEND:
             # 删除好友
-            result = self.db_conn.search(TABLE_NAME_USERINFO, ['id', pack['send_id']])
-            self.result_apply_friend_window = ResultFriendApply(self.id, pack['send_id'], result[0][1],
+            self.result_apply_friend_window = ResultFriendApply(self.id, pack['send_id'], pack['send_name'],
                                                                 pack['message'], PORTRAIT_PATH)
             self.delete_friend(pack['send_id'])
             self.result_apply_friend_window.show()
+
+    def add_to_do_list(self, pack):
+        result = self.db_conn.search(TABLE_NAME_USERINFO, ['id', pack['send_id']])
+        dict_to_add = {'self_id': self.id, 'send_id': pack['send_id'], 'send_name':result[0][1],
+                       'message': pack['message'], 'system_code': pack['system_code']}
+        if dict_to_add['system_code'] in self.system_code_instant:
+            # 重复登陆或强制下线立即执行而不是加入到to_do_list
+            self.system_information(dict_to_add)
+        else:
+            self.to_do_list.append(dict_to_add)
+            self.friend_process_window.update_to_do_list(self.to_do_list)
+            # 更改通知图标为带红点的
+            self.notice_label.setPixmap(QPixmap('../gui/resource/label/friend_list_red.png'))
+            self.notice_label.setScaledContents(True)
+
 
     def show_message(self, msg_pack):
         """
@@ -353,7 +368,7 @@ class ChatGUI(QWidget, Ui_Form):
         :return:
         """
         if 'system_code' in msg_pack:
-            self.system_information(msg_pack)
+            self.add_to_do_list(msg_pack)
             return
         time_ = msg_pack['time']
         user_id = msg_pack['user_id']
@@ -525,14 +540,3 @@ class ChatGUI(QWidget, Ui_Form):
                 return True  # 表示过滤此事件
 
         return False
-
-
-if __name__ == '__main__':
-    app = QApplication(sys.argv)
-    id = 4
-    user_name = '牛蛙丶丶'
-    fav_comic = 'Attack on Titan'
-    is_know = True
-    gui = ChatGUI(id, user_name, fav_comic, is_know)
-    gui.show()
-    sys.exit(app.exec_())
