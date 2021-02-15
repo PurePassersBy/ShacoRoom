@@ -126,9 +126,12 @@ class Manager(threading.Thread):
         if not os.path.exists(TODO_PATH % user_id):
             with open(TODO_PATH % user_id, 'w') as f:
                 pass # 创建
-        with open(TODO_PATH % user_id, 'r+') as f:
-            todo_list = json.load(f)
-            f.seek(0); f.truncate() # 清空文件
+        try:
+            with open(TODO_PATH % user_id, 'r+') as f:
+                todo_list = json.load(f)
+                f.seek(0); f.truncate() # 清空文件
+        except json.decoder.JSONDecodeError:
+            return
         for package in todo_list:
             print('Spot friend apply ')
             send_package(conn, package)
