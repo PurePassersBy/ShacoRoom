@@ -154,7 +154,7 @@ class Manager(threading.Thread):
         else:
             # 当前好友请求目标用户不在线
             with open(TODO_PATH % target_id, 'a') as f:
-                f.write(json.dumps(pack, indent=4) + '\n')
+                f.write(json.dumps(pack) + '\n')
 
     def run(self):
         print(f"{get_localtime()}  Manager starts...")
