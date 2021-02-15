@@ -1,4 +1,5 @@
 import json
+import os
 import socket
 import struct
 import pickle
@@ -122,6 +123,9 @@ class Manager(threading.Thread):
         :return:
         """
         print('Checking apply to do...')
+        if not os.path.exists(TODO_PATH % user_id):
+            with open(TODO_PATH % user_id, 'w') as f:
+                pass # 创建
         with open(TODO_PATH % user_id, 'r+') as f:
             todo_list = json.load(f)
             f.seek(0); f.truncate() # 清空文件
