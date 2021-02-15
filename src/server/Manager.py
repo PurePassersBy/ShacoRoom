@@ -61,7 +61,7 @@ class Manager(threading.Thread):
                     else:
                         msg['type'] = 'MESSAGE'
                         with open(TODO_PATH % msg['to_id'], 'a') as f:
-                            f.write(json.dumps(msg))
+                            f.write(json.dumps(msg) + '\n')
                 else:
                     for conn in self._user2conn.values():
                         send_package(conn, msg)
@@ -154,7 +154,7 @@ class Manager(threading.Thread):
         else:
             # 当前好友请求目标用户不在线
             with open(TODO_PATH % target_id, 'a') as f:
-                f.write(json.dumps(pack) + '\n')
+                f.writelines(json.dumps(pack))
 
     def run(self):
         print(f"{get_localtime()}  Manager starts...")
