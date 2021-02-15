@@ -318,7 +318,7 @@ class ChatGUI(QWidget, Ui_Form):
             # 好友请求
             result = self.db_conn.search(TABLE_NAME_USERINFO, ['id', pack['send_id']])
             self.apply_friend_window = FriendApply(self.id, pack['send_id'], result[0][1],
-                                                   pack['message'], PORTRAIT_PATH, self.chatter)
+                                                   pack['message'], self.chatter)
             self.apply_friend_window.accept_signal.connect(self.add_friend)
             self.apply_friend_window.show()
         if pack['system_code'] == SYSTEM_CODE_RESULT_FRIEND_APPLY:
