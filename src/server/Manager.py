@@ -132,9 +132,10 @@ class Manager(threading.Thread):
                 f.seek(0); f.truncate() # 清空文件
         except json.decoder.JSONDecodeError:
             return
-        for package in todo_list:
-            print('Spot friend apply ')
-            send_package(conn, package)
+        print(todo_list)
+        #for package in todo_list:
+        #    print('Spot friend apply ')
+        #    send_package(conn, package)
 
     def system_code(self, pack):
         """
