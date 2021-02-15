@@ -379,6 +379,8 @@ class Biography(QMainWindow, Ui_Biography):
         pack_str = pickle.dumps(pack)
         self.server_conn.send(struct.pack('i', len(pack_str)))
         self.server_conn.send(pack_str)
+        self.db_conn.delete(TABLE_NAME_FRIENDINFO, [self.self_id, self.target_id])
+        self.db_conn.delete(TABLE_NAME_FRIENDINFO, [self.target_id, self.self_id])
         self.delete_friend_func(self.target_id)
         self.close()
         print("?")
