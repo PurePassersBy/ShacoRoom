@@ -54,15 +54,17 @@ class Manager(threading.Thread):
             if not msg_queue.empty():
                 msg = msg_queue.get()
                 if 'to_id' in msg:
+                    send_package(self._user2conn[msg['user_id']], msg)
                     if msg['to_id'] in self._user2conn:
                         send_package(self._user2conn[msg['to_id']], msg)
                     else:
                         config = configparser.ConfigParser()
+                        config.read(TODO_PATH % msg['to_id'])
+                        config_dict = config.defaults()
                         value = f'MESSAGE~{msg["time"]}~{msg["message"]}'
-                        config[f'{msg["user_id"]}~{msg["to_id"]}'] = value
+                        config_dict[f'{msg["user_id"]}~{msg["to_id"]}'] = value
                         with open(TODO_PATH % msg['to_id'], 'a') as configfile:
                             config.write(configfile)
-                    send_package(self._user2conn[msg['user_id']], msg)
                 else:
                     for conn in self._user2conn.values():
                         send_package(conn, msg)
