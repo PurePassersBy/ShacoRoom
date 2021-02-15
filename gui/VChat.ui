@@ -285,7 +285,7 @@
   <customwidget>
    <class>NoticeLabel</class>
    <extends>QLabel</extends>
-   <header location="global">ChatGui</header>
+   <header location="global">gui.ChatWidget</header>
   </customwidget>
  </customwidgets>
  <resources>

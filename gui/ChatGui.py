@@ -16,6 +16,7 @@ sys.path.append('..')
 from gui.VChat import Ui_Form
 from gui.SettingsGui import SettingsGui
 from gui.EmojiWindow import EmojiWindow
+from gui.ChatWidget import *
 from authentication.constantName import *
 from authentication.dialogGUI import *
 
@@ -61,52 +62,6 @@ def fetch_package(conn):
             data += conn.recv(2048)
     pack = pickle.loads(data)
     return pack
-
-
-class BiographyWidget(QWidget):
-    clicked_fetch_signal = pyqtSignal(int)
-    clicked_pos_signal = pyqtSignal(int, int, int)
-
-    def __init__(self, user_id, fetch_func=None, dialog_func=None, parent=None):
-        super().__init__(parent)
-        self.user_id = user_id
-        if self.user_id is not None:
-            self.clicked_fetch_signal.connect(fetch_func)
-            self.clicked_pos_signal.connect(dialog_func)
-        else:
-            self.switch_shaco_room = fetch_func
-
-    def mousePressEvent(self, QMouseEvent):
-        if self.user_id is None:
-            self.switch_shaco_room()
-        self.clicked_fetch_signal.emit(self.user_id)
-        self.clicked_pos_signal.emit(self.user_id,
-                                     QMouseEvent.globalPos().x(), QMouseEvent.globalPos().y())
-
-
-class BiographyLabel(QLabel):
-    clicked_fetch_signal = pyqtSignal(int)
-    clicked_pos_signal = pyqtSignal(int, int, int)
-
-    def __init__(self, user_id, fetch_func, dialog_func, parent=None):
-        super().__init__(parent)
-        self.user_id = user_id
-        self.clicked_fetch_signal.connect(fetch_func)
-        self.clicked_pos_signal.connect(dialog_func)
-
-    def mousePressEvent(self, QMouseEvent):
-        self.clicked_fetch_signal.emit(self.user_id)
-        self.clicked_pos_signal.emit(self.user_id,
-                                     QMouseEvent.globalPos().x(), QMouseEvent.globalPos().y())
-
-
-class NoticeLabel(QLabel):
-    clicked_signal = pyqtSignal()
-    def __init__(self, parent=None):
-        super().__init__(parent)
-
-    def mousePressEvent(self, QMouseEvent):
-        self.clicked_signal.emit()
 
 
 class ReceiveMessageThread(QThread):
