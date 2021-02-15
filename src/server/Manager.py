@@ -127,44 +127,52 @@ class Manager(threading.Thread):
             split_key_name = key_name.split('~')
             send_id = int(split_key_name[0])
             target_id = int(split_key_name[1])
-            if target_id == user_id:
-                # 该用户id有待处理的好友请求信息
-                split_value = config_dict[key_name].split('~', 2)
-                print(split_value)
-                type = split_value[0]
-                time = split_value[1]
-                message = split_value[2]
-                if type == 'APPLY':
-                    # 需处理好友请求
-                    print(f'Sending friend apply to {user_id}')
-                    friend_apply_package = {
-                        'send_id': send_id,
-                        'time': get_localtime(),
-                        'message': message,
-                        'system_code': SYSTEM_CODE_FRIEND_APPLY}
-                    send_package(self._user2conn[int(user_id)], friend_apply_package)
+            # 该用户id有待处理的好友请求信息
+            split_value = config_dict[key_name].split('~', 2)
+            print(split_value)
+            type_ = split_value[0]
+            time_ = split_value[1]
+            message = split_value[2]
+            if type_ == 'MESSAGE':
+                print(f'Sending friend apply to {user_id}')
+                message_package = {
+                    'user_id': send_id,
+                    'time': time_,
+                    'to_id': int(user_id),
+                    'message': message
+                }
+                send_package(self._user2conn[int(user_id)], message_package)
+            if type_ == 'APPLY':
+                # 需处理好友请求
+                print(f'Sending friend apply to {user_id}')
+                friend_apply_package = {
+                    'send_id': send_id,
+                    'time': time_,
+                    'message': message,
+                    'system_code': SYSTEM_CODE_FRIEND_APPLY}
+                send_package(self._user2conn[int(user_id)], friend_apply_package)
 
-                if type == 'REPLY':
-                    # 需处理好友请求结果
-                    print(f'Sending result of friend apply to {user_id}')
-                    friend_reply_package = {
-                        'send_id': send_id,
-                        'time': get_localtime(),
-                        'message': message,
-                        'system_code': SYSTEM_CODE_RESULT_FRIEND_APPLY}
-                    send_package(self._user2conn[int(user_id)], friend_reply_package)
+            if type_ == 'REPLY':
+                # 需处理好友请求结果
+                print(f'Sending result of friend apply to {user_id}')
+                friend_reply_package = {
+                    'send_id': send_id,
+                    'time': time_,
+                    'message': message,
+                    'system_code': SYSTEM_CODE_RESULT_FRIEND_APPLY}
+                send_package(self._user2conn[int(user_id)], friend_reply_package)
 
-                if type == 'DELETE':
-                    # 需解除好友关系结果
-                    print(f'Sending result of delete friend to {user_id}')
-                    package = {
-                        'send_id': send_id,
-                        'time': get_localtime(),
-                        'message': message,
-                        'system_code': SYSTEM_CODE_RESULT_DELETE_FRIEND}
-                    send_package(self._user2conn[int(user_id)], package)
-                # 删除服务器待处理好友请求中该用户的记录
-                key_name_to_delete.append(key_name)
+            if type_ == 'DELETE':
+                # 需解除好友关系结果
+                print(f'Sending result of delete friend to {user_id}')
+                package = {
+                    'send_id': send_id,
+                    'time': time_,
+                    'message': message,
+                    'system_code': SYSTEM_CODE_RESULT_DELETE_FRIEND}
+                send_package(self._user2conn[int(user_id)], package)
+            # 删除服务器待处理好友请求中该用户的记录
+            key_name_to_delete.append(key_name)
 
         for i in key_name_to_delete:
             del config_dict[i]
