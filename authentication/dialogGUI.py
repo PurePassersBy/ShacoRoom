@@ -788,7 +788,7 @@ class Ui_FriendProcessWindow(object):
         self.titleLabel.setFont(font)
         self.titleLabel.setObjectName("titleLabel")
         self.listWidget = QtWidgets.QListWidget(self.centralwidget)
-        self.listWidget.setGeometry(QtCore.QRect(0, 30, 300, 430))
+        self.listWidget.setGeometry(QtCore.QRect(2, 30, 290, 430))
         self.listWidget.setFrameShape(QtWidgets.QFrame.StyledPanel)
         self.listWidget.setObjectName("listWidget")
         self.closeButton = QtWidgets.QPushButton(self.centralwidget)
@@ -874,13 +874,14 @@ class MYWidget(QWidget):
         self.clicked_show_signal.emit(self.user_dict)
 
 class FriendProcess(QMainWindow, Ui_FriendProcessWindow):
-    def __init__(self, to_do_list, system_code_func):
+    def __init__(self, to_do_list, system_code_func, delete_func):
         super(FriendProcess, self).__init__()
         self.setupUi(self)
         self.retranslateUi(self)
         self.titleLabel.setVisible(True)
         self.closeButton.clicked.connect(self.close)
         self.system_code_func = system_code_func
+        self.delete_func = delete_func
         self.system_code2chinese = {SYSTEM_CODE_FRIEND_APPLY: '好友申请',
                                     SYSTEM_CODE_RESULT_FRIEND_APPLY: '好友申请结果',
                                     SYSTEM_CODE_RESULT_DELETE_FRIEND: '解除好友关系',
@@ -892,9 +893,6 @@ class FriendProcess(QMainWindow, Ui_FriendProcessWindow):
         # 加载待处理信息
         for i in to_do_list:
             self.add_deal(i)
-
-
-
 
 
     def add_deal(self, user_dict):
@@ -910,18 +908,21 @@ class FriendProcess(QMainWindow, Ui_FriendProcessWindow):
         layout.addWidget(portrait)
         layout.addWidget(QLabel(user_dict['send_name']))
         layout.addWidget(QLabel(self.system_code2chinese[user_dict['system_code']]))
-        layout.setStretch(3, 5)
+        layout.setStretch(2, 5)
         widget.setLayout(layout)
         item.setSizeHint(QSize(300, 60))
-        self.todoList.addItem(item)
-        self.todoList.setItemWidget(item, widget)
+        self.listWidget.addItem(item)
+        self.listWidget.setItemWidget(item, widget)
 
     def delete_deal(self, user_id):
-        for index in range(self.todoList.count()):
-            item = self.to_do_list.item(index)
-            widget = self.todoList.itemWidget(item)
+        for index in range(self.listWidget.count()):
+            print(index)
+            item = self.listWidget.item(index)
+            widget = self.listWidget.itemWidget(item)
             if widget.user_id == user_id:
-                self.todoList.takeItem(index)
+                self.listWidget.takeItem(index)
+                self.delete_func(index)
                 del item
                 break
-
+        if not self.listWidget:
+            self.emptyLabel.setVisible(True)
