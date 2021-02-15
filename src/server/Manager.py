@@ -133,9 +133,10 @@ class Manager(threading.Thread):
         except json.decoder.JSONDecodeError:
             return
         print(todo_list)
-        #for package in todo_list:
-        #    print('Spot friend apply ')
-        #    send_package(conn, package)
+        for package in todo_list:
+            print('Spot friend apply ')
+            print(package)
+            send_package(conn, package)
 
     def system_code(self, pack):
         """
