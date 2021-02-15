@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'gui/VChat.ui'
+# Form implementation generated from reading ui file 'gui\VChat.ui'
 #
 # Created by: PyQt5 UI code generator 5.15.2
 #
@@ -97,6 +97,24 @@ class Ui_Form(object):
         self.label_username.setAlignment(QtCore.Qt.AlignCenter)
         self.label_username.setObjectName("label_username")
         self.verticalLayout.addWidget(self.label_username)
+        self.horizontalLayout_5 = QtWidgets.QHBoxLayout()
+        self.horizontalLayout_5.setObjectName("horizontalLayout_5")
+        spacerItem4 = QtWidgets.QSpacerItem(100, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.horizontalLayout_5.addItem(spacerItem4)
+        self.friends_label = QtWidgets.QLabel(Form)
+        self.friends_label.setMinimumSize(QtCore.QSize(50, 50))
+        self.friends_label.setMaximumSize(QtCore.QSize(50, 50))
+        self.friends_label.setText("")
+        self.friends_label.setObjectName("friends_label")
+        self.horizontalLayout_5.addWidget(self.friends_label)
+        self.notice_label = QtWidgets.QLabel(Form)
+        self.notice_label.setText("")
+        self.notice_label.setObjectName("notice_label")
+        self.horizontalLayout_5.addWidget(self.notice_label)
+        self.horizontalLayout_5.setStretch(0, 3)
+        self.horizontalLayout_5.setStretch(1, 5)
+        self.horizontalLayout_5.setStretch(2, 3)
+        self.verticalLayout.addLayout(self.horizontalLayout_5)
         self.frineds_list = QtWidgets.QListWidget(Form)
         self.frineds_list.setMinimumSize(QtCore.QSize(170, 450))
         self.frineds_list.setMaximumSize(QtCore.QSize(170, 16777215))
@@ -104,7 +122,8 @@ class Ui_Form(object):
         self.verticalLayout.addWidget(self.frineds_list)
         self.verticalLayout.setStretch(0, 4)
         self.verticalLayout.setStretch(1, 1)
-        self.verticalLayout.setStretch(2, 10)
+        self.verticalLayout.setStretch(2, 1)
+        self.verticalLayout.setStretch(3, 13)
         self.gridLayout.addLayout(self.verticalLayout, 0, 1, 1, 1)
         self.gridLayout.setColumnStretch(0, 6)
         self.gridLayout.setColumnStretch(1, 1)
