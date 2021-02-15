@@ -137,8 +137,8 @@ class ChatGUI(QWidget, Ui_Form):
         self.image_button.setIconSize(QSize(39, 28))
         self.file_button.setIcon(QIcon("../gui/resource/button/file_button.png"))
         self.file_button.setIconSize(QSize(39, 28))
-        self.friends_label.setPixmap(QPixmap('../gui/resource/label/friend_list.jpg'))
-        self.friends_label.setScaledContents(True)
+        self.notice_label.setPixmap(QPixmap('../gui/resource/label/friend_list.png'))
+        self.notice_label.setScaledContents(True)
 
         self.id = user_id
         self.userName = user_name

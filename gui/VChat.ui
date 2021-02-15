@@ -212,33 +212,48 @@
          </property>
          <property name="sizeHint" stdset="0">
           <size>
-           <width>100</width>
+           <width>40</width>
            <height>20</height>
           </size>
          </property>
         </spacer>
        </item>
        <item>
-        <widget class="QLabel" name="friends_label">
+        <widget class="QLabel" name="friend_label">
          <property name="minimumSize">
           <size>
-           <width>50</width>
-           <height>50</height>
+           <width>70</width>
+           <height>38</height>
           </size>
          </property>
          <property name="maximumSize">
           <size>
-           <width>50</width>
-           <height>50</height>
+           <width>70</width>
+           <height>38</height>
           </size>
          </property>
          <property name="text">
-          <string/>
+          <string>好友列表</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
          </property>
         </widget>
        </item>
        <item>
         <widget class="QLabel" name="notice_label">
+         <property name="minimumSize">
+          <size>
+           <width>42</width>
+           <height>38</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>42</width>
+           <height>38</height>
+          </size>
+         </property>
          <property name="text">
           <string/>
          </property>
