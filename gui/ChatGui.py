@@ -101,12 +101,12 @@ class BiographyLabel(QLabel):
 
 
 class NoticeLabel(QLabel):
+    clicked_signal = pyqtSignal()
     def __init__(self, parent=None):
         super().__init__(parent)
 
     def mousePressEvent(self, QMouseEvent):
-        # TODO
-        pass
+        self.clicked_signal.emit()
 
 
 class ReceiveMessageThread(QThread):
@@ -145,6 +145,7 @@ class ChatGUI(QWidget, Ui_Form):
         self.file_button.setIconSize(QSize(39, 28))
         self.notice_label.setPixmap(QPixmap('../gui/resource/label/friend_list.png'))
         self.notice_label.setScaledContents(True)
+        self.notice_label.clicked_signal.connect(self.show_process)
 
         self.id = user_id
         self.userName = user_name
@@ -169,8 +170,7 @@ class ChatGUI(QWidget, Ui_Form):
         # 初始化好友请求结果
         self.result_apply_friend_window = None
         # 初始化好友处理界面
-        self.friend_process_window = FriendProcess(self.to_do_list, self.system_information)
-        self.friend_process_window.setVisible(False)
+        self.friend_process_window = None
         # 待办事项
         self.to_do_list = []
         # 立即处理的system_code
@@ -316,6 +316,10 @@ class ChatGUI(QWidget, Ui_Form):
         self.biography = Biography(self.id, self.userName, target_id, x, y,
                                    self.db_conn,  self.chatter, self.switch_tab, self.delete_friend)
         self.biography.show()
+
+    def show_process(self):
+        self.friend_process_window = FriendProcess(self.to_do_list, self.system_information)
+        self.friend_process_window.show()
 
     def insert_emoji(self, emo):
         self.textEdit.insertPlainText(emo)
