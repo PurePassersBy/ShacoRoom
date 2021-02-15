@@ -9,17 +9,22 @@ class BiographyWidget(QWidget):
     def __init__(self, user_id, fetch_func=None, dialog_func=None, parent=None):
         super().__init__(parent)
         self.user_id = user_id
+        self.notice = None
         if self.user_id is not None:
             self.clicked_fetch_signal.connect(fetch_func)
             self.clicked_pos_signal.connect(dialog_func)
         else:
             self.switch_shaco_room = fetch_func
 
+    def set_notice(self, notice):
+        self.notice = notice
+
     def hide_notice(self):
-        self.setStyleSheet("")
+        self.notice.setVisible(False)
 
     def show_notice(self):
-        self.setStyleSheet("QLabel{background-color: red;}")
+        print('show notice')
+        self.notice.setVisible(True)
 
     def mousePressEvent(self, QMouseEvent):
         if self.user_id is None:
