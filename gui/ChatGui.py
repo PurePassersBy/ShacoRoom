@@ -282,7 +282,7 @@ class ChatGUI(QWidget, Ui_Form):
     def show_process(self):
         print(self.to_do_list)
         self.friend_process_window = FriendProcess(self.to_do_list, self.system_information,
-                                                   self.delete_todolist)
+                                                   self.delete_to_do_list)
         self.friend_process_window.show()
 
     def system_information(self, pack):
@@ -304,20 +304,20 @@ class ChatGUI(QWidget, Ui_Form):
         if pack['system_code'] == SYSTEM_CODE_RESULT_FRIEND_APPLY:
             # 好友请求的结果
             self.result_apply_friend_window = ResultFriendApply(self.id, pack['send_id'], pack['send_name'],
-                                                                pack['message'], PORTRAIT_PATH)
+                                                                pack['message'])
             if pack['message'] == 'ACCEPT':
                 self.add_friend(pack['send_id'], pack['send_name'])
             self.result_apply_friend_window.show()
 
         if pack['system_code'] == SYSTEM_CODE_REPEAT_FRIEND_APPLY:
             self.result_apply_friend_window = ResultFriendApply(self.id, pack['send_id'], pack['send_name'],
-                                                                pack['message'], PORTRAIT_PATH)
+                                                                pack['message'])
             self.result_apply_friend_window.show()
 
         if pack['system_code'] == SYSTEM_CODE_RESULT_DELETE_FRIEND:
             # 删除好友
             self.result_apply_friend_window = ResultFriendApply(self.id, pack['send_id'], pack['send_name'],
-                                                                pack['message'], PORTRAIT_PATH)
+                                                                pack['message'])
             self.delete_friend(pack['send_id'])
             self.result_apply_friend_window.show()
 
@@ -335,7 +335,7 @@ class ChatGUI(QWidget, Ui_Form):
             self.notice_label.setPixmap(QPixmap('../gui/resource/label/friend_list_red.png'))
             self.notice_label.setScaledContents(True)
 
-    def delete_todolist(self, target_index):
+    def delete_to_do_list(self, target_index):
         del self.to_do_list[target_index]
         print(self.to_do_list)
         if not self.to_do_list:
