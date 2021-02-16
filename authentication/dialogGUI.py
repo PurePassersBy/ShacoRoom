@@ -107,6 +107,7 @@ class Dialog(QMainWindow, Ui_Dialog):
         self.buttonBox.accepted.connect(self._close)
         self.buttonBox.rejected.connect(self._close)
         self.type = infomation
+        print('set_text')
         self._set_text()
 
     def _set_text(self):
@@ -288,15 +289,16 @@ class Biography(QMainWindow, Ui_Biography):
         self.setupUi(self)
         self.retranslateUi(self)
         self.setGeometry(x, y, 400, 400)
+        self.db_conn = db_conn
         self.self_id = self_id
         self.self_name = self_name
         self.target_id = target_id
-        self.db_conn = db_conn
+        res = self.db_conn.search(TABLE_NAME_USERINFO, ['id', self.target_id])
+        self.userinfo = res[0]
+        self.target_name = self.userinfo[1]
         self.server_conn = server_conn
         self.private_chat_func = private_chat
         self.delete_friend_func = delete_friend
-        res = self.db_conn.search(TABLE_NAME_USERINFO, ['id', self.target_id])
-        self.userinfo = res[0]
         self.friend_list = self.db_conn.search(TABLE_NAME_FRIENDINFO, ['id', self.self_id])
         self.deleteButton.setVisible(False)
         # 判断是否为自己或已添加的好友
@@ -374,6 +376,7 @@ class Biography(QMainWindow, Ui_Biography):
             'send_id': self.self_id,
             'send_name': self.self_name,
             'target_id': self.target_id,
+            'target_name': self.target_name,
             'message': f'您已被用户 {self.self_name} 删除好友关系',
             'system_code': SYSTEM_CODE_DELETE_FRIEND
         }
@@ -389,7 +392,8 @@ class Biography(QMainWindow, Ui_Biography):
     def add_friend(self):
         # self.addApply = Dialog('UNDER CONSTRUCTION')
         # self.addApply.show()
-        self.addApply = SendFriendApply(self.self_id, self.target_id, self.server_conn)
+        self.addApply = SendFriendApply(self.self_id, self.self_name,
+                                        self.target_id, self.target_name, self.server_conn)
         self.addApply.show()
 
     def eventFilter(self, obj, event):
@@ -479,7 +483,7 @@ class Ui_SendApplyDialog(object):
 
 class SendFriendApply(QMainWindow, Ui_SendApplyDialog):
 
-    def __init__(self, self_id, target_id, server_conn):
+    def __init__(self, self_id, self_name, target_id, target_name, server_conn):
         """
         发送好友请求的界面
         :param
@@ -489,7 +493,9 @@ class SendFriendApply(QMainWindow, Ui_SendApplyDialog):
         self.setupUi(self)
         self.retranslateUi(self)
         self.self_id = self_id
+        self.self_name = self_name
         self.target_id = target_id
+        self.target_name = target_name
         self.server_conn = server_conn
         self.buttonBox.accepted.connect(self.send)
         self.buttonBox.rejected.connect(self.close)
@@ -502,7 +508,9 @@ class SendFriendApply(QMainWindow, Ui_SendApplyDialog):
         pack = {
             'system_code': SYSTEM_CODE_FRIEND_APPLY,
             'send_id': self.self_id,
+            'send_name': self.self_name,
             'target_id': self.target_id,
+            'target_name': self.target_name,
             'message': self.textEdit.toPlainText()
         }
         pack_str = pickle.dumps(pack)
@@ -633,7 +641,7 @@ class Ui_ApplyDialog(object):
 class FriendApply(QMainWindow, Ui_ApplyDialog):
     accept_signal = QtCore.pyqtSignal(int, str)
 
-    def __init__(self, self_id, send_id, send_name, message, server_conn):
+    def __init__(self, self_id, self_name, send_id, send_name, message, server_conn):
         """
         处理好友请求的窗口
         """
@@ -641,9 +649,10 @@ class FriendApply(QMainWindow, Ui_ApplyDialog):
         self.setupUi(self)
         self.retranslateUi(self)
         self.self_id = self_id
+        self.self_name = self_name
         self.send_id = send_id
-        self.message = message
         self.send_name = send_name
+        self.message = message
         self.server_conn = server_conn
         img = QPixmap(PORTRAIT_PATH % self.send_id).scaled(100, 100)
         self.portraitLabel.setPixmap(img)
@@ -654,10 +663,12 @@ class FriendApply(QMainWindow, Ui_ApplyDialog):
 
     def accept(self):
         pack = {
-            'system_code': SYSTEM_CODE_RESULT_FRIEND_APPLY,
             'send_id': self.self_id,
+            'send_name': self.self_name,
             'target_id': self.send_id,
-            'message': 'ACCEPT'
+            'target_name': self.send_name,
+            'message': 'ACCEPT',
+            'system_code': SYSTEM_CODE_RESULT_FRIEND_APPLY,
         }
         pack_str = pickle.dumps(pack)
         self.server_conn.send(struct.pack('i', len(pack_str)))
@@ -667,10 +678,12 @@ class FriendApply(QMainWindow, Ui_ApplyDialog):
 
     def reject(self):
         pack = {
-            'system_code': SYSTEM_CODE_RESULT_FRIEND_APPLY,
             'send_id': self.self_id,
+            'send_name': self.self_name,
             'target_id': self.send_id,
-            'message': 'REJECT'
+            'target_name': self.send_name,
+            'message': 'REJECT',
+            'system_code': SYSTEM_CODE_RESULT_FRIEND_APPLY,
         }
         pack_str = pickle.dumps(pack)
         self.server_conn.send(struct.pack('i', len(pack_str)))
@@ -746,7 +759,7 @@ class Ui_ApplyResultDialog(object):
 
 
 class ResultFriendApply(QMainWindow, Ui_ApplyResultDialog):
-    def __init__(self, self_id, send_id, send_name, message):
+    def __init__(self, self_id, self_name, send_id, send_name, message):
         """
         处理好友请求的窗口
         """
@@ -754,6 +767,7 @@ class ResultFriendApply(QMainWindow, Ui_ApplyResultDialog):
         self.setupUi(self)
         self.retranslateUi(self)
         self.self_id = self_id
+        self.self_name = self_name
         self.send_id = send_id
         self.send_name = send_name
         img = QPixmap(PORTRAIT_PATH % self.send_id).scaled(100, 100)
