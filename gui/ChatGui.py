@@ -25,8 +25,8 @@ SERVER_ADDRESS = ('39.106.169.58', 3976)
 VIDEO_SERVER_ADDRESS = ('39.106.169.58', 3977)
 AUDIO_SERVER_ADDRESS = ('39.106.169.58', 3978)
 RESOURCE_SERVER_ADDRESS = ('39.106.169.58', 3979)
-LINE_LENGTH = 39
-UNI2ASC = 40 / 24
+LINE_LENGTH = 60
+UNI2ASC = 2
 message_lock = threading.Lock()
 
 
@@ -112,6 +112,8 @@ class ChatGUI(QWidget, Ui_Form):
 
         self.init_client()
 
+        self.setStyleSheet("QTextBrowser{background:transparent;border-width:0;border-style:outset}"
+                           "QLineEdit{background:transparent;border-width:0;border-style:outset}")
         self.textEdit.setStyleSheet("font:20px")
         self.textEdit.installEventFilter(self)
 
@@ -357,7 +359,9 @@ class ChatGUI(QWidget, Ui_Form):
         portrait.setFixedSize(50, 50)
         img = QPixmap(PORTRAIT_PATH % user_id).scaled(50, 50)
         portrait.setPixmap(img)
-        head = QLabel(f'{time_}  {user_name}')
+        head = QLineEdit()
+        head.setReadOnly(True)
+        head.setText(f'{time_}  {user_name}')
         head.setFont(QFont("Microsoft YaHei"))
         head.setStyleSheet("font: bold")
         layout_msg.addWidget(head)
@@ -374,10 +378,12 @@ class ChatGUI(QWidget, Ui_Form):
             item.setSizeHint(QSize(500, 250))
         else:
             msg = msg_pack['message']
+            text_browser = QTextBrowser()
+            text_browser.setText(msg)
+            # text_browser.setCursor(Qt.IBeamCursor)
+            layout_msg.addWidget(text_browser)
             msg_list = split_message(msg)
-            for msg_splited in msg_list:
-                layout_msg.addWidget(QLabel(msg_splited))
-            item.setSizeHint(QSize(500, 70 + (len(msg_list) - 1) * 35))
+            item.setSizeHint(QSize(500, 80 + (len(msg_list) - 1) * 25))
         if self.id == user_id:
             layout_main.addLayout(layout_msg)
             layout_main.addWidget(portrait)
