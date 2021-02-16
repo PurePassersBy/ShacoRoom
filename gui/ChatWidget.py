@@ -47,20 +47,22 @@ class BiographyWidget(QWidget):
         super().__init__(parent)
         self.user_id = user_id
         self.portrait = None
+        self.num = 0
         if self.user_id is not None:
             self.clicked_fetch_signal.connect(fetch_func)
             self.clicked_pos_signal.connect(dialog_func)
         else:
             self.switch_shaco_room = fetch_func
 
-
     def hide_notice(self):
+        self.num = 0
         portrait_path = PORTRAIT_PATH % self.user_id
         img = QPixmap(portrait_path).scaled(30, 30)
         self.portrait.setPixmap(img)
 
-    def show_notice(self, num):
-        portrait_add_num(self.user_id, num)
+    def show_notice(self):
+        self.num += 1
+        portrait_add_num(self.user_id, self.num)
         portrait_path = PORTRAIT_PATH % (str(self.user_id)+'notice')
         img = QPixmap(portrait_path).scaled(30, 30)
         self.portrait.setPixmap(img)
