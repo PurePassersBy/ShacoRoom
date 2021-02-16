@@ -168,9 +168,6 @@ class ChatGUI(QWidget, Ui_Form):
     def add_friend(self, friend_id=None, friend_name=None, new=True):
         print('add friend', friend_id, friend_name)
         if friend_id is not None and new is True:
-            res = self.db_conn.search(TABLE_NAME_FRIENDINFO, ['id', self.id])
-            if friend_id in res:
-                return
             self.db_conn.insert(TABLE_NAME_FRIENDINFO, [self.id, friend_id])
         item = QListWidgetItem()
         if friend_id is None:
