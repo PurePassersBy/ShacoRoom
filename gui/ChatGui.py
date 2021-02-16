@@ -291,16 +291,6 @@ class ChatGUI(QWidget, Ui_Form):
                                                    self.delete_todolist)
         self.friend_process_window.show()
 
-    def delete_todolist(self, target_index):
-        del self.to_do_list[target_index]
-        print(self.to_do_list)
-        if not self.to_do_list:
-            self.notice_label.setPixmap(QPixmap('../gui/resource/label/friend_list.png'))
-
-
-    def insert_emoji(self, emo):
-        self.textEdit.insertPlainText(emo)
-
     def system_information(self, pack):
         if pack['system_code'] == SYSTEM_CODE_KICK_OUT:
             # 将close 与kickout 信号连接
@@ -350,6 +340,12 @@ class ChatGUI(QWidget, Ui_Form):
             # 更改通知图标为带红点的
             self.notice_label.setPixmap(QPixmap('../gui/resource/label/friend_list_red.png'))
             self.notice_label.setScaledContents(True)
+
+    def delete_todolist(self, target_index):
+        del self.to_do_list[target_index]
+        print(self.to_do_list)
+        if not self.to_do_list:
+            self.notice_label.setPixmap(QPixmap('../gui/resource/label/friend_list.png'))
 
     def show_message(self, msg_pack):
         """
@@ -496,6 +492,9 @@ class ChatGUI(QWidget, Ui_Form):
         self.db_conn.edit(TABLE_NAME_USERINFO, [self.id, 'profile', self.profile])
         self._flush()
         threading.Thread(target=self._send_portrait).start()
+
+    def insert_emoji(self, emo):
+        self.textEdit.insertPlainText(emo)
 
     def send_emoji(self):
         pos = self.emoji_button.mapToGlobal(self.emoji_button.pos())
