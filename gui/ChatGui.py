@@ -175,7 +175,7 @@ class ChatGUI(QWidget, Ui_Form):
         layout = QHBoxLayout()
         if friend_id is None:
             friend_name = "ShacoRoom"
-            img = QPixmap('resources/pic/shaco.jpg').scaled(30, 30)
+            img = QPixmap('../gui/resource/portrait/shaco.jpg').scaled(30, 30)
         else:
             portrait_path = PORTRAIT_PATH % friend_id
             img = QPixmap(portrait_path).scaled(30, 30)

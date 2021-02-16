@@ -131,10 +131,7 @@ class Manager(threading.Thread):
             print(ls)
             todo_list = [json.loads(line.strip()) for line in ls]
             f.seek(0); f.truncate() # 清空文件
-        print(todo_list)
         for package in todo_list:
-            print('Spot friend apply ')
-            print(package)
             send_package(conn, package)
 
     def system_code(self, pack):

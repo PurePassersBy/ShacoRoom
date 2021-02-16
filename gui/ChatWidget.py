@@ -8,7 +8,10 @@ from authentication.constantName import *
 
 def portrait_add_num(portrait_id, add_num):
     # 生成一个图像副本对象，在副本里可以对图像进行任意修改和操作
-    portrait_path = PORTRAIT_PATH % portrait_id
+    if portrait_id is None:
+        portrait_path = '../gui/resource/portrait/shaco.jpg'
+    else:
+        portrait_path = PORTRAIT_PATH % portrait_id
     img = Image.open(portrait_path)
     draw = ImageDraw.Draw(img)
 
@@ -35,8 +38,10 @@ def portrait_add_num(portrait_id, add_num):
     draw.text(positionNum, Add_num, font=myfont, fill=White)  # 在红圆中写出数字
 
     # 保存修改后的图像id+notice.jpg，原图像依然存在
-
-    portrait_path = PORTRAIT_PATH % (str(portrait_id)+'notice')
+    if portrait_id is None:
+        portrait_path = '../gui/resource/portrait/shaco_notice.jpg'
+    else:
+        portrait_path = PORTRAIT_PATH % (str(portrait_id)+'notice')
     img.save(portrait_path, 'jpeg')
 
 class BiographyWidget(QWidget):
@@ -56,14 +61,21 @@ class BiographyWidget(QWidget):
 
     def hide_notice(self):
         self.num = 0
-        portrait_path = PORTRAIT_PATH % self.user_id
+        if self.user_id is None:
+            portrait_path = '../gui/resource/portrait/shaco.jpg'
+        else:
+            portrait_path = PORTRAIT_PATH % self.user_id
         img = QPixmap(portrait_path).scaled(30, 30)
         self.portrait.setPixmap(img)
 
     def show_notice(self):
         self.num += 1
+        self.num = max(self.num, 99)
         portrait_add_num(self.user_id, self.num)
-        portrait_path = PORTRAIT_PATH % (str(self.user_id)+'notice')
+        if self.user_id is None:
+            portrait_path = '../gui/resource/portrait/shaco_notice.jpg'
+        else:
+            portrait_path = PORTRAIT_PATH % (str(self.user_id)+'notice')
         img = QPixmap(portrait_path).scaled(30, 30)
         self.portrait.setPixmap(img)
 
