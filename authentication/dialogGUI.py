@@ -359,8 +359,8 @@ class Biography(QMainWindow, Ui_Biography):
 
     def delete_friend(self):
         delete_warning = '确定要删除该好友吗？（对方会收到被删通知）'
-        self.delete_friend_window = FriendApply(self.self_id, self.target_id, self.userinfo[1],
-                                                delete_warning, self.server_conn)
+        self.delete_friend_window = FriendApply(self.self_id, self.self_name, self.target_id,
+                                                self.target_name, delete_warning, self.server_conn)
         self.delete_friend_window.acceptButton.setText('取消')
         self.delete_friend_window.rejectButton.setText('爆杀！')
         self.delete_friend_window.applyLabel.setVisible(False)
@@ -387,7 +387,6 @@ class Biography(QMainWindow, Ui_Biography):
         self.db_conn.delete(TABLE_NAME_FRIENDINFO, [self.target_id, self.self_id])
         self.delete_friend_func(self.target_id)
         self.close()
-        print("?")
 
     def add_friend(self):
         # self.addApply = Dialog('UNDER CONSTRUCTION')
