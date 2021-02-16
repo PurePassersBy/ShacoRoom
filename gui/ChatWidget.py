@@ -6,9 +6,9 @@ from PyQt5.QtGui import *
 from authentication.constantName import *
 
 
-def add_num(portrait_id, add_num):
+def portrait_add_num(portrait_id, add_num):
     # 生成一个图像副本对象，在副本里可以对图像进行任意修改和操作
-    portrait_path = PORTRAIT_PATH % id
+    portrait_path = PORTRAIT_PATH % portrait_id
     img = Image.open(portrait_path)
     draw = ImageDraw.Draw(img)
 
@@ -55,21 +55,15 @@ class BiographyWidget(QWidget):
 
 
     def hide_notice(self):
-        print('hide_notice')
         portrait_path = PORTRAIT_PATH % self.user_id
         img = QPixmap(portrait_path).scaled(30, 30)
         self.portrait.setPixmap(img)
-        print('hide_notice ends')
 
     def show_notice(self, num):
-        print('show_notice')
-        add_num(self.user_id, num)
+        portrait_add_num(self.user_id, num)
         portrait_path = PORTRAIT_PATH % (str(self.user_id)+'notice')
         img = QPixmap(portrait_path).scaled(30, 30)
-        test = Image.open(portrait_path)
-        test.show()
         self.portrait.setPixmap(img)
-        print('hide_notice ends')
 
     def mousePressEvent(self, QMouseEvent):
         if self.user_id is None:
