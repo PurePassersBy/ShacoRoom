@@ -875,8 +875,7 @@ class Ui_FriendProcessWindow(object):
 
 
 class MYWidget(QWidget):
-    clicked_deal_signal = pyqtSignal(int)
-    clicked_show_signal = pyqtSignal(dict)
+    clicked_deal_signal = pyqtSignal(dict)
 
     def __init__(self, user_dict, parent=None):
         super().__init__(parent)
@@ -884,8 +883,7 @@ class MYWidget(QWidget):
         self.user_id = user_dict['send_id']
 
     def mousePressEvent(self, QMouseEvent):
-        self.clicked_deal_signal.emit(self.user_id)
-        self.clicked_show_signal.emit(self.user_dict)
+        self.clicked_deal_signal.emit(self.user_dict)
 
 class FriendProcess(QMainWindow, Ui_FriendProcessWindow):
     def __init__(self, to_do_list, system_code_func, delete_func):
@@ -913,7 +911,7 @@ class FriendProcess(QMainWindow, Ui_FriendProcessWindow):
         item = QListWidgetItem()
         widget = MYWidget(user_dict)
         widget.clicked_deal_signal.connect(self.delete_deal)
-        widget.clicked_show_signal.connect(self.system_code_func)
+        widget.clicked_deal_signal.connect(self.system_code_func)
         layout = QHBoxLayout()
         portrait_path = PORTRAIT_PATH % user_dict['send_id']
         img = QPixmap(portrait_path).scaled(30, 30)
@@ -928,12 +926,12 @@ class FriendProcess(QMainWindow, Ui_FriendProcessWindow):
         self.listWidget.addItem(item)
         self.listWidget.setItemWidget(item, widget)
 
-    def delete_deal(self, user_id):
+    def delete_deal(self, user_dict):
         for index in range(self.listWidget.count()):
             print(index)
             item = self.listWidget.item(index)
             widget = self.listWidget.itemWidget(item)
-            if widget.user_id == user_id:
+            if widget.user_dict == user_dict:
                 self.listWidget.takeItem(index)
                 self.delete_func(index)
                 del item
