@@ -304,8 +304,6 @@ class ChatGUI(QWidget, Ui_Form):
             # 好友请求的结果
             self.result_apply_friend_window = ResultFriendApply(self.id, self.userName, pack['send_id'],
                                                                 pack['send_name'], pack['message'])
-            if pack['message'] == 'ACCEPT':
-                self.add_friend(pack['send_id'], pack['send_name'])
             self.result_apply_friend_window.show()
 
         if pack['system_code'] == SYSTEM_CODE_REPEAT_FRIEND_APPLY:
@@ -317,7 +315,6 @@ class ChatGUI(QWidget, Ui_Form):
             # 删除好友
             self.result_apply_friend_window = ResultFriendApply(self.id, self.userName, pack['send_id'], pack['send_name'],
                                                                 pack['message'])
-            self.delete_friend(pack['send_id'])
             self.result_apply_friend_window.show()
 
     def add_to_do_list(self, pack):
@@ -327,6 +324,11 @@ class ChatGUI(QWidget, Ui_Form):
             # 重复登陆或强制下线立即执行而不是加入到to_do_list
             self.system_information(dict_to_add)
         else:
+            if dict_to_add['system_code'] == SYSTEM_CODE_RESULT_FRIEND_APPLY and dict_to_add['message'] == 'ACCEPT':
+                if pack['message'] == 'ACCEPT':
+                    self.add_friend(dict_to_add['send_id'], dict_to_add['send_name'])
+            if dict_to_add['system_code'] == SYSTEM_CODE_RESULT_DELETE_FRIEND:
+                self.delete_friend(dict_to_add['send_id'])
             self.to_do_list.append(dict_to_add)
             # 更改通知图标为带红点的
             self.notice_label.setPixmap(QPixmap('../gui/resource/label/friend_list_red.png'))
