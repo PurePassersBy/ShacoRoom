@@ -76,8 +76,8 @@ class Manager(threading.Thread):
             # 重复登录，发送下线请求给当前登录用户
             print('sending kickout')
             kickout_package = {
-                'user_id': user_id,
-                'user_name': user_name,
+                'send_id': user_id,
+                'send_name': user_name,
                 'time': get_localtime(),
                 'message': '该账号在其他客户端登录，您已被强制下线',
                 'system_code': SYSTEM_CODE_KICK_OUT}
