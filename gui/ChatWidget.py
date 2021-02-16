@@ -70,7 +70,7 @@ class BiographyWidget(QWidget):
 
     def show_notice(self):
         self.num += 1
-        self.num = max(self.num, 99)
+        self.num = min(self.num, 99)
         portrait_add_num(self.user_id, self.num)
         if self.user_id is None:
             portrait_path = '../gui/resource/portrait/shaco_notice.jpg'
