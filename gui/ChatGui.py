@@ -280,7 +280,6 @@ class ChatGUI(QWidget, Ui_Form):
         self.biography.show()
 
     def show_process(self):
-        print(self.to_do_list)
         self.friend_process_window = FriendProcess(self.to_do_list, self.system_information,
                                                    self.delete_to_do_list)
         self.friend_process_window.show()
@@ -332,6 +331,8 @@ class ChatGUI(QWidget, Ui_Form):
             # 更改通知图标为带红点的
             self.notice_label.setPixmap(QPixmap('../gui/resource/label/friend_list_red.png'))
             self.notice_label.setScaledContents(True)
+            if self.friend_process_window is not None and not self.friend_process_window.isHidden():
+                self.friend_process_window.add_deal(dict_to_add)
 
     def delete_to_do_list(self, target_index):
         del self.to_do_list[target_index]

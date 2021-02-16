@@ -908,6 +908,7 @@ class FriendProcess(QMainWindow, Ui_FriendProcessWindow):
 
 
     def add_deal(self, user_dict):
+        self.emptyLabel.setVisible(False)
         item = QListWidgetItem()
         widget = MYWidget(user_dict)
         widget.clicked_deal_signal.connect(self.delete_deal)
