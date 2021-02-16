@@ -78,6 +78,8 @@ class Manager(threading.Thread):
             kickout_package = {
                 'send_id': user_id,
                 'send_name': user_name,
+                'target_id': user_id,
+                'target_name': user_name,
                 'time': get_localtime(),
                 'message': '该账号在其他客户端登录，您已被强制下线',
                 'system_code': SYSTEM_CODE_KICK_OUT}
