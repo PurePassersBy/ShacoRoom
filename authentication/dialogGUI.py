@@ -746,7 +746,7 @@ class Ui_ApplyResultDialog(object):
 
 
 class ResultFriendApply(QMainWindow, Ui_ApplyResultDialog):
-    def __init__(self, self_id, send_id, send_name, message, PORTRAIT_PATH):
+    def __init__(self, self_id, send_id, send_name, message):
         """
         处理好友请求的窗口
         """
@@ -766,6 +766,7 @@ class ResultFriendApply(QMainWindow, Ui_ApplyResultDialog):
             self.textLabel.setText(f'{send_name}拒绝了您的好友请求')
         else:
             self.textLabel.setText(f'{send_name}解除了与您的好友关系')
+            self.setWindowTitle('好友关系解除')
 
 class Ui_FriendProcessWindow(object):
     def setupUi(self, FriendProcessWindow):
