@@ -297,35 +297,33 @@ class ChatGUI(QWidget, Ui_Form):
             self.dialog = Dialog(SYSTEM_CODE_LOGIN_REPEAT)
             self.dialog.show()
         if pack['system_code'] == SYSTEM_CODE_FRIEND_APPLY:
-            self.apply_friend_window = FriendApply(self.id, pack['send_id'], pack['send_name'],
+            self.apply_friend_window = FriendApply(self.id, self.userName, pack['send_id'], pack['send_name'],
                                                    pack['message'], self.chatter)
             self.apply_friend_window.accept_signal.connect(self.add_friend)
             self.apply_friend_window.show()
         if pack['system_code'] == SYSTEM_CODE_RESULT_FRIEND_APPLY:
             # 好友请求的结果
-            self.result_apply_friend_window = ResultFriendApply(self.id, pack['send_id'], pack['send_name'],
-                                                                pack['message'])
+            self.result_apply_friend_window = ResultFriendApply(self.id, self.userName, pack['send_id'],
+                                                                pack['send_name'], pack['message'])
             if pack['message'] == 'ACCEPT':
                 self.add_friend(pack['send_id'], pack['send_name'])
             self.result_apply_friend_window.show()
 
         if pack['system_code'] == SYSTEM_CODE_REPEAT_FRIEND_APPLY:
-            self.result_apply_friend_window = ResultFriendApply(self.id, pack['send_id'], pack['send_name'],
+            self.result_apply_friend_window = ResultFriendApply(self.id, self.userName, pack['send_id'], pack['send_name'],
                                                                 pack['message'])
             self.result_apply_friend_window.show()
 
         if pack['system_code'] == SYSTEM_CODE_RESULT_DELETE_FRIEND:
             # 删除好友
-            self.result_apply_friend_window = ResultFriendApply(self.id, pack['send_id'], pack['send_name'],
+            self.result_apply_friend_window = ResultFriendApply(self.id, self.userName, pack['send_id'], pack['send_name'],
                                                                 pack['message'])
             self.delete_friend(pack['send_id'])
             self.result_apply_friend_window.show()
 
     def add_to_do_list(self, pack):
-        result = self.db_conn.search(TABLE_NAME_USERINFO, ['id', pack['send_id']])
-        dict_to_add = {'self_id': self.id, 'send_id': pack['send_id'], 'send_name': result[0][1],
+        dict_to_add = {'self_id': self.id, 'send_id': pack['send_id'], 'send_name': pack['send_name'],
                        'message': pack['message'], 'system_code': pack['system_code']}
-        print(dict_to_add)
         if dict_to_add['system_code'] in self.system_code_instant:
             # 重复登陆或强制下线立即执行而不是加入到to_do_list
             self.system_information(dict_to_add)
