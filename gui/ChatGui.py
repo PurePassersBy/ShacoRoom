@@ -179,18 +179,11 @@ class ChatGUI(QWidget, Ui_Form):
         else:
             portrait_path = PORTRAIT_PATH % friend_id
             img = QPixmap(portrait_path).scaled(30, 30)
-        portrait = QLabel()
-        portrait.setPixmap(img)
-        layout.addWidget(portrait)
-        notice = QLabel()
-        notice.setPixmap(QPixmap('../gui/resource/label/notice.png').scaled(3,3))
-        widget.set_notice(notice)
-        widget.hide_notice()
-        layout.addWidget(notice)
+        widget.portrait = QLabel()
+        widget.portrait.setPixmap(img)
+        layout.addWidget(widget.portrait)
         layout.addWidget(QLabel(friend_name))
-        layout.setStretch(0,5)
-        layout.setStretch(1,1)
-        layout.setStretch(2,25)
+        layout.setStretch(3, 7)
         widget.setLayout(layout)
         item.setSizeHint(QSize(150, 55))
         self.frineds_list.addItem(item)
@@ -410,7 +403,7 @@ class ChatGUI(QWidget, Ui_Form):
                 item = self.frineds_list.item(index)
                 widget = self.frineds_list.itemWidget(item)
                 if widget.user_id == other_id:
-                    widget.show_notice()
+                    widget.show_notice(1)
                     break
 
     def send_message(self):
