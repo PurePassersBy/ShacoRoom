@@ -51,12 +51,11 @@ class ConnectSQL():
                 print(f"提交数据到{table_name}发生错误:{e}")
                 return False
 
-
     def search(self, table_name, data):
         """
         在数据库查询数据，输入表名以及一个数组包含 查询的属性 对应内容，返回该用户的所有数据
         :param table_name '需要操作的表名'
-        :param data['属性名', '该属性需查找的内容']
+        :param data['属性名', '该属性需查找的内容'] data[1]如果为list的话，则为批量查询操作
         :return results:一个n维数组[n][id, name, mail, password] 未查到则返回 None,查询失败而返回False
                 ans：一个列表[]，该id所有的好友id 未查到则返回 None,查询失败而返回False
         """
@@ -68,8 +67,13 @@ class ConnectSQL():
         for i in property_name:
             if i == data[0]:
                 try:
-                    sql = f'select * from {table_name} where {data[0]} = %s;'
-                    send_data = {'sql': sql, 'args': data[1]}
+                    if isinstance(data[1],list):
+                        sql = f"select * from {table_name} where {data[0]} in %s;"
+                        args = tuple(int(i) for i in data[1])
+                        send_data = {'sql': sql, 'args': (args,)}
+                    else:
+                        sql = f'select * from {table_name} where {data[0]} = %s;'
+                        send_data = {'sql': sql, 'args': data[1]}
                     self.cur.send_sql('search', send_data)
                     if self.cur.get_count():
                         result = self.cur.get_result()
